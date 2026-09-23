@@ -1,0 +1,8 @@
+{
+  "name": "Simulador de Prompting",
+  "description": "Un simulador interactivo de Prompt Engineering para dominar el método C.O.N.T.E.X.T.O.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
