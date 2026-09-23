@@ -13,15 +13,8 @@ const app = express();
 app.use(express.json());
 
 // Set up Gemini SDK
-// Always call Gemini API from the server-side code of the application.
-// We must set the User-Agent header to 'aistudio-build' in httpOptions for telemetry.
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    }
-  }
+  apiKey: process.env.GEMINI_API_KEY
 });
 
 // Serve the main HTML file at root, mapping to the user's HTML entry point

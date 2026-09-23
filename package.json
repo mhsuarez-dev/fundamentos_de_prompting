@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "build": "echo 'No build step required'",
+    "build": "mkdir -p public && cp index.html public/index.html",
     "lint": "echo 'No lint step required'"
   },
   "dependencies": {

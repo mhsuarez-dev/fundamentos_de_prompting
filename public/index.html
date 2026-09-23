@@ -3,9 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simulador de Prompting</title>
+    <script>
+        // Prevenir error 'Cannot set property fetch of #<Window> which has only a getter'
+        (function() {
+            try {
+                var _fetch = window.fetch ? window.fetch.bind(window) : null;
+                if (typeof Window !== 'undefined' && Window.prototype) {
+                    try {
+                        Object.defineProperty(Window.prototype, 'fetch', {
+                            get: function() { return _fetch; },
+                            set: function(fn) { _fetch = fn; },
+                            configurable: true,
+                            enumerable: true
+                        });
+                    } catch (e) {}
+                }
+                try {
+                    Object.defineProperty(window, 'fetch', {
+                        get: function() { return _fetch; },
+                        set: function(fn) { _fetch = fn; },
+                        configurable: true,
+                        enumerable: true
+                    });
+                } catch (e) {}
+            } catch (err) {}
+        })();
+    </script>
+    <title>Fundamentos de Prompting: Simulador Interactivo</title>
     <meta name="description" content="Un simulador interactivo de Prompt Engineering para dominar el método C.O.N.T.E.X.T.O.">
-    <meta property="og:title" content="Simulador de Prompting">
+    <meta property="og:title" content="Fundamentos de Prompting: Simulador Interactivo">
     <meta property="og:description" content="Un simulador interactivo de Prompt Engineering para dominar el método C.O.N.T.E.X.T.O.">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
