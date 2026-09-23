@@ -1,0 +1,1965 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fundamentos de Prompting: Simulador Interactivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #070b14;
+            --bg-surface: #0e1726;
+            --bg-card: #152238;
+            --accent: #0284c7;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 40%);
+            min-height: 100dvh;
+        }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Typing Dots */
+        .typing-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #38bdf8;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.3); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn-evaluate {
+            background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+            transition: all 0.2s ease;
+        }
+        .btn-evaluate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+        }
+        .btn-evaluate:active {
+            transform: translateY(1px);
+        }
+
+        #onboarding-modal {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #030712;
+        }
+
+        #onboarding-modal.hidden { display: none !important; }
+        #mission-modal.hidden, #feedback-modal.hidden, #completion-modal.hidden, #level-summary-modal.hidden { display: none !important; }
+        
+        .prose table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; }
+        .prose th, .prose td { border: 1px solid #334155; padding: 8px; text-align: left; }
+        .prose th { background-color: #0f172a; color: #38bdf8; }
+    </style>
+</head>
+<body class="w-full h-[100dvh] flex items-center justify-center p-0 sm:p-3 md:p-5 overflow-hidden">
+
+    <div class="w-full h-full max-w-6xl flex flex-col bg-[#0a101f] sm:rounded-2xl shadow-2xl border-0 sm:border border-slate-800 overflow-hidden relative">
+        
+        <!-- Onboarding Modal -->
+        <div id="onboarding-modal" class="p-3 sm:p-4 md:p-6 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg md:max-w-2xl lg:max-w-3xl w-full p-4 sm:p-5 md:p-6 shadow-2xl relative max-h-[94vh] overflow-y-auto">
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                        <div class="w-10 h-10 sm:w-11 sm:h-11 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center justify-center text-xl text-sky-400 shrink-0">
+                            🎯
+                        </div>
+                        <div class="min-w-0">
+                            <h2 class="text-base sm:text-xl font-bold text-white leading-tight">¿Usas la IA de forma Profesional?</h2>
+                            <p class="text-xs sm:text-sm text-slate-400 leading-tight mt-1">Pon a prueba tu criterio al colaborar con una Inteligencia Artificial.</p>
+                        </div>
+                    </div>
+
+                    <!-- Botón Laboratorio IA en el Onboarding -->
+                    <button onclick="openLabIntroModal()" type="button" title="Abrir Laboratorio de Prompts" class="shrink-0 flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-900/60 to-indigo-900/60 hover:from-sky-800 hover:to-indigo-800 border border-sky-500/50 text-sky-200 hover:text-white text-xs sm:text-sm font-medium transition-all shadow-sm active:scale-95">
+                        <svg class="w-3.5 h-3.5 text-amber-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        <span class="font-semibold hidden sm:inline">Laboratorio IA</span>
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-slate-300 text-sm sm:text-[15px] leading-relaxed">
+                    <!-- Contexto del Escenario -->
+                    <div class="p-3 sm:p-3.5 bg-slate-800/70 rounded-xl border border-slate-700/80">
+                        <span class="text-sky-400 font-bold block text-xs sm:text-sm mb-1 uppercase tracking-wider font-mono">El Escenario</span>
+                        <p class="text-slate-200 text-sm sm:text-base leading-relaxed">Estás a cargo de una campaña digital sobre el impacto del uso constante de pantallas en la salud mental de jóvenes y adultos. Tu objetivo es colaborar con un asistente de IA a través de <strong class="text-white">3 niveles de maestría (9 misiones)</strong>, construyendo y descubriendo paso a paso la metodología definitiva para lograr resultados profesionales.</p>
+                    </div>
+
+                    <!-- Instrucciones Claras -->
+                    <div class="bg-slate-800/40 p-3 sm:p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+                        <span class="font-semibold text-white block text-xs sm:text-sm uppercase tracking-wider font-mono">¿Cómo funciona la simulación?</span>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2.5 text-slate-300 text-xs sm:text-sm">
+                            <div class="flex items-start gap-2.5 bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/80">
+                                <span class="w-5 h-5 rounded-md bg-sky-950 border border-sky-600/40 text-sky-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">1</span>
+                                <p><strong class="text-slate-100">Observa el chat:</strong> Cada misión inicia con un mensaje introductorio y la primera respuesta del asistente de IA.</p>
+                            </div>
+
+                            <div class="flex items-start gap-2.5 bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/80">
+                                <span class="w-5 h-5 rounded-md bg-sky-950 border border-sky-600/40 text-sky-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">2</span>
+                                <p><strong class="text-slate-100">Elige tu instrucción:</strong> Selecciona cuál de las 3 opciones guiará mejor a la IA. <span class="text-sky-300 font-medium">(En móviles, pulsa «Ver opciones de respuesta»)</span>.</p>
+                            </div>
+
+                            <div class="flex items-start gap-2.5 bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/80">
+                                <span class="w-5 h-5 rounded-md bg-sky-950 border border-sky-600/40 text-sky-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">3</span>
+                                <p><strong class="text-slate-100">Analiza la respuesta:</strong> Lee con atención el texto generado por la IA en el chat y reflexiona según tu propio criterio si consideras que resolvió bien la tarea.</p>
+                            </div>
+
+                            <div class="flex items-start gap-2.5 bg-slate-900/50 p-2.5 rounded-xl border border-slate-800/80">
+                                <span class="w-5 h-5 rounded-md bg-sky-950 border border-sky-600/40 text-sky-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">4</span>
+                                <p><strong class="text-slate-100">Descubre el veredicto:</strong> Pulsa el botón <span class="text-white font-semibold">«Evaluar Resultado»</span> para ver el análisis detallado de lo que ocurrió internamente.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="closeOnboarding()" class="mt-3.5 w-full btn-evaluate text-white font-semibold py-2.5 sm:py-3 px-5 rounded-xl text-sm sm:text-base transition-all shadow-lg active:scale-98">
+                    Comenzar Simulación
+                </button>
+            </div>
+        </div>
+
+        <!-- Explanatory Modal before entering Lab -->
+        <div id="lab-intro-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-[70] flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-sky-800/60 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col text-left max-h-[92vh] overflow-y-auto" id="lab-intro-modal-content">
+                <div class="flex items-center gap-3 mb-3.5 pb-3 border-b border-slate-800">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base sm:text-lg font-bold text-white leading-tight">Laboratorio IA</h3>
+                        <p class="text-xs text-sky-400 font-mono">Entorno de Auditoría y Pruebas</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3 text-slate-300 text-xs sm:text-sm leading-relaxed mb-5">
+                    <p>
+                        Este espacio está diseñado para que experimentes libremente con el modelo <strong class="text-white">Gemini Flash-Lite</strong>:
+                    </p>
+                    
+                    <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/70 space-y-2.5">
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-md bg-sky-950 border border-sky-600/40 text-sky-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">1</span>
+                            <p><strong class="text-slate-100">Ejecución Libre:</strong> Escribe cualquier instrucción real y evalúa cómo responde la IA directamente.</p>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-5 h-5 rounded-md bg-indigo-950 border border-indigo-500/40 text-indigo-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">2</span>
+                            <p><strong class="text-slate-100">Auditoría Estructural:</strong> El sistema evaluará tu prompt basándose estrictamente en las 8 variables del método <strong class="text-indigo-300">C.O.N.T.E.X.T.O.</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 rounded-xl bg-amber-950/30 border border-amber-500/30 text-amber-200 text-xs flex items-start gap-2.5">
+                        <span class="text-amber-400 text-base leading-none mt-0.5">💡</span>
+                        <span><strong>Recomendación:</strong> Te sugerimos superar primero los 3 niveles del simulador (9 misiones) para dominar la metodología antes de auditar tus propios prompts.</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-2.5">
+                    <button onclick="closeLabIntroModal()" type="button" class="w-full sm:w-auto flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-semibold text-xs sm:text-sm transition-colors text-center order-2 sm:order-1">
+                        Volver
+                    </button>
+                    <button onclick="continueToLabFromIntro()" type="button" class="w-full sm:w-auto flex-1 btn-evaluate text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-lg active:scale-98 text-center order-1 sm:order-2">
+                        Continuar al Laboratorio
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Summary Modal -->
+        <div id="level-summary-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-sky-800/60 rounded-2xl max-w-lg w-full p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh] overflow-y-auto" id="level-summary-content">
+                
+                <div class="flex items-center gap-4 mb-5 pb-5 border-b border-slate-800">
+                    <div class="w-14 h-14 shrink-0 rounded-2xl bg-sky-500/20 border border-sky-500/40 flex items-center justify-center text-3xl shadow-inner">
+                        🔓
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-sky-950 text-sky-400 border border-sky-800/50 font-bold">Progreso Guardado</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-white" id="level-summary-title"></h2>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6 text-sm sm:text-[15px] text-slate-300 leading-relaxed" id="level-summary-body">
+                    <!-- Populated via JS -->
+                </div>
+
+                <button onclick="closeLevelSummaryAndAdvance()" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm btn-evaluate text-white transition-all shadow-lg active:scale-95">
+                    <span>Continuar al Siguiente Nivel</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="bg-slate-900/90 border-b border-slate-800 px-3 sm:px-4 py-2.5 flex justify-between items-center z-20 backdrop-blur-md shrink-0">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div class="w-8 h-8 rounded-lg bg-sky-950 border border-sky-600/40 flex items-center justify-center text-sky-400 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div class="min-w-0 flex flex-col justify-center">
+                    <h1 class="font-bold text-sm sm:text-base text-white tracking-tight flex items-center gap-1.5 sm:gap-2 truncate">
+                        <span class="truncate">Simulador de Prompting</span>
+                    </h1>
+                    <span class="text-[11px] text-sky-400 font-mono tracking-wider truncate" id="header-level-name">Nivel 1: C.O.N.</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                <!-- Laboratorio IA Button -->
+                <button onclick="openLabIntroModal()" id="nav-lab-btn" type="button" title="Abrir Laboratorio de Prompts" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-sky-900/60 to-indigo-900/60 hover:from-sky-800 hover:to-indigo-800 border border-sky-500/50 text-sky-200 hover:text-white text-xs sm:text-sm font-medium transition-all shadow-sm active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-amber-300 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                    <span class="font-semibold hidden sm:inline">Laboratorio</span>
+                </button>
+
+                <!-- Navigation: Retroceder -->
+                <button onclick="goBackAction()" id="nav-back-btn" type="button" title="Volver al nivel anterior o al inicio" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs sm:text-sm font-medium transition-all shadow-sm active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span class="hidden md:inline">Atrás</span>
+                </button>
+
+                <!-- Progress indicator -->
+                <div class="px-2.5 sm:px-3 py-1 rounded-lg bg-slate-800/80 border border-slate-700 text-right flex flex-col justify-center min-w-[50px] sm:min-w-[60px]">
+                    <span class="text-[10px] sm:text-[11px] text-slate-400 uppercase tracking-wider block font-semibold leading-none mb-0.5">Misión</span>
+                    <span class="text-sm sm:text-base font-mono text-sky-400 font-bold leading-none" id="level-indicator">1/9</span>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-container" class="flex-1 min-h-0 flex flex-col md:grid md:grid-cols-12 overflow-y-auto md:overflow-hidden relative">
+            
+            <!-- Left Column: Chat Conversation -->
+            <section id="chat-section" class="w-full md:col-span-7 flex flex-col md:h-full md:min-h-0 border-b md:border-b-0 md:border-r border-slate-800 bg-[#060a12] shrink-0 md:shrink">
+                <div class="px-3 sm:px-4 py-2 border-b border-slate-800/80 bg-slate-900/40 flex items-center justify-between text-xs sm:text-sm text-slate-400 shrink-0 gap-2">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="font-mono text-xs sm:text-sm text-slate-300 truncate">Chat con IA</span>
+                    </div>
+                    <span class="text-[11px] sm:text-xs font-mono text-slate-400">Simulación Guiada</span>
+                </div>
+
+                <div id="chat-canvas" class="p-4 space-y-4 md:flex-1 md:min-h-0 md:overflow-y-auto">
+                    <!-- Dynamic chat bubbles injected here -->
+                </div>
+            </section>
+            
+            <!-- Right Column: Mission Control & Options -->
+            <section id="options-section" class="w-full md:col-span-5 hidden md:flex flex-col bg-[#0c1322] border-t md:border-t-0 border-slate-800 md:h-full md:min-h-0 md:overflow-y-auto shrink-0 md:shrink">
+                
+                <div class="px-4 py-2.5 border-b border-slate-800 bg-slate-900/70 flex items-center justify-between gap-3 shrink-0">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-0.5">
+                            <span class="text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-950 border border-sky-600/40 text-sky-400" id="side-level-badge">Nivel 1</span>
+                            <span class="text-xs text-slate-400 font-mono truncate" id="side-mission-badge">Misión 1</span>
+                        </div>
+                        <h2 class="text-sm sm:text-base font-bold text-white truncate" id="side-mission-title">Título de la Misión</h2>
+                    </div>
+                    <button onclick="viewMissionModal()" type="button" class="shrink-0 flex items-center gap-1.5 text-xs sm:text-sm font-semibold px-2.5 py-1.5 rounded-lg bg-sky-950/80 hover:bg-sky-900 border border-sky-600/50 text-sky-300 hover:text-white transition-all shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Ver Misión</span>
+                    </button>
+                </div>
+
+                <div class="p-4 flex-1 flex flex-col justify-between" id="side-actions-area">
+                    <div id="options-view" class="space-y-3">
+                        <div class="flex items-center justify-between pb-1">
+                            <span class="text-sm font-semibold text-slate-200">Elige la instrucción a enviar:</span>
+                            <span class="text-xs font-mono text-slate-400">3 alternativas</span>
+                        </div>
+                        
+                        <div class="space-y-2.5" id="options-container">
+                            <!-- Dynamic option cards injected by JS -->
+                        </div>
+                    </div>
+
+                    <div id="evaluation-view" class="hidden flex-col items-center justify-center p-4 bg-slate-900/70 rounded-xl border border-slate-700/80 text-center space-y-3 my-auto fade-in">
+                        <div class="w-10 h-10 rounded-full bg-sky-950 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                            <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-sm sm:text-base font-bold text-white">Respuesta generada</h3>
+                            <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+                                Lee en el chat la respuesta de la IA. Analiza su estructura y rigor antes de continuar.
+                            </p>
+                        </div>
+                        <button onclick="revealFeedback()" class="w-full btn-evaluate text-white font-semibold py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm">
+                            Evaluar Resultado
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+
+        <!-- Mission Intro Modal -->
+        <div id="mission-modal" class="absolute inset-0 bg-slate-950/90 backdrop-blur-md z-40 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-sky-800/60 rounded-2xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col text-left max-h-[90vh] overflow-y-auto" id="mission-modal-content">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs sm:text-sm font-mono text-sky-400 tracking-wider uppercase font-bold px-2 py-0.5 rounded bg-sky-950 border border-sky-700/50" id="modal-mission-level">Nivel 1</span>
+                        <span class="text-xs sm:text-sm font-mono text-slate-400 tracking-wider font-bold" id="mission-number">Misión 1</span>
+                    </div>
+                    <span class="text-xs text-slate-500 font-mono uppercase font-semibold tracking-widest" id="mission-focus">C - CONTEXTO</span>
+                </div>
+                <h2 class="text-lg sm:text-xl font-bold text-white mb-2" id="mission-title">Título de la Misión</h2>
+                <div class="text-slate-300 text-sm sm:text-base leading-relaxed mb-5 space-y-2 bg-slate-800/50 p-4 rounded-xl border border-slate-700/60" id="mission-desc">
+                    <!-- Populated by JS -->
+                </div>
+                <button id="mission-action-btn" onclick="handleMissionAction()" class="w-full btn-evaluate text-white font-semibold py-3 px-4 rounded-xl text-sm sm:text-base transition-all">
+                    Iniciar Conversación
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Modal -->
+        <div id="feedback-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg md:max-w-xl w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh] overflow-y-auto" id="feedback-content">
+                
+                <div class="flex items-start gap-3.5 mb-4 pb-3.5 border-b border-slate-800">
+                    <div id="modal-icon" class="w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl font-bold shadow-inner"></div>
+                    <div>
+                        <h2 id="modal-title" class="text-base sm:text-lg font-bold text-white leading-tight"></h2>
+                        <p id="modal-subtitle" class="text-xs sm:text-sm text-slate-400 mt-0.5"></p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h4 class="text-xs sm:text-sm font-mono text-slate-400 uppercase tracking-wider mb-1.5 font-semibold flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        Análisis del Comportamiento
+                    </h4>
+                    <p id="modal-text" class="text-slate-300 text-sm sm:text-base leading-relaxed bg-slate-800/40 p-3.5 rounded-xl border border-slate-800"></p>
+                </div>
+
+                <div class="mb-5 bg-gradient-to-br from-indigo-950/40 to-slate-900 rounded-xl border border-indigo-700/40 p-3.5 relative overflow-hidden shadow-sm">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500"></div>
+                    <div class="flex items-center gap-1.5 mb-1.5 text-indigo-400 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider" id="modal-concept-letter">
+                        COMPONENTE CLAVE
+                    </div>
+                    <p id="modal-concept-title" class="font-bold text-slate-100 text-sm sm:text-base mb-1"></p>
+                    <p id="modal-concept-text" class="text-slate-300 text-xs sm:text-sm leading-relaxed"></p>
+                </div>
+
+                <button id="modal-btn" class="w-full py-3 rounded-xl font-semibold text-sm sm:text-base transition-transform active:scale-95 text-white shadow-lg">
+                    Continuar
+                </button>
+            </div>
+        </div>
+
+        <!-- Completion Modal -->
+        <div id="completion-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[92vh] overflow-y-auto" id="completion-content">
+                
+                <div class="flex items-center gap-4 mb-5 pb-5 border-b border-slate-800">
+                    <div class="w-14 h-14 shrink-0 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-3xl shadow-inner">
+                        🏆
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-bold">Simulador Completado</span>
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-white">¡Has dominado el Framework C.O.N.T.E.X.T.O.!</h2>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6 text-sm sm:text-[15px] text-slate-300 leading-relaxed">
+                    <p>Has comprobado cómo estructurar instrucciones con este método transforma por completo la fiabilidad de la IA. Este es tu nuevo arsenal para el día a día:</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 text-xs sm:text-sm">
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">C</strong>
+                            <span class="text-slate-200"><strong>Contexto:</strong> Ancla datos reales para evitar alucinaciones.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">O</strong>
+                            <span class="text-slate-200"><strong>Objetivo:</strong> Define claramente el «para qué» y la meta.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">N</strong>
+                            <span class="text-slate-200"><strong>Nivel/Rol:</strong> Desactiva el sesgo de amabilidad y complacencia.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">T</strong>
+                            <span class="text-slate-200"><strong>Tarea:</strong> Da directivas operativas (qué construir).</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">E</strong>
+                            <span class="text-slate-200"><strong>Especificaciones:</strong> Extensión, tono y diseño exacto.</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">X</strong>
+                            <span class="text-slate-200"><strong>eXclusiones:</strong> Límites prohibidos y plantillas (Few-Shot).</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">T</strong>
+                            <span class="text-slate-200"><strong>Tipo Salida:</strong> Formato estricto (JSON, tabla, etc).</span>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <strong class="text-sky-400 font-mono w-4">O</strong>
+                            <span class="text-slate-200"><strong>Optimización:</strong> Razonamiento lógico paso a paso.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="share-toast" class="hidden mb-4 p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-xl text-center text-sm text-emerald-300 font-medium fade-in shadow-inner">
+                    ✓ Enlace de la herramienta copiado al portapapeles.
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                    <button onclick="handleShare()" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 transition-all shadow-md active:scale-95">
+                        <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                        Compartir Herramienta
+                    </button>
+                    <button onclick="restartSimulation()" class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm btn-evaluate text-white transition-all shadow-lg active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Volver a Entrenar
+                    </button>
+                </div>
+
+                <div class="mt-3">
+                    <button onclick="openLabIntroModal()" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm bg-gradient-to-r from-sky-950/80 to-indigo-950/80 hover:from-sky-900 hover:to-indigo-900 border border-sky-500/40 text-sky-200 transition-all shadow-md active:scale-95">
+                        <svg class="w-5 h-5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        Abrir Auditor de Prompts (Laboratorio IA)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gemini AI Sandbox Modal -->
+        <div id="lab-modal" class="absolute inset-0 bg-slate-950/95 backdrop-blur-md z-[60] flex items-center justify-center p-2 sm:p-3 md:p-4 hidden opacity-0 transition-opacity duration-300">
+            <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-full md:max-w-[98%] lg:max-w-full p-4 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[95vh] overflow-y-auto" id="lab-modal-content">
+                
+                <div class="flex items-center justify-between pb-3.5 border-b border-slate-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-white">Laboratorio de Prompting</h3>
+                            <p class="text-xs sm:text-sm text-slate-400">Prueba tus propios prompts libremente o solicita una auditoría técnica.</p>
+                        </div>
+                    </div>
+                    <button onclick="closeLabModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+                        ✕
+                    </button>
+                </div>
+
+                <div class="py-4 space-y-4">
+                    <!-- Casilla de Respaldo (Fallback) -->
+                    <div id="lab-custom-api-container" class="hidden bg-amber-950/30 border border-amber-500/40 p-3 rounded-xl flex flex-col gap-2.5 fade-in shadow-inner">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 text-amber-300 text-xs font-semibold">
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span>La conexión a la cuota compartida ha fallado o se agotó</span>
+                            </div>
+                            <button type="button" onclick="toggleApiKeyHelp()" class="text-[11px] text-sky-400 hover:underline font-mono flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                ¿Cómo obtener una clave gratis?
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Para continuar probando sin límites en el laboratorio, puedes ingresar tu propia API Key gratuita de Google AI Studio:
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <input type="password" id="lab-custom-api-key" placeholder="Pega tu API Key de Google AI Studio aquí" class="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500 font-mono shadow-inner">
+                        </div>
+
+                        <!-- Tooltip / Guía de pasos desplegable -->
+                        <div id="lab-api-key-help" class="hidden bg-slate-900/95 border border-sky-800/60 rounded-xl p-3 text-xs text-slate-300 space-y-2 mt-1 shadow-lg">
+                            <div class="flex items-center justify-between pb-1 border-b border-slate-800">
+                                <span class="font-semibold text-sky-300 font-mono text-[11px]">Pasos para obtener tu clave gratuita (Free Tier):</span>
+                                <button type="button" onclick="toggleApiKeyHelp()" class="text-slate-400 hover:text-white text-xs w-5 h-5 rounded hover:bg-slate-800 flex items-center justify-center">✕</button>
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-slate-300 font-sans text-xs">
+                                <li>Ingresa a <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:underline font-semibold font-mono">aistudio.google.com</a> con tu cuenta Google.</li>
+                                <li>Haz clic en <strong class="text-white">«Get API key»</strong> y luego en <strong class="text-white">«Create API key»</strong>.</li>
+                                <li>Copia el código generado y pégalo en la casilla de arriba (No requiere tarjeta de crédito).</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label for="lab-prompt-input" class="text-xs sm:text-sm font-semibold text-slate-200">Tu Instrucción / Prompt:</label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-slate-400 font-mono" id="lab-char-count">0 caracteres</span>
+                                <button onclick="clearLabPrompt()" type="button" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-300 hover:text-white font-mono transition-colors">
+                                    Limpiar
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="lab-prompt-input" rows="4" placeholder="Escribe aquí tu prompt libremente..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 leading-relaxed font-sans shadow-inner"></textarea>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2.5">
+                        <button onclick="executeLabPrompt()" id="lab-run-btn" class="flex-1 btn-evaluate text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-all">
+                            <svg class="w-4 h-4 text-sky-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>1. Ejecutar con Gemini Flash-Lite</span>
+                        </button>
+                        <button onclick="auditLabPrompt()" id="lab-audit-btn" class="flex-1 bg-gradient-to-r from-indigo-700 to-purple-700 hover:from-indigo-600 hover:to-purple-600 text-white font-semibold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg active:scale-98 transition-all">
+                            <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            <span>2. Auditar Calidad del Prompt</span>
+                        </button>
+                    </div>
+
+                    <div id="lab-output-box" class="hidden space-y-3 pt-2 border-t border-slate-800">
+                        <div class="flex items-center justify-between pb-1">
+                            <span class="text-xs font-mono uppercase font-bold text-sky-400 tracking-wider flex items-center gap-1.5" id="lab-output-title">
+                                <span>Resultado de la IA</span>
+                            </span>
+                            <span class="text-[11px] font-mono text-slate-400" id="lab-output-time"></span>
+                        </div>
+                        <div id="lab-output-content" class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 text-slate-200 text-xs sm:text-sm leading-relaxed whitespace-pre-line max-h-72 overflow-y-auto font-mono shadow-inner prose prose-invert max-w-none">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <div id="lab-audit-box" class="hidden space-y-3 pt-2 border-t border-slate-800">
+                        <div class="pb-1">
+                            <span class="text-xs font-mono uppercase font-bold text-indigo-400 tracking-wider flex items-center gap-1.5">
+                                <span>Reporte de Auditoría Estructural (C.O.N.T.E.X.T.O.)</span>
+                            </span>
+                        </div>
+                        <div id="lab-audit-content" class="bg-indigo-950/20 border border-indigo-800/40 rounded-xl p-4 text-slate-200 text-xs sm:text-sm leading-relaxed space-y-3 shadow-inner">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 text-right">
+                    <button onclick="closeLabModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs sm:text-sm transition-colors shadow-sm">
+                        Cerrar Laboratorio
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const levels = [
+            // ================== NIVEL 1 ==================
+            {
+                id: 1,
+                stage: 1,
+                stageName: "Nivel 1: C.O.N.",
+                letter: "C - CONTEXTO",
+                title: "Anclaje de Datos",
+                briefingHtml: `
+                    <p>Estás comenzando a planificar los contenidos de la campaña sobre cómo el uso continuo de redes sociales afecta la dopamina y la atención en jóvenes y adultos.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo: Obtener una propuesta estructurada de 3 publicaciones veraces sin que la IA invente datos clínicos (Alucinaciones).</p>
+                `,
+                autoUserPrompt: "Hola, estoy armando una campaña sobre cómo el scroll en redes afecta la salud mental de jóvenes y adultos y quiero estructurar los primeros posts. ¿Me das una mano?",
+                aiGreeting: "¡Hola! Claro que sí, es un tema muy relevante. ¿Cómo tienes pensado enfocar los contenidos o qué datos base te gustaría incluir para armar las publicaciones?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Actúa como un experto en psicología. Diseña una campaña completa de 3 posts sobre cómo el scroll continuo afecta negativamente la dopamina en jóvenes y adultos. Usa un tono muy persuasivo.",
+                        aiResponse: "📱 Post 1: ¿Sientes que el celular te cansa? Tu mente necesita respirar. ¡Desconéctate hoy mismo y disfruta el momento real!\n\n🧠 Post 2: La dopamina en redes te agota poco a poco. Sal a caminar, respira aire fresco y conecta con quienes te rodean.\n\n🛑 Post 3: ¡Ponle un alto a las pantallas! Tu bienestar mental está primero. Recupera tu tiempo libre y vive sin prisas.",
+                        feedbackTitle: "Resultado Superficial y Predecible",
+                        feedbackSubtitle: "La IA recurrió a lugares comunes.",
+                        feedbackText: "La respuesta solo ofreció consejos trillados de internet ('sal a caminar', 'deja el celular'). Aunque pediste sonar 'profesional', no le suministraste hechos concretos para construir argumentos de valor.",
+                        conceptTitle: "Contexto (C)",
+                        conceptText: "Una IA no tiene criterio propio. Funciona calculando las palabras más frecuentes. La mejor forma de obtener contenido profesional es proporcionarle un Contexto robusto (datos y hechos verificados) que ancle su respuesta y delimite su área de trabajo.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600 border border-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "Escribe una campaña con rigor médico estricto sobre el impacto neurológico del scroll continuo en la corteza prefrontal en jóvenes y adultos. Redacta 3 posts usando terminología clínica avanzada, pero por favor, no inventes ningún dato.",
+                        aiResponse: "🔬 Post 1: El scroll continuo produce 'Neuro-desincronía Óptica Prefrontal', reduciendo el grosor de la corteza cerebral hasta un 18% en jóvenes y adultos.\n\n🧬 Post 2: La 'Fatiga Dopamínica Retiniana' bloquea los receptores neuronales ante la luz constante de los dispositivos móviles.\n\n🩺 Post 3: La hipo-atención celular es reversible si aplicas pausas vestibulares de 45 minutos diarios lejos de cualquier dispositivo.",
+                        feedbackTitle: "La Apariencia Científica Falsa (Alucinación)",
+                        feedbackSubtitle: "La IA inventó términos médicos con total seguridad.",
+                        feedbackText: "El texto suena técnico, pero conceptos como la 'Neuro-desincronía Óptica' no existen. Pedirle 'no inventes' no evita que la IA genere falsedades si no le das los datos.",
+                        conceptTitle: "Contexto (C)",
+                        conceptText: "Los modelos de lenguaje no consultan una enciclopedia médica en tiempo real. Exigir tecnicismos sin aportar los hechos genera 'alucinaciones' (mentiras plausibles). El Contexto es indispensable para evitar datos falsos.",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600 border border-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: true,
+                        text: "Diseña una campaña de 3 posts usando únicamente estos datos comprobados: 1. El scroll imita la recompensa variable de máquinas de casino. 2. Causa picos rápidos de dopamina no sostenidos. 3. Provoca fatiga cognitiva. Asume el rol de divulgador riguroso.",
+                        aiResponse: "🎰 Post 1: El efecto casino en tu teléfono. El scroll continuo opera bajo el mismo principio de recompensa variable de las máquinas de casino: no saber qué estímulo viene después mantiene la atención atrapada.\n\n📉 Post 2: El pico fugaz de dopamina. Cada nuevo contenido genera una recompensa química inmediata pero muy breve, propiciando un posterior cansancio mental.\n\n🧠 Post 3: Fatiga cognitiva. Sobrecargar la mente con gratificaciones instantáneas agota la capacidad de concentración sostenida. Claves prácticas para regular estímulos.",
+                        feedbackTitle: "¡Excelente Estrategia de Control!",
+                        feedbackSubtitle: "Rigor, claridad y cero falsedades.",
+                        feedbackText: "En lugar de pedirle a la máquina que 'supiera' del tema por su cuenta, tú le entregaste los datos verificados que debía utilizar. Conseguiste una estructura precisa y de alto impacto.",
+                        conceptTitle: "Contexto (C)",
+                        conceptText: "El primer pilar es el Anclaje de Contexto. Al delimitar su conocimiento entregando los hechos fundamentales, reduces el margen de alucinación a cero y garantizas contenido verdaderamente profesional.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                stage: 1,
+                stageName: "Nivel 1: C.O.N.",
+                letter: "O - OBJETIVO",
+                title: "Definiendo el 'Para Qué'",
+                briefingHtml: `
+                    <p>Quieres crear un texto para la web de la campaña sobre la luz azul y el sueño nocturno.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo de la misión: Lograr que la IA redacte un texto que no sea un simple resumen enciclopédico, definiéndole explícitamente el propósito emocional (persuadir a adultos estresados).</p>
+                `,
+                autoUserPrompt: "Quiero escribir un texto sobre cómo la luz del celular de noche afecta el cortisol y arruina el sueño de los adultos.",
+                aiGreeting: "Entiendo. Es un tema crítico para la salud integral. ¿Qué enfoque te gustaría darle al texto o qué esperas lograr en los lectores con esta información?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Explica detalladamente cómo el celular afecta el cortisol de los adultos en la noche basándote en la biología humana.",
+                        aiResponse: "El uso nocturno de dispositivos móviles altera significativamente los ritmos circadianos. La luz azul, cuya longitud de onda oscila entre los 400 y 495 nanómetros, impacta en las células ganglionares fotosensibles de la retina. Esta señal se transmite al núcleo supraquiasmático, suprimiendo la secreción de melatonina pineal y manteniendo artificialmente elevados los niveles séricos de cortisol, prolongando el estado de alerta fisiológica...",
+                        feedbackTitle: "Ausencia de Intención y Empatía",
+                        feedbackSubtitle: "Obtuviste un ensayo académico frío.",
+                        feedbackText: "Aunque la información es biológicamente correcta, al no decirle a la IA cuál era tu objetivo (persuadir/ayudar), generó un texto enciclopédico que no conectará emocionalmente con adultos estresados.",
+                        conceptTitle: "Objetivo (O)",
+                        conceptText: "El Objetivo (O) no es el tema del que vas a hablar, sino el propósito de fondo ('para qué' estás escribiendo esto). Sin un Objetivo claro, la IA asume por defecto el rol de una enciclopedia informativa y neutral.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "El objetivo es asustar a los pacientes para que dejen el celular en la cama de una vez por todas. Háblales sobre el cortisol de forma muy dramática.",
+                        aiResponse: "¡Atención! Cada vez que miras la pantalla en tu cama, estás envenenando tu descanso y disparando tu cortisol a niveles alarmantes. Esta hormona del estrés, desatada en la oscuridad, destruye tu recuperación celular y te condena a un insomnio crónico e irreversible si no sueltas el dispositivo de inmediato. ¡Tu salud está en grave peligro cada noche!",
+                        feedbackTitle: "Extremismo Reactivo",
+                        feedbackSubtitle: "El objetivo forzó un tono inapropiado.",
+                        feedbackText: "Usar palabras como 'asustar' o 'dramático' en el objetivo empujó a la IA a generar un contenido amarillista y poco profesional, inaceptable para una campaña de salud seria.",
+                        conceptTitle: "Calibración del Objetivo (O)",
+                        conceptText: "Las palabras con las que defines el Objetivo (O) dictan radicalmente el tono. Si usas verbos reactivos ('asustar'), el modelo exagerará. Para temas serios, el objetivo debe redactarse desde la motivación constructiva ('concientizar', 'guiar', 'persuadir').",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: true,
+                        text: "Objetivo: Lograr que adultos con vidas estresantes comprendan con empatía cómo la luz azul eleva su cortisol, para que se sientan motivados a probar la desconexión nocturna, no juzgados.",
+                        aiResponse: "Sabemos que al final de un día largo, revisar el teléfono en la cama parece la única forma de desconectar. Sin embargo, esa luz brillante le envía un mensaje equivocado a tu cerebro: le dice que es de día y eleva tu cortisol, manteniéndote alerta cuando más necesitas descansar. No se trata de culparse, sino de entender cómo funciona nuestro cuerpo. Probar solo 30 minutos sin pantallas antes de dormir puede ser el pequeño gran paso hacia el descanso que realmente mereces.",
+                        feedbackTitle: "Persuasión y Empatía Alineadas",
+                        feedbackSubtitle: "El propósito moldeó perfectamente el texto.",
+                        feedbackText: "Al especificar a quién le hablabas, qué querías lograr (concientizar) y cómo querías que se sintieran (motivados, no juzgados), la IA pudo ajustar el ángulo narrativo a la perfección.",
+                        conceptTitle: "Objetivo (O)",
+                        conceptText: "El pilar del Objetivo (O) le entrega a la IA la brújula emocional del texto. Cuando defines el 'para qué', el modelo abandona el tono robótico enciclopédico y adopta estrategias de redacción enfocadas en el usuario final.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                stage: 1,
+                stageName: "Nivel 1: C.O.N.",
+                letter: "N - NIVEL/ROL",
+                title: "Desactivando la Complacencia",
+                briefingHtml: `
+                    <p>Redactaste este primer borrador para un post de la campaña:</p>
+                    <div class="italic text-xs text-sky-200 bg-slate-900/80 p-3 rounded-lg border border-slate-700 my-2">
+                        «Las redes sociales nos hacen pasar mucho tiempo viendo el teléfono y eso deprime. Deberíamos usarlas menos para no estar tan estresados siempre y vivir mejor.»
+                    </div>
+                    <p class="text-sky-300 font-medium mt-1">Objetivo: Forzar a la IA a criticar duramente la debilidad de este texto sin que intente ser 'amable'.</p>
+                `,
+                autoUserPrompt: "Estuve escribiendo un borrador para un post sobre redes sociales y estrés, pero siento que le falta fuerza. ¿Me ayudas a revisarlo?",
+                aiGreeting: "¡Hola! Con gusto te doy una mano. Pega aquí el borrador que tienes para revisarlo y potenciarlo.",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Mi borrador: 'Las redes... [texto] ...vivir mejor.' Corrígelo con cuidado, arregla la gramática y mejóralo para que suene mucho más profesional y articulado.",
+                        aiResponse: "¡Tu mensaje tiene una premisa excelente! Aquí tienes una versión más fluida y pulida:\n\n'El uso prolongado de las redes sociales nos lleva a pasar demasiado tiempo en nuestros teléfonos, lo cual puede generar depresión. Es conveniente reducir su uso para disminuir el estrés cotidiano y disfrutar de una mejor calidad de vida.'",
+                        feedbackTitle: "Corrección Puramente Estética",
+                        feedbackSubtitle: "La debilidad argumentativa sigue intacta.",
+                        feedbackText: "La IA solo cambió sinónimos y ordenó la sintaxis. El texto suena más formal, pero el argumento sigue siendo básico y moralista. No aportó valor crítico porque actuó como un simple corrector ortográfico.",
+                        conceptTitle: "La ley del mínimo cambio",
+                        conceptText: "Si no defines un Rol (N) estricto y solo pides 'mejorar', la IA usará su sesgo conservador para mantener la idea original del usuario intacta, asumiendo el rol de un asistente pasivo y educado.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "Mi borrador: 'Las redes... [texto] ...vivir mejor.' Quiero tu opinión más honesta y sincera. Si notas que es aburrido o débil, dímelo con total franqueza.",
+                        aiResponse: "Sinceramente, tu borrador tiene un gran potencial y aborda una realidad indispensable. Para que resalte más, podrías agregar algún dato sobre el descanso mental o usar palabras más inspiradoras. ¡Vas por muy buen camino!",
+                        feedbackTitle: "La Trampa de la Cortesía",
+                        feedbackSubtitle: "La IA prefirió no contradecirte.",
+                        feedbackText: "Aunque le pediste 'máxima franqueza', la IA respondió con halagos suaves. Recibiste afirmación vacía en lugar del rigor que necesitabas.",
+                        conceptTitle: "Pedir 'honestidad' no funciona",
+                        conceptText: "Los modelos están entrenados (alineados) por humanos para ser cordiales y no ofender. Usar frases como 'sé honesto' o 'dime la verdad' no es suficiente para romper ese escudo algorítmico de complacencia.",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: true,
+                        text: "Mi borrador: 'Las redes... [texto] ...vivir mejor.' Nivel/Rol: Eres un editor psicológico implacable. Identifica y enumera 3 debilidades argumentativas del texto sin rodeos, y luego reescríbelo resolviéndolas.",
+                        aiResponse: "Debilidades del borrador:\n1. Causalidad simplista: Asume erróneamente que el tiempo de uso deprime por sí solo, ignorando el factor de comparación social pasiva.\n2. Consejo inútil: 'Usarlas menos' es una directiva practicable sin metodología.\n3. Tono moralista y carente de sustento clínico.\n\nReescritura corregida:\n'El agotamiento mental en redes no proviene de la pantalla, sino del consumo pasivo constante. Recuperar el control no exige desconexión total, sino implementar pausas activas para restaurar la carga de estrés del cerebro.'",
+                        feedbackTitle: "¡Filtro de Complacencia Roto!",
+                        feedbackSubtitle: "Obtuviste crítica experta y rigor real.",
+                        feedbackText: "Al asignar un nivel de autoridad implacable y exigirle listas de errores, neutralizaste por completo su hábito de halagar al usuario.",
+                        conceptTitle: "Nivel/Rol (N)",
+                        conceptText: "El Nivel/Rol (N) establece la 'personalidad técnica' de la IA. Asignar un rol de autoridad estricta desactiva el sesgo de amabilidad y te permite escalar a un modo de auditoría profesional real.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    }
+                ]
+            },
+            // ================== NIVEL 2 ==================
+            {
+                id: 4,
+                stage: 2,
+                stageName: "Nivel 2: T.E.X.",
+                letter: "T - TAREA",
+                title: "La Directiva Operativa",
+                briefingHtml: `
+                    <p>Tienes el objetivo de ayudar a los pacientes adultos a mejorar su higiene del sueño.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo de la misión: Lograr que la IA entregue una guía accionable e instruccional (qué construir) y no solo charle sobre el tema.</p>
+                `,
+                autoUserPrompt: "Necesito material para los adultos de la campaña sobre el tema de dejar las pantallas antes de dormir para que descansen mejor.",
+                aiGreeting: "Comprendido. Es un pilar central en la higiene del sueño. ¿Qué tipo de entregable o material específico quieres que desarrolle con esta información?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Haz algo sobre rutinas de salud visual para adultos para que no se expongan tanto a las pantallas en la noche.",
+                        aiResponse: "La salud visual y el sueño en adultos son vitales. Es común sufrir fatiga por la luz azul nocturna. Te recomiendo que implementes pausas regulares. Además, pueden sugerir apagar las pantallas una hora antes de dormir y usar filtros cálidos en los teléfonos. Es clave no ignorar estos hábitos para lograr un descanso óptimo en la vida diaria.",
+                        feedbackTitle: "Ausencia de Tarea Operativa",
+                        feedbackSubtitle: "Obtuviste un texto genérico, no un entregable.",
+                        feedbackText: "Al pedir 'haz algo', la IA respondió con consejos conversacionales. No especificaste qué producto final necesitabas (una tabla, una lista, una carta).",
+                        conceptTitle: "La Ambigüedad Estructural",
+                        conceptText: "Si no defines la Tarea (T), el modelo asume por defecto que estás 'conversando' y devolverá bloques de texto sin estructura utilizable para un producto real.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "Escribe un ensayo fundamentado justificando por qué los adultos necesitan desconectarse de la luz azul en las noches. Hazlo detallado.",
+                        aiResponse: "Introducción: La disrupción del sueño digital en la adultez...\n\nJustificación fisiológica: La sobreexposición a luz azul suprime la secreción de melatonina en la glándula pineal, interrumpiendo las fases del sueño REM y profundo...\n\nConclusión: Por lo tanto, la implementación de restricciones digitales nocturnas es un requerimiento ineludible para la recuperación circadiana.",
+                        feedbackTitle: "Formato Correcto, Tarea Inútil",
+                        feedbackSubtitle: "Tienes un ensayo, pero no es accionable para pacientes.",
+                        feedbackText: "La Tarea fue clara ('Escribe un ensayo'), pero fallaste en la estrategia. Los pacientes estresados no van a leer un ensayo fisiológico largo antes de dormir.",
+                        conceptTitle: "Alineación de la Tarea (T)",
+                        conceptText: "La Tarea (T) (el formato del entregable) debe ser coherente con la audiencia y el Objetivo. Un buen objetivo falla si se empaqueta en la Tarea equivocada.",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: true,
+                        text: "Tarea: Redacta una guía accionable con 3 pasos específicos (lista numerada) sobre qué hacer con las luces y dispositivos exactamente 60 minutos antes de dormir.",
+                        aiResponse: "1. Activar Filtros de Pantalla (T-60 min): Habilita el modo 'Night Shift' o luz cálida en el teléfono y reduce el brillo al mínimo posible.\n2. Sustitución de Hábito (T-45 min): Reemplaza el scroll en redes por una actividad sin pantalla iluminada, como leer un libro físico o escuchar un podcast.\n3. Iluminación Ambiental (T-30 min): Apaga las luces blancas del techo y enciende únicamente una lámpara cálida de mesa o de lectura.",
+                        feedbackTitle: "Directiva Operativa Exitosa",
+                        feedbackSubtitle: "Intención y regla de construcción trabajaron juntas.",
+                        feedbackText: "Obtuviste exactamente lo que necesitabas: un entregable limpio y aplicable, gracias a declarar el tipo de documento (guía accionable, lista numerada).",
+                        conceptTitle: "Tarea (T)",
+                        conceptText: "La Tarea (T) es la directiva operativa: es indicarle a la IA qué debe *construir* (una tabla, una lista, un código, un cuestionario) en lugar de simplemente decirle de qué hablar.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    }
+                ]
+            },
+            {
+                id: 5,
+                stage: 2,
+                stageName: "Nivel 2: T.E.X.",
+                letter: "E - ESPECIFICACIONES",
+                title: "Control de Verbosidad",
+                briefingHtml: `
+                    <p>Debes redactar un boletín semanal (newsletter) para pacientes sobre cómo establecer límites de uso de pantallas en casa de forma saludable.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo: Evitar que la IA genere un texto infinito y verboso; imponer especificaciones numéricas exactas para su diseño y longitud.</p>
+                `,
+                autoUserPrompt: "Tengo que mandar el boletín de esta semana a los pacientes sobre cómo poner límites saludables al celular en casa.",
+                aiGreeting: "Es un tema fundamental para la salud mental. Puedo redactar el boletín informativo. ¿Qué especificaciones de formato, extensión y estilo necesitas?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Redacta el newsletter para los padres/pacientes. Hazlo lo más completo y detallado posible para que entiendan a fondo el problema de las pantallas.",
+                        aiResponse: "Asunto: La Guía Definitiva sobre el Uso de Pantallas\n\nEstimados pacientes,\n\nHoy en día enfrentamos una crisis. La tecnología afecta el desarrollo y el descanso. Nuestro hogar debe ser un santuario. Abordemos esto desde 5 ejes fundamentales:\n1. Desarrollo Cognitivo...\n2. Prevención de Aislamiento...\n3. Ergonomía Digital...\n4. Modelado de Comportamiento...\n5. Riesgos del Scroll...\n\n[... 10 párrafos densos más detallando metodologías y estudios ...]\n\nEsperamos su atenta lectura.",
+                        feedbackTitle: "Desbordamiento de Texto (Verbosidad)",
+                        feedbackSubtitle: "La IA asoció 'completo' con 'excesivamente largo'.",
+                        feedbackText: "Al pedir algo 'lo más detallado posible' sin poner límites de longitud, el modelo generó un muro de texto interminable que nadie leerá completo.",
+                        conceptTitle: "El Defecto de la Verbosidad",
+                        conceptText: "Las inteligencias artificiales tienden a ser extremadamente verbosas por defecto, intentando cubrir todas las aristas posibles de un tema para demostrar 'utilidad'.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "Redacta el newsletter. Asegúrate de que sea muy corto y no sea nada aburrido ni médico para que la gente sí lo lea.",
+                        aiResponse: "Asunto: ¡Ponte las pilas y suelta el celu! 🚀\n\n¿Qué onda a todos? Sabemos que soltar el celular está súper difícil. ¡Pero cero estrés! Tenemos que hacer el esfuerzo de apagar las pantallas un ratito y disfrutar más la vida real en casa.\n\n¡Anímense a probarlo hoy mismo, va a estar increíble! 😉 Nos leemos pronto, equipo.",
+                        feedbackTitle: "Pérdida Total del Tono Profesional",
+                        feedbackSubtitle: "Confundió 'no aburrido' con lenguaje coloquial.",
+                        feedbackText: "Lograste acortarlo, pero usar instrucciones negativas y subjetivas ('no aburrido', 'no médico') hizo que la IA utilizara un tono excesivamente informal, inapropiado para un profesional de salud.",
+                        conceptTitle: "El Peligro de las Especificaciones Negativas",
+                        conceptText: "Las instrucciones negativas ('no aburrido') dejan a la IA adivinando el extremo opuesto. Siempre debes usar Especificaciones positivas y exactas para definir el estilo ('Tono empático pero profesional').",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: true,
+                        text: "Redacta el newsletter. Especificaciones: Extensión de exactamente 2 párrafos. Tono: Empático y orientador. Incluye 3 viñetas breves en el segundo párrafo detallando los límites recomendados.",
+                        aiResponse: "Asunto: Construyendo hábitos digitales saludables en casa\n\nSabemos que gestionar el tiempo de pantallas puede ser un desafío constante que genera fricción. No se trata de prohibir la tecnología de golpe, sino de encontrar un equilibrio compasivo que permita a toda la familia reconectar con el descanso y reducir la carga de estrés.\n\nPara iniciar este cambio de forma gradual, les sugerimos implementar estos tres acuerdos simples esta semana:\n* Establecer la mesa del comedor como zona libre de teléfonos.\n* Activar el modo 'no molestar' en todos los dispositivos durante la cena.\n* Sustituir el uso del celular en la cama por 15 minutos de lectura o diálogo.",
+                        feedbackTitle: "Precisión de Cirujano",
+                        feedbackSubtitle: "Extensión, diseño y estilo bajo control total.",
+                        feedbackText: "Al proporcionar reglas numéricas ('2 párrafos'), de estilo ('empático') y visuales ('3 viñetas'), tomaste el control total del empaque del texto. Está listo para publicarse.",
+                        conceptTitle: "Especificaciones (E)",
+                        conceptText: "La 'E' dicta el empaque visual y de estilo. Definir la longitud exacta y el diseño asegura un entregable que se adapta perfectamente a tus necesidades reales, domando el exceso de texto de la IA.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    }
+                ]
+            },
+            {
+                id: 6,
+                stage: 2,
+                stageName: "Nivel 2: T.E.X.",
+                letter: "X - EXCLUSIONES / EJEMPLOS",
+                title: "Plantillas y Filtros Restrictivos",
+                briefingHtml: `
+                    <p>Vas a generar una breve sección de Preguntas Frecuentes (FAQs) para la web de la campaña.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo: Imponer un diseño exacto clonando un patrón, y evitar palabras alarmistas utilizando el pilar de Exclusiones (Restricciones negativas absolutas).</p>
+                `,
+                autoUserPrompt: "Hagamos unas FAQs para la página web de la campaña sobre el cortisol y el uso de pantallas antes de dormir.",
+                aiGreeting: "¡Entendido! Puedo generar las preguntas y respuestas. ¿Tienes algún formato específico en mente o alguna restricción de lenguaje para este tema médico?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: true,
+                        text: "Genera 2 FAQs. eXclusiones: PROHIBIDO usar las palabras 'peligro', 'tóxico', 'daño' e 'insomnio severo'. Ejemplos de formato estricto a clonar: [P: ¿Qué es X? R: X significa...]",
+                        aiResponse: "P: ¿Cómo afecta la pantalla a mis niveles de estrés nocturno?\nR: La exposición a la luz de los dispositivos retrasa la producción de melatonina y puede mantener elevados los niveles de cortisol, dificultando la relajación natural.\n\nP: ¿Debo apagar todo para poder descansar bien?\nR: Se recomienda establecer una transición de 45 minutos sin dispositivos antes de dormir para facilitar una correcta regulación hormonal previa al sueño.",
+                        feedbackTitle: "Patrón y Filtro Exitosos",
+                        feedbackSubtitle: "Clonó el formato a la perfección y respetó la lista negra.",
+                        feedbackText: "La IA replicó tu plantilla visual a la perfección ('P: / R:') y acató la prohibición absoluta de usar palabras sensacionalistas. Esto se llama Few-Shot Prompting y Negative Prompting.",
+                        conceptTitle: "eXclusiones y Ejemplos (X)",
+                        conceptText: "La variable X une dos técnicas pro: Las 'Exclusiones' (restricciones absolutas con listas negras de palabras) y los 'Ejemplos', que enseñan a la red neuronal el patrón visual exacto a replicar sin que tenga que adivinarlo.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "Genera 2 FAQs explicativas. Haz que sean en un tono muy calmado y científico.",
+                        aiResponse: "Pregunta 1: ¿Por qué la luminosidad de los dispositivos resulta disruptiva para los pacientes?\nRespuesta: Es vital mantener la calma. La radiación visible interfiere con la glándula pineal, desencadenando un estado de vigilia tóxica inducido por el estrés.\n\nPregunta 2: ¿Cuáles son las consecuencias?\nRespuesta: Si no nos relajamos, experimentaremos daño neurológico leve, llevando invariablemente a episodios de insomnio severo.",
+                        feedbackTitle: "Diseño Impredecible y Alarmista",
+                        feedbackSubtitle: "No restringiste palabras negativas.",
+                        feedbackText: "Aunque pediste un tono 'calmado', el tema clínico provocó que la IA hablara de 'vigilia tóxica' y 'daño'. Además, inventó su propio formato de 'Pregunta 1 / Respuesta', que podría no cuadrar con tu diseño web.",
+                        conceptTitle: "El sesgo afirmativo en salud",
+                        conceptText: "Para temas clínicos, pedir un tono 'positivo' a menudo falla. Debes usar Exclusiones explícitas (listas de palabras prohibidas) para bloquear el léxico alarmista que el modelo usaría por defecto.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: false,
+                        text: "Genera 2 FAQs. Usa la plantilla P: / R:. Por favor no asustes al lector hablando de toxinas o peligros del insomnio severo.",
+                        aiResponse: "P: ¿Es la luz del celular un peligro o una toxina para el sueño?\nR: No, no es un peligro inminente ni una toxina física, pero sí interfiere con el cortisol, provocando estrés.\n\nP: ¿Me dará insomnio severo por usar el móvil en la cama?\nR: No te asustes, el insomnio severo no siempre ocurre de inmediato, pero el uso nocturno sí eleva todos los riesgos a largo plazo.",
+                        feedbackTitle: "El Efecto 'Elefante Rosa'",
+                        feedbackSubtitle: "Mencionó exactamente lo que pediste no mencionar.",
+                        feedbackText: "Al usar frases conversacionales como 'no hables de peligros', inyectaste esas palabras clave en la memoria de la IA. El modelo las incluyó en su respuesta para intentar 'desmentirlas'.",
+                        conceptTitle: "Las eXclusiones (X) deben ser absolutas",
+                        conceptText: "No redactes restricciones como oraciones largas o sugerencias ('intenta no hablar sobre...'). Debes usar reglas robóticas en formato de lista: 'REGLA: PROHIBIDO usar las palabras: A, B, C'.",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    }
+                ]
+            },
+            // ================== NIVEL 3 ==================
+            {
+                id: 7,
+                stage: 3,
+                stageName: "Nivel 3: T.O. & Maestría",
+                letter: "T - TIPO DE SALIDA",
+                title: "Formatos Estrictos de Interfaz",
+                briefingHtml: `
+                    <p>Vas a diseñar un 'Reto de Desintoxicación Digital' de 3 días para pacientes adultos.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo: Forzar a la IA a devolver exclusivamente los datos tabulados, bloqueando por completo su instinto de actuar como un chat (sin saludos, introducciones ni explicaciones extra).</p>
+                `,
+                autoUserPrompt: "Quiero armar un reto práctico de desintoxicación digital de 3 días (Viernes, Sábado y Domingo) para los pacientes.",
+                aiGreeting: "Me parece una excelente iniciativa para reducir la ansiedad ligada a pantallas. ¿Cómo quieres que organice y te presente las actividades de este reto?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Hazme el plan detallado para el reto del viernes, sábado y domingo.",
+                        aiResponse: "¡Por supuesto! Aquí tienes un excelente plan de desintoxicación digital para el fin de semana, diseñado especialmente para los pacientes adultos:\n\n**Viernes:**\nPara la tarde, recomiendo apagar las notificaciones laborales. En la noche, opten por una cena sin teléfonos en la mesa para fomentar el diálogo.\n\n**Sábado:**\nDurante la mañana, realicen una caminata sin llevar dispositivos...\n\n¡Espero que a los pacientes les resulte muy útil y logren disminuir su estrés!",
+                        feedbackTitle: "Formato Conversacional Ineficiente",
+                        feedbackSubtitle: "Obtuviste mucho texto de relleno.",
+                        feedbackText: "La IA generó un formato de ensayo largo, lleno de comentarios introductorios y de despedida. Para un material imprimible o de consulta rápida, este formato es visualmente ineficiente.",
+                        conceptTitle: "El Sesgo de Chatbot",
+                        conceptText: "Sin especificar un formato, los LLMs actúan como 'chats amigables' e inundan la respuesta de introducciones largas. Si necesitas datos, debes exigir un formato técnico específico.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: true,
+                        text: "Genera el plan (Viernes, Sábado, Domingo). Tipo de salida: Devuelve ÚNICAMENTE una tabla en formato Markdown con las columnas 'Día', 'Mañana', 'Tarde' y 'Noche'. Sin texto introductorio ni conclusiones.",
+                        aiResponse: "| Día | Mañana | Tarde | Noche |\n|---|---|---|---|\n| Viernes | Activar modo 'No Molestar' | Caminata de 30 min sin móvil | Cena sin pantallas, lectura |\n| Sábado | Desayuno consciente (sin TV) | Hobby manual o deporte | Apagar router WiFi a las 9pm |\n| Domingo | Limpiar apps innecesarias | Llamada a familiar (sin redes) | Planificar la semana en papel |",
+                        feedbackTitle: "Data Pura y Organizada",
+                        feedbackSubtitle: "Salida visual perfecta y directa al grano.",
+                        feedbackText: "Al exigir la ausencia de saludos y nombrar el formato exacto ('Tabla en formato Markdown'), transformaste al asistente de chat en un procesador eficiente de datos. Limpio y listo para imprimir.",
+                        conceptTitle: "Tipo de Salida (T)",
+                        conceptText: "Definir un Tipo de Salida (T) estricto (Tabla, JSON, CSV, viñetas HTML) y prohibir explícitamente el relleno (saludos/despedidas), garantiza que la IA se integre perfectamente a tu flujo de trabajo visual.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: false,
+                        text: "Genera el plan de 3 días. Pon el plan en un cuadro o algo que se vea muy ordenado para imprimir y entregar a los pacientes.",
+                        aiResponse: "¡Claro que sí! Aquí he organizado el reto en una estructura ordenada para que sea fácil de imprimir para tus pacientes:\n\n* **DÍA 1: VIERNES**\n  - Mañana: Revisión final de correos e inicio de desconexión.\n  - Tarde: Dejar el móvil en otra habitación.\n\n* **DÍA 2: SÁBADO**\n  - Mañana: Salida al parque sin dispositivos.\n\nComo puedes ver, este formato tipo lista ordenada les permitirá llevar el seguimiento. ¡Éxito con la campaña!",
+                        feedbackTitle: "Ambigüedad de Formato",
+                        feedbackSubtitle: "La IA adivinó lo que significaba 'algo ordenado'.",
+                        feedbackText: "Instrucciones subjetivas como 'un cuadro o algo ordenado' hacen que la IA adivine y ofrezca listas de viñetas simples, incluyendo nuevamente texto conversacional inservible al inicio y al final.",
+                        conceptTitle: "Estandarización del Tipo (T)",
+                        conceptText: "Nunca dejes el formato a la interpretación libre de la IA. Llama a las estructuras por su nombre técnico universal (Tabla, Columnas, Lista HTML).",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    }
+                ]
+            },
+            {
+                id: 8,
+                stage: 3,
+                stageName: "Nivel 3: T.O. & Maestría",
+                letter: "O - OPTIMIZACIÓN LÓGICA",
+                title: "Razonamiento y Evaluación",
+                briefingHtml: `
+                    <p>Quieres proponer en la campaña un "Ayuno digital radical de 24 horas continuas" para bajar el estrés general de los adultos.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo: Obligar a la IA a evaluar los riesgos reales con un método de pasos sucesivos antes de darte una respuesta, evitando que valide tu idea ciegamente.</p>
+                `,
+                autoUserPrompt: "¿Qué te parece si implementamos un reto de ayuno total de pantallas de 24 horas continuas para bajar el estrés?",
+                aiGreeting: "Interesante abordaje. Estoy listo para evaluar esa propuesta para tu campaña. ¿Cómo quieres que proceda con el análisis?",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Dame tu opinión sobre esta idea. ¿Crees que funcionará para reducir la ansiedad de los adultos?",
+                        aiResponse: "¡Es una idea excelente! Un ayuno digital de 24 horas es una forma fantástica de desintoxicar el cerebro, reducir el estrés y reconectar con el entorno. Sin duda, funcionará maravillosamente para bajar la ansiedad de tus pacientes adultos.",
+                        feedbackTitle: "Ceguera por Confirmación",
+                        feedbackSubtitle: "Validó tu idea ciegamente, ignorando riesgos.",
+                        feedbackText: "La IA asumió que porque propusiste la idea, querías validación positiva. Ignoró los riesgos clínicos (abstinencia, ansiedad de rebote, urgencias laborales) para darte una respuesta 'amable'.",
+                        conceptTitle: "El Sesgo de Confirmación Natural",
+                        conceptText: "Si haces preguntas de sí/no o pides opiniones genéricas, las IA tenderán a darte la razón para parecer 'útiles'. Esto es extremadamente peligroso en el ámbito de la salud mental o toma de decisiones.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: true,
+                        text: "Optimización: Actúa como psicólogo clínico. 1. Enumera 2 beneficios potenciales. 2. Enumera 2 riesgos clínicos (ansiedad de rebote). 3. Solo basándote en la comparación estricta de 1 y 2, redacta tu veredicto final sobre la viabilidad.",
+                        aiResponse: "1. Beneficios: Reducción inmediata de la hiperestimulación luminosa; freno temporal a la comparación social pasiva.\n2. Riesgos: Síndrome de abstinencia psicológica (FOMO) exacerbando la ideación ansiosa; estrés logístico severo por aislamiento repentino.\n3. Veredicto: Un ayuno radical de 24h sin preparación es contraproducente y elevará la ansiedad (riesgos superan beneficios). Una restricción gradual por bloques horarios es clínicamente más segura y viable.",
+                        feedbackTitle: "Razonamiento Multiperspectiva Logrado",
+                        feedbackSubtitle: "La IA evaluó críticamente antes de concluir.",
+                        feedbackText: "Al forzar al modelo a escribir los riesgos (paso 2) ANTES de generar el veredicto (paso 3), las palabras sobre 'ansiedad de rebote' alteraron su cálculo matemático posterior, resultando en un análisis seguro, crítico y objetivo.",
+                        conceptTitle: "Optimización por Pasos (Chain of Thought)",
+                        conceptText: "La letra O representa la Optimización lógica. Forzar a la IA a escribir pros y contras explícitos, o aplicar rúbricas numéricas antes de concluir, es la única manera de lograr que 'piense' y evalúe escenarios complejos con objetividad.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: false,
+                        text: "Analiza a profundidad los pros y contras de esta idea y dime si sirve.",
+                        aiResponse: "Pros: Mejora del sueño, mayor atención sostenida en el entorno físico.\nContras: Aburrimiento inicial, posible necesidad de usar el teléfono para trabajo urgente.\nConclusión: Sí sirve, es una gran herramienta siempre que los pacientes organicen bien su día de descanso libre de pantallas.",
+                        feedbackTitle: "Análisis Superficial y Genérico",
+                        feedbackSubtitle: "Faltó rigor sistémico y un rol técnico.",
+                        feedbackText: "Aunque pediste 'pros y contras', al no exigir un rol clínico (psicólogo) ni encadenar la conclusión estrictamente a los riesgos, el modelo produjo observaciones obvias y terminó dándote la razón de todos modos.",
+                        conceptTitle: "Estructura Lógica (O)",
+                        conceptText: "La Optimización requiere pautas encadenadas estrictas: 'Paso 1 haz X, Paso 2 haz Y, y basado solo en Y, concluye Z'.",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    }
+                ]
+            },
+            {
+                id: 9,
+                stage: 3,
+                stageName: "Nivel 3: T.O. & Maestría",
+                letter: "C.O.N.T.E.X.T.O.",
+                title: "Prueba de Maestría Final",
+                briefingHtml: `
+                    <p>Vas a solicitar el guion final para un video corto (Reel/TikTok) de la campaña sobre la rutina de sueño y la luz azul.</p>
+                    <p class="text-sky-300 font-medium mt-2">Objetivo Definitivo: Demostrar tu capacidad de Operador Estructural integrando todas las variables del framework C.O.N.T.E.X.T.O en un solo prompt maestro imparable.</p>
+                `,
+                autoUserPrompt: "Llegó la hora de poner todo el método a prueba.",
+                aiGreeting: "Estoy listo. Envíame tu prompt final estructurado para demostrar el control absoluto sobre mi modelo generativo.",
+                options: [
+                    {
+                        tag: "A",
+                        isMaster: false,
+                        text: "Contexto: La luz azul bloquea melatonina. Rol: Neurólogo. Tarea: Crea el guion para un Reel de Instagram sobre pantallas y sueño. Especificaciones: Que sea detallado y científico.",
+                        aiResponse: "TÍTULO: LA DISRUPCIÓN MELATONÍNICA\n(El presentador mira a cámara)\nLa glándula pineal inhibe la secreción de N-acetil-5-metoxitriptamina ante espectros lumínicos de onda corta (400-490 nm) emitidos por sus dispositivos móviles...\n\n(Siguen 3 minutos de texto clínico muy denso sin divisiones visuales claras)...",
+                        feedbackTitle: "Estructura Incompleta",
+                        feedbackSubtitle: "Ignoraste las Exclusiones y el Formato Visual.",
+                        feedbackText: "Aplicaste bien el inicio del método (C, N, T), pero fallaste en las restricciones de diseño. Al olvidar el Tipo de Salida y las Exclusiones, la IA generó un muro de texto técnico e inusable para un Reel rápido de redes sociales.",
+                        conceptTitle: "El Framework Parcial",
+                        conceptText: "Usar solo la mitad del acrónimo deja la puerta abierta para que el modelo vuelva a sus peores hábitos: verbosidad incontrolable y pérdida de formato.",
+                        icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "B",
+                        isMaster: false,
+                        text: "Redacta un guion de TikTok sobre cómo los celulares arruinan el sueño de los adultos. Eres un experto médico. Usa datos alarmantes para el gancho. Ponlo en formato de viñetas.",
+                        aiResponse: "📱 ¡EL CELULAR DESTRUYE TU CEREBRO MIENTRAS DUERMES! 📱\n• La luz de tu pantalla engaña a tu sistema nervioso central simulando pleno mediodía.\n• El uso constante mata tu melatonina.\n• Más del 85% de los adultos sufren de insomnio neurológico severo por culpa del scroll nocturno en cama.",
+                        feedbackTitle: "Caída Crítica (Modo Chatbot)",
+                        feedbackSubtitle: "Regresaste a la instrucción informal y ambigua.",
+                        feedbackText: "Usaste lenguaje conversacional reactivo ('arruinan', 'datos alarmantes') sin anclar un Contexto verificable. Como resultado, la IA alucinó estadísticas falsas ('85% de adultos con insomnio severo') y adoptó un tono sensacionalista.",
+                        conceptTitle: "Los riesgos de la instrucción suelta",
+                        conceptText: "Sin el rigor metódico del framework, la IA busca la interacción más fácil, resultando en desinformación y contenido no apto para uso profesional.",
+                        icon: "✕", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
+                    },
+                    {
+                        tag: "C",
+                        isMaster: true,
+                        text: "C: Luz azul inhibe melatonina. O: Educar sobre rutinas nocturnas. N: Divulgador riguroso. T: Redactar guion de Reel. E: 3 actos, tono empático, 45segs total. X: PROHIBIDO alarmismo o inventar stats. T: Tabla Markdown (Sección/Audio). O: Verifica tiempos antes de escribir.",
+                        aiResponse: "Validación (O): 3 actos a ritmo de habla normal = 45 segundos totales. Aprobado.\n\n| Sección (15s c/u) | Audio del Presentador (Texto exacto) |\n|---|---|\n| 1. El Gancho | ¿Sabías que el cerebro confunde la luz brillante del celular con la luz de la mañana? |\n| 2. El Proceso | Esa luz interrumpe tu melatonina, la hormona clave que te ayuda a iniciar el ciclo de sueño y relajar el cuerpo. |\n| 3. La Acción | El descanso empieza antes de cerrar los ojos. Prueba apagar pantallas 45 minutos antes de dormir. |",
+                        feedbackTitle: "Control Absoluto (C.O.N.T.E.X.T.O.)",
+                        feedbackSubtitle: "El modelo obedeció como una herramienta ingenieril perfecta.",
+                        feedbackText: "Anclaje veraz, intención de fondo clara, rol experto, directiva operativa precisa, extensión controlada, lista negra respetada, formato de tabla inmaculado y verificación de tiempo.",
+                        conceptTitle: "Maestría Estructural Lograda",
+                        conceptText: "Has integrado las 8 variables del framework en un solo bloque estructurado. Ahora cuentas con el rigor técnico y mental para dejar de ser un simple 'usuario de chat' y convertirte en un Operador de IA Avanzado.",
+                        icon: "✓", iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40", btnClass: "btn-evaluate"
+                    }
+                ]
+            }
+        ];
+
+        let currentLevelIdx = 0;
+        let selectedOption = null;
+        let isReviewingMission = false;
+
+        function openLabIntroModal() {
+            const modal = document.getElementById('lab-intro-modal');
+            const content = document.getElementById('lab-intro-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 20);
+        }
+
+        function closeLabIntroModal() {
+            const modal = document.getElementById('lab-intro-modal');
+            const content = document.getElementById('lab-intro-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function continueToLabFromIntro() {
+            closeLabIntroModal();
+            setTimeout(() => {
+                openLabModal();
+            }, 180);
+        }
+
+        function toggleApiKeyHelp() {
+            const helpBox = document.getElementById('lab-api-key-help');
+            if (helpBox) {
+                helpBox.classList.toggle('hidden');
+            }
+        }
+
+        function showCustomApiFallback(reasonMsg) {
+            const container = document.getElementById('lab-custom-api-container');
+            if (container) {
+                container.classList.remove('hidden');
+            }
+        }
+
+        async function callGeminiAPI(payload, maxRetries = 3) {
+            const customKey = document.getElementById('lab-custom-api-key')?.value?.trim();
+            const modelName = "gemini-flash-lite-latest";
+            let delay = 1000;
+
+            if (customKey) {
+                const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${customKey}`;
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    try {
+                        const response = await fetch(directUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            if (response.status === 429 && attempt < maxRetries - 1) {
+                                await new Promise(res => setTimeout(res, delay));
+                                delay *= 2;
+                                continue;
+                            }
+                            const errJson = await response.json().catch(() => null);
+                            const msg = errJson?.error?.message || `HTTP ${response.status}`;
+                            throw new Error(msg);
+                        }
+
+                        const data = await response.json();
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                        if (text) return text;
+                        throw new Error("Respuesta vacía del modelo");
+                    } catch (err) {
+                        if (attempt === maxRetries - 1) throw err;
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    }
+                }
+                return;
+            }
+
+            try {
+                const backendResponse = await fetch('/api/gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...payload, model: modelName })
+                });
+
+                if (backendResponse.ok) {
+                    const data = await backendResponse.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) return text;
+                    throw new Error("Respuesta vacía del servidor.");
+                }
+
+                if (backendResponse.status === 429 || backendResponse.status === 404 || backendResponse.status === 500) {
+                    showCustomApiFallback();
+                    if (backendResponse.status === 429) {
+                        throw new Error("La cuota comunitaria diaria se ha completado. Ingresa tu clave gratuita arriba para continuar.");
+                    } else {
+                        throw new Error("Servidor no disponible en este entorno. Ingresa tu API Key gratuita en la casilla superior.");
+                    }
+                }
+
+                const errJson = await backendResponse.json().catch(() => null);
+                const errorMsg = errJson?.error?.message || errJson?.error || `HTTP ${backendResponse.status}`;
+                throw new Error(errorMsg);
+            } catch (backendErr) {
+                showCustomApiFallback();
+                throw backendErr;
+            }
+        }
+
+        function openLabModal() {
+            const modal = document.getElementById('lab-modal');
+            const content = document.getElementById('lab-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 20);
+
+            const textarea = document.getElementById('lab-prompt-input');
+            const countEl = document.getElementById('lab-char-count');
+            textarea.oninput = () => {
+                countEl.textContent = `${textarea.value.length} caracteres`;
+            };
+        }
+
+        function closeLabModal() {
+            const modal = document.getElementById('lab-modal');
+            const content = document.getElementById('lab-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function clearLabPrompt() {
+            const input = document.getElementById('lab-prompt-input');
+            input.value = '';
+            document.getElementById('lab-char-count').textContent = `0 caracteres`;
+            document.getElementById('lab-output-box').classList.add('hidden');
+            document.getElementById('lab-audit-box').classList.add('hidden');
+        }
+
+        async function executeLabPrompt() {
+            const input = document.getElementById('lab-prompt-input');
+            const promptText = input.value.trim();
+            if (!promptText) {
+                input.focus();
+                return;
+            }
+
+            const btn = document.getElementById('lab-run-btn');
+            const outBox = document.getElementById('lab-output-box');
+            const outContent = document.getElementById('lab-output-content');
+            const outTime = document.getElementById('lab-output-time');
+            const originalBtnHtml = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Conectando...`;
+            outBox.classList.remove('hidden');
+            outContent.textContent = "Generando respuesta...";
+
+            try {
+                const startTime = performance.now();
+                const payload = {
+                    contents: [{ parts: [{ text: promptText }] }],
+                    systemInstruction: { parts: [{ text: "Eres un asistente de IA profesional y analítico. Responde al usuario de forma estructurada, rigurosa y directa." }] }
+                };
+                const responseText = await callGeminiAPI(payload);
+                const duration = ((performance.now() - startTime) / 1000).toFixed(2);
+                outContent.textContent = responseText || "No se recibió respuesta del modelo.";
+                outTime.textContent = `Generado en ${duration}s`;
+            } catch (err) {
+                outContent.textContent = `Aviso de conexión: ${err.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        async function auditLabPrompt() {
+            const input = document.getElementById('lab-prompt-input');
+            const promptText = input.value.trim();
+            if (!promptText) {
+                input.focus();
+                return;
+            }
+
+            const btn = document.getElementById('lab-audit-btn');
+            const auditBox = document.getElementById('lab-audit-box');
+            const auditContent = document.getElementById('lab-audit-content');
+            const originalBtnHtml = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Auditando C.O.N.T.E.X.T.O...`;
+            auditBox.classList.remove('hidden');
+            auditContent.innerHTML = `<div class="flex items-center gap-2 text-indigo-300 font-mono text-xs"><span class="typing-dot"></span> Evaluando las 8 variables del método...</div>`;
+
+            const auditSystemPrompt = `Eres un auditor experto en Prompt Engineering. Tu tarea es auditar el prompt del usuario basándote ESTRICTAMENTE en las 8 variables del framework C.O.N.T.E.X.T.O.:
+1. Contexto (Datos y antecedentes anclados)
+2. Objetivo (Propósito o intención de fondo)
+3. Nivel/Rol (Autoridad que desactiva complacencia)
+4. Tarea (Directiva operativa de qué construir)
+5. Especificaciones (Tono, extensión y estilo)
+6. eXclusiones/Ejemplos (Restricciones y formato Few-Shot)
+7. Tipo de salida (Formato final técnico: Tabla, CSV, Lista)
+8. Optimización (Razonamiento por pasos y evaluación lógica)
+
+Devuelve tu análisis en este formato Markdown:
+### 📊 Diagnóstico C.O.N.T.E.X.T.O.
+- **Fortalezas:** [Lista qué variables del método aplicó bien]
+- **Puntos Ciegos:** [Lista qué variables faltan y el riesgo de que la IA asuma comportamientos indeseados]
+
+### 💡 Veredicto y Oportunidad
+[1 párrafo explicando el impacto real que tendrá en un modelo generativo]
+
+### 🚀 Versión Optimizada Recomendada
+"[Escribe aquí la versión mejorada aplicando los 8 fundamentos estructurales de la metodología]"`;
+
+            try {
+                const payload = {
+                    contents: [{ parts: [{ text: `Audita el siguiente prompt:\n\n"""\n${promptText}\n"""` }] }],
+                    systemInstruction: { parts: [{ text: auditSystemPrompt }] }
+                };
+                const auditText = await callGeminiAPI(payload);
+                auditContent.innerHTML = `<div class="prose prose-invert max-w-none text-xs sm:text-sm leading-relaxed">${escapeHtml(auditText).replace(/\n/g, '<br>')}</div>`;
+            } catch (err) {
+                auditContent.innerHTML = `<span class="text-rose-400 font-mono text-xs">Error al auditar: ${escapeHtml(err.message)}</span>`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        function goBackAction() {
+            ['mission-modal', 'feedback-modal', 'completion-modal', 'level-summary-modal'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el && !el.classList.contains('hidden')) {
+                    el.classList.add('hidden');
+                    el.classList.add('opacity-0');
+                }
+            });
+
+            if (currentLevelIdx > 0) {
+                currentLevelIdx--;
+                selectedOption = null;
+                isReviewingMission = false;
+                loadLevelEnvironment();
+            } else {
+                restartSimulation();
+            }
+        }
+
+        function closeOnboarding() {
+            const modal = document.getElementById('onboarding-modal');
+            openMissionModal(false);
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function openMissionModal(isReview = false) {
+            isReviewingMission = isReview;
+            const lvl = levels[currentLevelIdx];
+            
+            document.getElementById('modal-mission-level').textContent = lvl.stageName;
+            document.getElementById('mission-number').textContent = `Misión ${lvl.id}`;
+            document.getElementById('mission-focus').textContent = lvl.letter;
+            document.getElementById('mission-title').textContent = lvl.title;
+            document.getElementById('mission-desc').innerHTML = lvl.briefingHtml;
+
+            const actionBtn = document.getElementById('mission-action-btn');
+            if (isReview) {
+                actionBtn.textContent = "Volver a las Opciones";
+            } else {
+                actionBtn.textContent = "Iniciar Conversación";
+            }
+
+            const modal = document.getElementById('mission-modal');
+            const content = document.getElementById('mission-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 20);
+        }
+
+        function viewMissionModal() {
+            openMissionModal(true);
+        }
+
+        function handleMissionAction() {
+            if (isReviewingMission) {
+                const modal = document.getElementById('mission-modal');
+                const content = document.getElementById('mission-modal-content');
+                modal.classList.add('opacity-0');
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    isReviewingMission = false;
+                }, 300);
+            } else {
+                startMission();
+            }
+        }
+
+        function startMission() {
+            const modal = document.getElementById('mission-modal');
+            const content = document.getElementById('mission-modal-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                loadLevelEnvironment();
+            }, 300);
+        }
+
+        function loadLevelEnvironment() {
+            const lvl = levels[currentLevelIdx];
+            
+            document.getElementById('header-level-name').textContent = lvl.stageName;
+            document.getElementById('level-indicator').textContent = `${lvl.id} / ${levels.length}`;
+            document.getElementById('side-level-badge').textContent = `Nivel ${lvl.stage}`;
+            document.getElementById('side-mission-badge').textContent = `Misión ${lvl.id}`;
+            document.getElementById('side-mission-title').textContent = lvl.title;
+
+            document.getElementById('options-view').classList.remove('hidden');
+            document.getElementById('evaluation-view').classList.add('hidden');
+            document.getElementById('evaluation-view').classList.remove('flex');
+
+            const optsSection = document.getElementById('options-section');
+            if (window.innerWidth < 768) {
+                optsSection.classList.add('hidden');
+                optsSection.classList.remove('flex');
+            } else {
+                optsSection.classList.remove('hidden');
+                optsSection.classList.add('md:flex');
+            }
+
+            renderOptions(lvl.options);
+
+            const chatCanvas = document.getElementById('chat-canvas');
+            chatCanvas.innerHTML = '';
+
+            simulateInitialDialogue(lvl);
+        }
+
+        function renderOptions(options) {
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            options.forEach((opt) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3.5 sm:p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/90 transition-all duration-200 text-slate-200 flex items-start gap-3 group";
+                btn.onclick = () => selectOption(opt);
+                
+                btn.innerHTML = `
+                    <span class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-sky-950 border border-sky-600/50 flex items-center justify-center text-xs sm:text-xs font-mono font-bold text-sky-400 shrink-0 group-hover:bg-sky-900 group-hover:border-sky-400 transition-colors mt-0.5">
+                        ${opt.tag}
+                    </span>
+                    <span class="text-sm sm:text-xs md:text-xs lg:text-[13px] leading-relaxed text-slate-300 group-hover:text-white transition-colors">
+                        ${opt.text}
+                    </span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function simulateInitialDialogue(lvl) {
+            const chatCanvas = document.getElementById('chat-canvas');
+            
+            const userMsg = createMessageBubble('user', lvl.autoUserPrompt);
+            chatCanvas.appendChild(userMsg);
+            scrollChatView();
+
+            showTypingIndicator();
+
+            setTimeout(() => {
+                hideTypingIndicator();
+                const aiMsg = createMessageBubble('ai', lvl.aiGreeting);
+                chatCanvas.appendChild(aiMsg);
+                scrollChatView();
+
+                const mobileCta = document.createElement('div');
+                mobileCta.id = 'mobile-options-cta';
+                mobileCta.className = 'md:hidden pt-2 fade-in';
+                mobileCta.innerHTML = `
+                    <button onclick="toggleMobileOptions()" type="button" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-sky-950/90 hover:bg-sky-900 border border-sky-500/40 text-sky-300 font-semibold text-sm transition-all shadow-md active:scale-98">
+                        <span>Ver opciones de respuesta</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                `;
+                chatCanvas.appendChild(mobileCta);
+            }, 800);
+        }
+
+        function toggleMobileOptions() {
+            const optsSection = document.getElementById('options-section');
+            const ctaBtn = document.getElementById('mobile-options-cta');
+            if (!optsSection) return;
+
+            optsSection.classList.remove('hidden');
+            optsSection.classList.add('flex');
+
+            if (ctaBtn) {
+                ctaBtn.classList.add('hidden');
+            }
+
+            setTimeout(() => {
+                optsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 60);
+        }
+
+        function createMessageBubble(sender, text) {
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex gap-3 fade-in ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            if (sender === 'user') {
+                wrapper.innerHTML = `
+                    <div class="max-w-[85%] bg-sky-950/80 border border-sky-800/60 text-slate-100 rounded-2xl rounded-tr-sm px-4 py-2.5 sm:py-3 text-sm sm:text-[15px] shadow-sm leading-relaxed">
+                        <span class="text-xs font-mono text-sky-400 block mb-1 font-semibold">Tú</span>
+                        ${escapeHtml(text)}
+                    </div>
+                `;
+            } else {
+                // Table support for output rendering
+                let formattedText = escapeHtml(text);
+                
+                if (formattedText.includes('| Día |') || formattedText.includes('| Sección')) {
+                    const rows = formattedText.split('\n');
+                    let tableHTML = '<div class="overflow-x-auto"><table class="min-w-full text-xs sm:text-sm mt-2 mb-2 border-collapse border border-slate-700">';
+                    rows.forEach(row => {
+                        if (row.trim().startsWith('|') && !row.includes('---|---')) {
+                            const cells = row.split('|').filter(c => c.trim() !== '');
+                            tableHTML += '<tr>';
+                            cells.forEach(cell => {
+                                if (row.includes('Día') || row.includes('Sección')) {
+                                    tableHTML += `<th class="border border-slate-700 bg-slate-800/80 p-2 text-sky-300 font-semibold">${cell.trim()}</th>`;
+                                } else {
+                                    tableHTML += `<td class="border border-slate-700 p-2 text-slate-200">${cell.trim()}</td>`;
+                                }
+                            });
+                            tableHTML += '</tr>';
+                        }
+                    });
+                    tableHTML += '</table></div>';
+                    // Reemplazo básico de la tabla markdown en el texto renderizado
+                    formattedText = formattedText.replace(/\| .* \|[\s\S]*\|/g, tableHTML);
+                } else {
+                    formattedText = formattedText.replace(/\n/g, '<br>');
+                }
+
+                wrapper.innerHTML = `
+                    <div class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <div class="max-w-[85%] bg-slate-900 border border-slate-800 text-slate-200 rounded-2xl rounded-tl-sm px-4 py-2.5 sm:py-3 text-sm sm:text-[15px] shadow-sm leading-relaxed prose prose-invert">
+                        <span class="text-xs font-mono text-slate-400 block mb-1 font-semibold">IA Asistente</span>
+                        ${formattedText}
+                    </div>
+                `;
+            }
+            return wrapper;
+        }
+
+        function showTypingIndicator() {
+            const chatCanvas = document.getElementById('chat-canvas');
+            const ind = document.createElement('div');
+            ind.id = 'typing-indicator-box';
+            ind.className = "flex gap-3 items-center fade-in";
+            ind.innerHTML = `
+                <div class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl px-4 py-2 text-xs">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
+            `;
+            chatCanvas.appendChild(ind);
+            chatCanvas.scrollTop = chatCanvas.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const ind = document.getElementById('typing-indicator-box');
+            if (ind) ind.remove();
+        }
+
+        function selectOption(opt) {
+            selectedOption = opt;
+            const chatCanvas = document.getElementById('chat-canvas');
+
+            const mobileCta = document.getElementById('mobile-options-cta');
+            if (mobileCta) mobileCta.remove();
+
+            if (window.innerWidth < 768) {
+                const optsSection = document.getElementById('options-section');
+                optsSection.classList.add('hidden');
+                optsSection.classList.remove('flex');
+            }
+
+            document.getElementById('options-view').classList.add('hidden');
+            const evalView = document.getElementById('evaluation-view');
+            evalView.classList.remove('hidden');
+            evalView.classList.add('flex');
+
+            const oldCallout = document.getElementById('inline-eval-callout');
+            if (oldCallout) oldCallout.remove();
+
+            const userMsg = createMessageBubble('user', opt.text);
+            chatCanvas.appendChild(userMsg);
+            scrollChatView();
+
+            showTypingIndicator();
+
+            setTimeout(() => {
+                hideTypingIndicator();
+                const aiMsg = createMessageBubble('ai', opt.aiResponse);
+                chatCanvas.appendChild(aiMsg);
+                
+                const evalCallout = document.createElement('div');
+                evalCallout.id = 'inline-eval-callout';
+                evalCallout.className = 'md:hidden w-full bg-slate-900/95 border border-sky-800/60 rounded-2xl p-4 shadow-xl fade-in my-3';
+                evalCallout.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-sky-950 border border-sky-500/40 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-bold text-white">Análisis de Estructura</h4>
+                            <p class="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed">
+                                Lee en el chat la respuesta de la IA. Analiza su estructura y rigor antes de continuar.
+                            </p>
+                            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex justify-end">
+                                <button onclick="revealFeedback()" class="w-full sm:w-auto btn-evaluate text-white font-semibold py-2.5 px-5 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg hover:scale-[1.01] active:scale-98 transition-all">
+                                    <span>Auditar Resultado</span>
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                chatCanvas.appendChild(evalCallout);
+
+                if (window.innerWidth < 768) {
+                    setTimeout(() => {
+                        aiMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 60);
+                } else {
+                    chatCanvas.scrollTop = chatCanvas.scrollHeight;
+                }
+            }, 900);
+        }
+
+        function showLevelSummary(levelCompleted) {
+            closeFeedbackModal(() => {
+                const modal = document.getElementById('level-summary-modal');
+                const content = document.getElementById('level-summary-content');
+                const title = document.getElementById('level-summary-title');
+                const body = document.getElementById('level-summary-body');
+
+                if (levelCompleted === 1) {
+                    title.innerHTML = '¡Nivel 1 Completado!<br><span class="text-sky-400 text-lg">Has desbloqueado: C.O.N.</span>';
+                    body.innerHTML = `
+                        <p class="mb-3">Has dominado los cimientos operativos para que la IA deje de alucinar y trabaje con foco:</p>
+                        <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 text-sm space-y-3">
+                            <div class="flex items-start gap-2">
+                                <strong class="text-sky-400 font-mono w-4">C</strong>
+                                <span class="text-slate-200"><strong>Contexto:</strong> Anclar a datos verificados.</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <strong class="text-sky-400 font-mono w-4">O</strong>
+                                <span class="text-slate-200"><strong>Objetivo:</strong> Declarar la intención de fondo y empatía.</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <strong class="text-sky-400 font-mono w-4">N</strong>
+                                <span class="text-slate-200"><strong>Nivel/Rol:</strong> Imponer autoridad estricta.</span>
+                            </div>
+                        </div>
+                    `;
+                } else if (levelCompleted === 2) {
+                    title.innerHTML = '¡Nivel 2 Completado!<br><span class="text-sky-400 text-lg">Has desbloqueado: T.E.X.</span>';
+                    body.innerHTML = `
+                        <p class="mb-3">Has tomado el control estructural y estético, domando el sesgo de verbosidad:</p>
+                        <div class="bg-slate-800/60 p-4 rounded-xl border border-slate-700/80 text-sm space-y-3">
+                            <div class="flex items-start gap-2">
+                                <strong class="text-sky-400 font-mono w-4">T</strong>
+                                <span class="text-slate-200"><strong>Tarea:</strong> Exigir un entregable operativo claro.</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <strong class="text-sky-400 font-mono w-4">E</strong>
+                                <span class="text-slate-200"><strong>Especificaciones:</strong> Forzar tono, longitud y diseño.</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <strong class="text-sky-400 font-mono w-4">X</strong>
+                                <span class="text-slate-200"><strong>eXclusiones:</strong> Bloquear sesgos y obligar plantillas exactas.</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-0');
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }, 20);
+            });
+        }
+
+        function closeLevelSummaryAndAdvance() {
+            const modal = document.getElementById('level-summary-modal');
+            const content = document.getElementById('level-summary-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                currentLevelIdx++;
+                openMissionModal(false);
+            }, 300);
+        }
+
+        function revealFeedback() {
+            if (!selectedOption) return;
+
+            const opt = selectedOption;
+            const modal = document.getElementById('feedback-modal');
+            const content = document.getElementById('feedback-content');
+
+            const iconElem = document.getElementById('modal-icon');
+            iconElem.textContent = opt.icon;
+            iconElem.className = `w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl font-bold shadow-inner ${opt.iconBg}`;
+
+            document.getElementById('modal-title').textContent = opt.feedbackTitle;
+            document.getElementById('modal-subtitle').textContent = opt.feedbackSubtitle;
+            document.getElementById('modal-text').textContent = opt.feedbackText;
+
+            document.getElementById('modal-concept-title').textContent = opt.conceptTitle;
+            document.getElementById('modal-concept-text').textContent = opt.conceptText;
+
+            const actionBtn = document.getElementById('modal-btn');
+            actionBtn.className = `w-full py-3 rounded-xl font-semibold text-sm sm:text-base transition-transform active:scale-95 text-white shadow-lg ${opt.btnClass}`;
+
+            if (opt.isMaster) {
+                if (currentLevelIdx === 2) { 
+                    actionBtn.textContent = "Ver Resumen del Nivel 1";
+                    actionBtn.onclick = () => showLevelSummary(1);
+                } else if (currentLevelIdx === 5) {
+                    actionBtn.textContent = "Ver Resumen del Nivel 2";
+                    actionBtn.onclick = () => showLevelSummary(2);
+                } else if (currentLevelIdx === 8) {
+                    actionBtn.textContent = "Ver Maestría Final";
+                    actionBtn.onclick = finishSimulation;
+                } else {
+                    actionBtn.textContent = "Siguiente Misión";
+                    actionBtn.onclick = advanceToNextLevel;
+                }
+            } else {
+                actionBtn.textContent = "Reintentar esta Misión";
+                actionBtn.onclick = retryLevel;
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 20);
+        }
+
+        function retryLevel() {
+            closeFeedbackModal(() => {
+                document.getElementById('evaluation-view').classList.add('hidden');
+                document.getElementById('evaluation-view').classList.remove('flex');
+                document.getElementById('options-view').classList.remove('hidden');
+                
+                const inlineCallout = document.getElementById('inline-eval-callout');
+                if (inlineCallout) inlineCallout.remove();
+
+                const optsSection = document.getElementById('options-section');
+                optsSection.classList.remove('hidden');
+                optsSection.classList.add('flex');
+                
+                if (window.innerWidth < 768) {
+                    setTimeout(() => {
+                        optsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 50);
+                }
+            });
+        }
+
+        function advanceToNextLevel() {
+            closeFeedbackModal(() => {
+                currentLevelIdx++;
+                openMissionModal(false);
+            });
+        }
+
+        function finishSimulation() {
+            closeFeedbackModal(() => {
+                openCompletionModal();
+            });
+        }
+
+        function openCompletionModal() {
+            const modal = document.getElementById('completion-modal');
+            const content = document.getElementById('completion-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 20);
+        }
+
+        function closeCompletionModal(callback) {
+            const modal = document.getElementById('completion-modal');
+            const content = document.getElementById('completion-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (callback) callback();
+            }, 300);
+        }
+
+        function restartSimulation() {
+            ['mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('opacity-0');
+                    el.classList.add('hidden');
+                }
+            });
+
+            currentLevelIdx = 0;
+            selectedOption = null;
+            isReviewingMission = false;
+            
+            const toast = document.getElementById('share-toast');
+            if (toast) toast.classList.add('hidden');
+
+            const chatCanvas = document.getElementById('chat-canvas');
+            if (chatCanvas) chatCanvas.innerHTML = '';
+
+            const optsSection = document.getElementById('options-section');
+            if (optsSection && window.innerWidth < 768) {
+                optsSection.classList.add('hidden');
+                optsSection.classList.remove('flex');
+            }
+
+            const onboarding = document.getElementById('onboarding-modal');
+            if (onboarding) {
+                onboarding.classList.remove('hidden');
+                setTimeout(() => {
+                    onboarding.classList.remove('opacity-0');
+                }, 20);
+            }
+        }
+
+        function getShareUrl() {
+            let url = '';
+            try {
+                if (window.top && window.top.location && window.top.location.href && window.top.location.href.startsWith('http')) {
+                    url = window.top.location.href;
+                }
+            } catch (e) {}
+
+            if (!url || !url.startsWith('http')) {
+                if (document.referrer && document.referrer.startsWith('http')) {
+                    url = document.referrer;
+                }
+            }
+
+            if (!url || !url.startsWith('http')) {
+                if (window.location.href && window.location.href.startsWith('http')) {
+                    url = window.location.href;
+                }
+            }
+
+            return url || window.location.href || window.location.origin || '';
+        }
+
+        async function handleShare() {
+            const shareUrl = getShareUrl();
+            const shareData = {
+                title: 'Fundamentos de Prompting: Simulador Interactivo',
+                url: shareUrl
+            };
+
+            if (navigator.share) {
+                try {
+                    if (navigator.canShare && !navigator.canShare(shareData)) {
+                        copyLinkFallback(shareUrl);
+                        return;
+                    }
+                    await navigator.share(shareData);
+                    return; 
+                } catch (err) {
+                    if (err.name === 'AbortError') return; 
+                    console.warn('Fallo en compartir nativo, procediendo a respaldo:', err);
+                }
+            }
+            copyLinkFallback(shareUrl);
+        }
+
+        function copyLinkFallback(urlToCopy) {
+            const linkToCopy = urlToCopy || getShareUrl();
+
+            const tempInput = document.createElement('input');
+            tempInput.value = linkToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            tempInput.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                showShareToast();
+            } catch (err) {
+                console.warn('Error al copiar enlace', err);
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        function showShareToast() {
+            const toast = document.getElementById('share-toast');
+            if (toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        function closeFeedbackModal(callback) {
+            const modal = document.getElementById('feedback-modal');
+            const content = document.getElementById('feedback-content');
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (callback) callback();
+            }, 300);
+        }
+
+        function scrollToOptions() {
+            const optsSection = document.getElementById('options-section');
+            if (optsSection) {
+                optsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function scrollChatView() {
+            const chatCanvas = document.getElementById('chat-canvas');
+            if (chatCanvas) {
+                chatCanvas.scrollTop = chatCanvas.scrollHeight;
+            }
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
