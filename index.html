@@ -388,6 +388,16 @@
 
     <div class="w-full h-full flex flex-col overflow-hidden relative">
         
+        <!-- Pull-To-Refresh Indicator for Mobile -->
+        <div id="pull-to-refresh-indicator" class="pointer-events-none fixed top-14 left-0 right-0 z-40 flex items-center justify-center transition-opacity duration-150 opacity-0" style="transform: translateY(-4rem);" aria-hidden="true">
+            <div id="pull-refresh-bubble" class="flex items-center gap-2.5 px-4 py-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs font-semibold transition-colors duration-150">
+                <svg id="pull-refresh-icon" class="w-4 h-4 text-blue-600 dark:text-sky-400 transition-transform duration-150 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+                <span id="pull-refresh-text">Desliza para actualizar</span>
+            </div>
+        </div>
+        
         <!-- Pantalla de Bienvenida Inicial (Welcome Screen) -->
         <div id="welcome-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 md:p-6 bg-slate-900/70 dark:bg-black/85 backdrop-blur-md transition-opacity duration-300 flex items-center justify-center">
             <div id="welcome-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg sm:max-w-xl w-full p-5 sm:p-6 md:p-7 shadow-2xl relative my-auto max-h-[92dvh] flex flex-col text-left overflow-y-auto">
@@ -3834,6 +3844,18 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         let activeSummaryLevel = 1;
 
         function showLevelSummary(levelCompleted) {
+            if (!simulationCompleted) {
+                const stageMissions = {
+                    1: [0, 1, 2],
+                    2: [3, 4, 5],
+                    3: [6, 7, 8]
+                }[levelCompleted] || [];
+                const allDone = stageMissions.length > 0 && stageMissions.every(idx => completedLevels.includes(idx));
+                if (!allDone) {
+                    console.warn(`El resumen del Nivel ${levelCompleted} requiere completar todas sus 3 misiones.`);
+                    return;
+                }
+            }
             activeSummaryLevel = levelCompleted;
             closeFeedbackModal(() => {
                 const modal = document.getElementById('level-summary-modal');
@@ -4577,41 +4599,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                                 </div>
                             </div>
                         `;
-                    } else if (isCurrent) {
-                        // Paso Activo Actual en la Línea de Tiempo (Destacado)
-                        html += `
-                            <div class="relative flex items-start">
-                                <!-- Nodo Icono Misión Activa con Pulso -->
-                                <div class="absolute -left-8 sm:-left-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-lg ring-4 ring-blue-100 dark:ring-sky-950/80 animate-pulse shrink-0 z-10">
-                                    ⚡
-                                </div>
-                                <!-- Tarjeta de Paso Activo -->
-                                <div class="w-full p-3.5 sm:p-4 rounded-xl border-2 border-blue-500 dark:border-sky-500 bg-blue-50/60 dark:bg-sky-950/30 shadow-md">
-                                    <div class="flex items-center justify-between text-xs mb-1">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="text-base">${lvl.emoji}</span>
-                                            <span class="font-mono font-bold text-blue-700 dark:text-sky-300">Misión ${lvl.id}</span>
-                                            <span class="text-xs text-slate-400">·</span>
-                                            <span class="text-[11px] text-slate-600 dark:text-slate-300 font-medium">${lvl.category}</span>
-                                        </div>
-                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-xs">
-                                            Misión Activa
-                                        </span>
-                                    </div>
-                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">${lvl.title}</h4>
-                                    <div class="mt-3 pt-2.5 border-t border-blue-200/80 dark:border-sky-800/60 flex flex-wrap items-center gap-2">
-                                        <button onclick="navigateToMission(${mIdx})" type="button" class="py-1.5 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
-                                            <span>💬</span>
-                                            <span>Continuar Misión →</span>
-                                        </button>
-                                        <button onclick="viewMissionBriefingFromNavigator(${mIdx})" type="button" class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer" title="Ver detalles y objetivo de la misión">
-                                            <span>📋 Detalles</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
+                    } else if (isDone) {
                         // Paso Superado en la Línea de Tiempo
                         html += `
                             <div class="relative flex items-start">
@@ -4648,6 +4636,76 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                                 </div>
                             </div>
                         `;
+                    } else if (isCurrent) {
+                        // Paso Activo Actual en la Línea de Tiempo (En curso - Aún no superada)
+                        html += `
+                            <div class="relative flex items-start">
+                                <!-- Nodo Icono Misión Activa con Pulso -->
+                                <div class="absolute -left-8 sm:-left-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-lg ring-4 ring-blue-100 dark:ring-sky-950/80 animate-pulse shrink-0 z-10">
+                                    ⚡
+                                </div>
+                                <!-- Tarjeta de Paso Activo -->
+                                <div class="w-full p-3.5 sm:p-4 rounded-xl border-2 border-blue-500 dark:border-sky-500 bg-blue-50/60 dark:bg-sky-950/30 shadow-md">
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base">${lvl.emoji}</span>
+                                            <span class="font-mono font-bold text-blue-700 dark:text-sky-300">Misión ${lvl.id}</span>
+                                            <span class="text-xs text-slate-400">·</span>
+                                            <span class="text-[11px] text-slate-600 dark:text-slate-300 font-medium">${lvl.category}</span>
+                                        </div>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-xs">
+                                            Misión Activa
+                                        </span>
+                                    </div>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">${lvl.title}</h4>
+                                    <p class="text-[11px] text-blue-700 dark:text-sky-300 mt-1">Misión en curso · Completa esta misión para desbloquear sus aprendizajes</p>
+                                    <div class="mt-3 pt-2.5 border-t border-blue-200/80 dark:border-sky-800/60 flex flex-wrap items-center gap-2">
+                                        <button onclick="navigateToMission(${mIdx})" type="button" class="py-1.5 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                            <span>💬</span>
+                                            <span>Continuar Misión →</span>
+                                        </button>
+                                        <button onclick="viewMissionBriefingFromNavigator(${mIdx})" type="button" class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer" title="Ver detalles y objetivo de la misión">
+                                            <span>📋 Detalles</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Paso Desbloqueado pero aún no completado ni activo
+                        html += `
+                            <div class="relative flex items-start">
+                                <!-- Nodo Icono Desbloqueado -->
+                                <div class="absolute -left-8 sm:-left-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-sky-400 border border-blue-300 dark:border-sky-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-xs z-10">
+                                    ▶
+                                </div>
+                                <!-- Tarjeta de Paso Disponible -->
+                                <div class="w-full p-3 sm:p-3.5 rounded-xl border border-blue-200 dark:border-sky-800/50 bg-white/80 dark:bg-slate-900/50 shadow-xs">
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base">${lvl.emoji}</span>
+                                            <span class="font-mono font-bold text-slate-700 dark:text-slate-300">Misión ${lvl.id}</span>
+                                            <span class="text-xs text-slate-400">·</span>
+                                            <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">${lvl.category}</span>
+                                        </div>
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 dark:bg-sky-950 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800">
+                                            Disponible
+                                        </span>
+                                    </div>
+                                    <h4 class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug">${lvl.title}</h4>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Desbloqueada · Completa la misión para ver sus aprendizajes</p>
+                                    <div class="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-1.5">
+                                        <button onclick="navigateToMission(${mIdx})" type="button" class="py-1 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition-colors cursor-pointer flex items-center gap-1">
+                                            <span>💬</span>
+                                            <span>Iniciar Misión</span>
+                                        </button>
+                                        <button onclick="viewMissionBriefingFromNavigator(${mIdx})" type="button" class="py-1 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold transition-colors cursor-pointer" title="Ver detalles y objetivo de la misión">
+                                            <span>📋 Detalles</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
                     }
                 });
 
@@ -4655,19 +4713,19 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         </div>
 
                         <!-- Hito de Cierre de Nivel / Resumen de Etapa -->
-                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <span class="text-xs text-slate-500 dark:text-slate-400">
-                                ${isStageCompleted ? '🏆 Etapa completada con éxito' : '🏁 Meta: Completa las 3 misiones para el resumen del nivel'}
+                                ${isStageCompleted ? '🏆 Nivel completado con éxito' : `🏁 Meta: Completa las 3 misiones (${completedInStage}/3 superadas) para ver el resumen del nivel`}
                             </span>
-                            ${isStageReached ? `
-                                <button onclick="closeMissionsNavigator(); showLevelSummary(${stg.stage});" type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                            ${isStageCompleted ? `
+                                <button onclick="closeMissionsNavigator(); showLevelSummary(${stg.stage});" type="button" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
                                     <span>📖</span>
-                                    <span>Resumen Nivel ${stg.stage}</span>
+                                    <span>Ver Resumen Nivel ${stg.stage}</span>
                                 </button>
                             ` : `
-                                <button disabled type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-xs font-medium flex items-center gap-1.5 opacity-60 cursor-not-allowed">
+                                <button disabled type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-xs font-medium flex items-center gap-1.5 opacity-60 cursor-not-allowed" title="Completa las 3 misiones de este nivel para desbloquear su resumen">
                                     <span>🔒</span>
-                                    <span>Resumen Bloqueado</span>
+                                    <span>Resumen Bloqueado (${completedInStage}/3)</span>
                                 </button>
                             `}
                         </div>
@@ -4712,7 +4770,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
         function viewMissionFeedbackFromNavigator(missionIdx) {
             if (missionIdx < 0 || missionIdx >= levels.length) return;
-            if (!simulationCompleted && missionIdx > highestUnlockedLevel && !completedLevels.includes(missionIdx)) {
+            // Solo se permite ver aprendizajes si la misión fue completada con éxito
+            if (!simulationCompleted && !completedLevels.includes(missionIdx)) {
                 return;
             }
 
@@ -5143,7 +5202,27 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 closeOnboarding();
             } catch (err) {
                 console.error('Error Google Sign In:', err);
-                if (err.code === 'auth/popup-closed-by-user') {
+                if (err.code === 'auth/unauthorized-domain') {
+                    showAuthError(`
+                        <div class="space-y-1.5 text-left leading-relaxed">
+                            <div class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <span>⚠️</span>
+                                <span>Dominio no autorizado en Firebase</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300">
+                                Tu app está corriendo en <strong>${window.location.hostname}</strong>, pero este dominio aún no está en la lista de dominios autorizados de Firebase.
+                            </p>
+                            <div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
+                                <div class="font-semibold text-slate-900 dark:text-white">Para habilitarlo en 20 segundos:</div>
+                                <ol class="list-decimal list-inside space-y-1">
+                                    <li>Abre <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Settings</a></li>
+                                    <li>Baja a <strong>Authorized domains</strong> (Dominios autorizados).</li>
+                                    <li>Pulsa <strong>Agregar dominio</strong> y escribe: <code class="font-mono font-bold bg-white dark:bg-slate-900 px-1 py-0.5 rounded text-blue-600 dark:text-sky-400">${window.location.hostname}</code></li>
+                                </ol>
+                            </div>
+                        </div>
+                    `, true);
+                } else if (err.code === 'auth/popup-closed-by-user') {
                     showAuthError('Se cerró la ventana de inicio de sesión antes de completar el acceso.');
                 } else if (err.code === 'auth/popup-blocked') {
                     showAuthError('El navegador bloqueó la ventana emergente. Por favor, permítela para iniciar sesión con Google.');
@@ -5189,6 +5268,20 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 if (passInput) passInput.value = '';
             } catch (err) {
                 console.error('Error Email Auth:', err);
+                if (err.code === 'auth/unauthorized-domain') {
+                    showAuthError(`
+                        <div class="space-y-1.5 text-left leading-relaxed">
+                            <div class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <span>⚠️</span>
+                                <span>Dominio no autorizado en Firebase</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300">
+                                Agrega <strong>${window.location.hostname}</strong> en <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Authorized domains</a>.
+                            </p>
+                        </div>
+                    `, true);
+                    return;
+                }
                 let msg = err.message;
                 if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
                     msg = 'Correo o contraseña incorrectos.';
@@ -5273,11 +5366,132 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
-        function showAuthError(msg) {
+        function showAuthError(msg, isHtml = false) {
             const errorDiv = document.getElementById('auth-error-msg');
             if (errorDiv) {
-                errorDiv.textContent = msg;
+                if (isHtml) {
+                    errorDiv.innerHTML = msg;
+                } else {
+                    errorDiv.textContent = msg;
+                }
                 errorDiv.classList.remove('hidden');
+            }
+        }
+
+        let isPullToRefreshInitialized = false;
+        function initPullToRefresh() {
+            if (isPullToRefreshInitialized) return;
+            isPullToRefreshInitialized = true;
+
+            let startY = 0;
+            let currentY = 0;
+            let isPulling = false;
+            let isRefreshing = false;
+            const threshold = 65;
+
+            const indicator = document.getElementById('pull-to-refresh-indicator');
+            const icon = document.getElementById('pull-refresh-icon');
+            const text = document.getElementById('pull-refresh-text');
+            const bubble = document.getElementById('pull-refresh-bubble');
+            const mainContainer = document.getElementById('main-container');
+            const chatCanvas = document.getElementById('chat-canvas');
+
+            if (!indicator) return;
+
+            function isAtTop() {
+                const mainScroll = mainContainer ? mainContainer.scrollTop : 0;
+                const chatScroll = chatCanvas ? chatCanvas.scrollTop : 0;
+                const windowScroll = window.scrollY || document.documentElement.scrollTop || 0;
+                return mainScroll <= 0 && chatScroll <= 0 && windowScroll <= 0;
+            }
+
+            document.addEventListener('touchstart', (e) => {
+                if (isRefreshing) return;
+                // No activar si hay modales visibles abiertos
+                const openModal = document.querySelector('.fixed.z-50:not(.hidden), .fixed.z-\\[60\\]:not(.hidden)');
+                if (openModal) return;
+
+                if (isAtTop() && e.touches.length === 1) {
+                    startY = e.touches[0].pageY;
+                    currentY = startY;
+                    isPulling = true;
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isPulling || isRefreshing || e.touches.length !== 1) return;
+                currentY = e.touches[0].pageY;
+                const diff = currentY - startY;
+
+                if (diff > 0 && isAtTop()) {
+                    // Resistencia elástica progresiva
+                    const pull = Math.min(95, Math.pow(diff, 0.82));
+
+                    if (pull > 8) {
+                        indicator.classList.remove('opacity-0');
+                        indicator.style.transform = `translateY(${pull}px)`;
+
+                        if (pull >= threshold) {
+                            text.textContent = 'Suelta para actualizar';
+                            icon.style.transform = 'rotate(180deg)';
+                            if (bubble) {
+                                bubble.classList.add('border-blue-500', 'dark:border-sky-400', 'bg-blue-50/95', 'dark:bg-sky-950/95');
+                            }
+                        } else {
+                            text.textContent = 'Desliza para actualizar';
+                            icon.style.transform = `rotate(${Math.min(180, (pull / threshold) * 180)}deg)`;
+                            if (bubble) {
+                                bubble.classList.remove('border-blue-500', 'dark:border-sky-400', 'bg-blue-50/95', 'dark:bg-sky-950/95');
+                            }
+                        }
+                    }
+                } else if (diff < 0) {
+                    isPulling = false;
+                    resetPullIndicator();
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', async () => {
+                if (!isPulling || isRefreshing) {
+                    isPulling = false;
+                    return;
+                }
+                isPulling = false;
+                const diff = currentY - startY;
+                const pull = Math.min(95, Math.pow(Math.max(0, diff), 0.82));
+
+                if (pull >= threshold && isAtTop()) {
+                    isRefreshing = true;
+                    indicator.style.transform = 'translateY(55px)';
+                    text.textContent = 'Actualizando app...';
+                    icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>`;
+                    icon.classList.add('animate-spin');
+
+                    // Si hay sesión de usuario, sincronizar progreso antes de recargar
+                    try {
+                        if (firebaseAuth && firebaseAuth.currentUser && typeof resolveAndSyncProgress === 'function') {
+                            await resolveAndSyncProgress(firebaseAuth.currentUser, false);
+                        }
+                    } catch (e) {
+                        console.warn('Sync en recarga gesture:', e);
+                    }
+
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 400);
+                } else {
+                    resetPullIndicator();
+                }
+            }, { passive: true });
+
+            function resetPullIndicator() {
+                indicator.style.transform = 'translateY(-4rem)';
+                indicator.classList.add('opacity-0');
+                icon.style.transform = 'rotate(0deg)';
+                icon.classList.remove('animate-spin');
+                if (bubble) {
+                    bubble.classList.remove('border-blue-500', 'dark:border-sky-400', 'bg-blue-50/95', 'dark:bg-sky-950/95');
+                }
             }
         }
 
@@ -5303,12 +5517,14 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             initStoredApiKey();
             initSimulationProgress();
             initFirebaseClient();
+            initPullToRefresh();
         });
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             updateThemeUI();
             initStoredApiKey();
             initSimulationProgress();
             initFirebaseClient();
+            initPullToRefresh();
         }
     </script>
 </body>
