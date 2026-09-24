@@ -399,7 +399,7 @@
         </div>
         
         <!-- Pantalla de Bienvenida Inicial (Welcome Screen) -->
-        <div id="welcome-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 md:p-6 bg-slate-900/70 dark:bg-black/85 backdrop-blur-md transition-opacity duration-300 flex items-center justify-center">
+        <div id="welcome-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 md:p-6 bg-slate-900/70 dark:bg-black/85 backdrop-blur-md transition-opacity duration-300 flex items-center justify-center hidden opacity-0">
             <div id="welcome-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg sm:max-w-xl w-full p-5 sm:p-6 md:p-7 shadow-2xl relative my-auto max-h-[92dvh] flex flex-col text-left overflow-y-auto">
                 
                 <!-- Badge superior -->
@@ -477,12 +477,6 @@
                     <button onclick="welcomeLoadAccountProgress()" type="button" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
                         <span>🔑 Ya tengo cuenta (Cargar progreso)</span>
                     </button>
-                </div>
-
-                <!-- Nota informativa -->
-                <div class="mt-3.5 py-2 px-3 rounded-lg bg-blue-50/70 dark:bg-sky-950/40 border border-blue-200/80 dark:border-sky-800/60 text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed flex items-center gap-2.5">
-                    <span class="text-sm shrink-0">💡</span>
-                    <span>Tu avance se guarda automáticamente en este navegador. Puedes iniciar sesión desde el menú para sincronizarlo en la nube.</span>
                 </div>
             </div>
         </div>
@@ -841,19 +835,30 @@
                         <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Ver</span>
                     </button>
 
-                    <!-- 4. Guía y Escenario Inicial -->
+                    <!-- 4. Guía e Instrucciones -->
                     <button onclick="closeMobileMenu(); openOnboarding();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 9.172l-2.12 5.656a1 1 0 01-.536.536l-5.656 2.12 2.12-5.656a1 1 0 01.536-.536l5.656-2.12z" />
                             </svg>
-                            <span>Guía y Escenario Inicial</span>
+                            <span>Guía e Instrucciones</span>
                         </div>
                         <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Guía</span>
                     </button>
 
-                    <!-- 5. Modo Claro / Oscuro -->
+                    <!-- 5. Bienvenida / Inicio -->
+                    <button onclick="closeMobileMenu(); openWelcomeModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                            </svg>
+                            <span>Bienvenida / Inicio</span>
+                        </div>
+                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Inicio →</span>
+                    </button>
+
+                    <!-- 6. Modo Claro / Oscuro -->
                     <button onclick="toggleTheme()" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <svg id="mobile-theme-icon-sun" class="w-5 h-5 text-amber-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -867,18 +872,7 @@
                         <span class="text-xs sm:text-sm font-mono font-medium text-slate-600 dark:text-slate-300" id="mobile-theme-status">Oscuro 🌙</span>
                     </button>
 
-                    <!-- 6. (Penúltimo) Acerca del Simulador / Inicio -->
-                    <button onclick="closeMobileMenu(); openWelcomeModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                            </svg>
-                            <span>Acerca del Simulador / Inicio</span>
-                        </div>
-                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Inicio →</span>
-                    </button>
-
-                    <!-- 7. (Último) Iniciar sesión o Crear cuenta -->
+                    <!-- 7. Mi Cuenta / Iniciar sesión o Crear cuenta -->
                     <button onclick="closeMobileMenu(); openAuthModal(currentUser ? 'profile' : 'login');" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-blue-100/70 dark:bg-sky-950/80 border border-blue-200/80 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0" id="mobile-auth-icon-container">
@@ -1329,10 +1323,10 @@
                 <div id="navigator-status-banner" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shrink-0">
                     <div class="flex items-center gap-2">
                         <span class="text-base shrink-0">📊</span>
-                        <span id="navigator-status-text" class="text-slate-700 dark:text-slate-300">Desbloqueadas: <strong>1 de 9 misiones</strong></span>
+                        <span id="navigator-status-text" class="text-slate-700 dark:text-slate-300">Progreso: <strong>0 de 9 misiones superadas</strong></span>
                     </div>
                     <div class="w-full sm:w-48 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shrink-0">
-                        <div id="navigator-progress-bar" class="bg-blue-600 dark:bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 11%;"></div>
+                        <div id="navigator-progress-bar" class="bg-blue-600 dark:bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
                     </div>
                 </div>
 
@@ -1484,7 +1478,7 @@
 
         <!-- Gemini AI Sandbox Modal -->
         <div id="lab-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[60] flex items-center justify-center p-2 sm:p-4 md:p-6 hidden opacity-0 transition-opacity duration-200">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[94vh] overflow-y-auto" id="lab-modal-content">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[94vh] overflow-y-auto overflow-x-hidden" id="lab-modal-content">
                 
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-3">
                     <div class="flex items-center gap-3 min-w-0">
@@ -1511,8 +1505,37 @@
 
                 <div class="py-4 space-y-4">
                     <div>
-                        <div class="flex justify-between items-center mb-1.5">
-                            <label for="lab-prompt-input" class="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200">Tu Instrucción / Prompt:</label>
+                        <div class="flex flex-wrap justify-between items-center gap-2 mb-1.5">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <label for="lab-prompt-input" class="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200">Tu Instrucción / Prompt:</label>
+                                
+                                <!-- Botón Micrófono + Tooltip Info de Privacidad -->
+                                <div class="inline-flex items-center gap-1">
+                                    <button id="lab-mic-btn" type="button" onclick="toggleLabVoiceDictation()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95" title="Dictar prompt por voz">
+                                        <svg id="lab-mic-icon" class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                        </svg>
+                                        <span id="lab-mic-btn-text">Dictar por voz</span>
+                                    </button>
+
+                                    <!-- Icono 'i' con Tooltip -->
+                                    <div class="relative inline-flex items-center">
+                                        <button type="button" onclick="toggleMicPrivacyTooltip(event)" class="w-5 h-5 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors text-xs font-bold border border-slate-200 dark:border-slate-700" title="Información sobre privacidad del micrófono">
+                                            ⓘ
+                                        </button>
+                                        <div id="lab-mic-tooltip" class="hidden absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-3.5rem)] p-3 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] leading-relaxed rounded-xl shadow-2xl z-50 border border-slate-700 pointer-events-auto">
+                                            <div class="flex items-start gap-2">
+                                                <span class="text-sm shrink-0">🔒</span>
+                                                <div class="flex-1 min-w-0 pr-1">
+                                                    <strong class="block text-slate-100 font-semibold mb-0.5">Privacidad garantizada</strong>
+                                                    <span class="text-slate-300">El reconocimiento de voz se procesa localmente en tu navegador. Tu audio no se almacena, no se comparte ni sale de tu dispositivo.</span>
+                                                </div>
+                                                <button type="button" onclick="toggleMicPrivacyTooltip(event)" class="text-slate-400 hover:text-white p-0.5 rounded cursor-pointer -mt-0.5 -mr-1" title="Cerrar">✕</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="flex items-center gap-2">
                                 <span class="text-xs sm:text-sm text-slate-400 font-mono" id="lab-char-count">0 caracteres</span>
                                 <button onclick="clearLabPrompt()" type="button" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-mono transition-colors">
@@ -1520,7 +1543,7 @@
                                 </button>
                             </div>
                         </div>
-                        <textarea id="lab-prompt-input" rows="4" placeholder="Escribe aquí tu prompt libremente..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm sm:text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 leading-relaxed font-sans"></textarea>
+                        <textarea id="lab-prompt-input" rows="4" placeholder="Escribe aquí tu prompt o pulsa 'Dictar por voz' para hablar..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm sm:text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 leading-relaxed font-sans"></textarea>
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-3">
@@ -2535,6 +2558,143 @@
             }
         }
 
+        let labSpeechRecognition = null;
+        let isLabRecording = false;
+
+        function initLabSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                return null;
+            }
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'es-ES';
+
+            recognition.onstart = () => {
+                isLabRecording = true;
+                updateLabMicUI(true);
+            };
+
+            recognition.onresult = (event) => {
+                const textarea = document.getElementById('lab-prompt-input');
+                if (!textarea) return;
+
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                if (finalTranscript) {
+                    const currentVal = textarea.value;
+                    const needsSpace = currentVal.length > 0 && !currentVal.endsWith(' ') && !currentVal.endsWith('\n');
+                    textarea.value = currentVal + (needsSpace ? ' ' : '') + finalTranscript;
+                    const countEl = document.getElementById('lab-char-count');
+                    if (countEl) countEl.textContent = `${textarea.value.length} caracteres`;
+                }
+            };
+
+            recognition.onerror = (event) => {
+                console.warn('Speech recognition error:', event.error);
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    alert('Permiso de micrófono no concedido en tu navegador.');
+                }
+                stopLabVoiceDictation();
+            };
+
+            recognition.onend = () => {
+                if (isLabRecording) {
+                    stopLabVoiceDictation();
+                }
+            };
+
+            return recognition;
+        }
+
+        function toggleLabVoiceDictation() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Tu navegador no cuenta con soporte nativo para reconocimiento de voz Web Speech.');
+                return;
+            }
+
+            if (isLabRecording) {
+                stopLabVoiceDictation();
+            } else {
+                startLabVoiceDictation();
+            }
+        }
+
+        function startLabVoiceDictation() {
+            try {
+                if (!labSpeechRecognition) {
+                    labSpeechRecognition = initLabSpeechRecognition();
+                }
+                if (!labSpeechRecognition) {
+                    alert('Reconocimiento de voz no disponible en este dispositivo.');
+                    return;
+                }
+                labSpeechRecognition.start();
+                isLabRecording = true;
+                updateLabMicUI(true);
+            } catch (e) {
+                console.warn('Error al iniciar reconocimiento de voz:', e);
+                try {
+                    if (labSpeechRecognition) labSpeechRecognition.stop();
+                } catch(err) {}
+                isLabRecording = false;
+                updateLabMicUI(false);
+            }
+        }
+
+        function stopLabVoiceDictation() {
+            isLabRecording = false;
+            if (labSpeechRecognition) {
+                try {
+                    labSpeechRecognition.stop();
+                } catch (e) {}
+            }
+            updateLabMicUI(false);
+        }
+
+        function updateLabMicUI(recording) {
+            const micBtn = document.getElementById('lab-mic-btn');
+            const micText = document.getElementById('lab-mic-btn-text');
+            const micIcon = document.getElementById('lab-mic-icon');
+            if (!micBtn) return;
+
+            if (recording) {
+                micBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200');
+                micBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white', 'animate-pulse', 'border-red-600');
+                if (micText) micText.textContent = 'Escuchando...';
+                if (micIcon) {
+                    micIcon.classList.remove('text-blue-600', 'dark:text-sky-400');
+                    micIcon.classList.add('text-white');
+                }
+            } else {
+                micBtn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200');
+                micBtn.classList.remove('bg-red-500', 'hover:bg-red-600', 'text-white', 'animate-pulse', 'border-red-600');
+                if (micText) micText.textContent = 'Dictar por voz';
+                if (micIcon) {
+                    micIcon.classList.add('text-blue-600', 'dark:text-sky-400');
+                    micIcon.classList.remove('text-white');
+                }
+            }
+        }
+
+        function toggleMicPrivacyTooltip(e) {
+            if (e && e.stopPropagation) e.stopPropagation();
+            const tooltip = document.getElementById('lab-mic-tooltip');
+            if (!tooltip) return;
+            if (tooltip.classList.contains('hidden')) {
+                tooltip.classList.remove('hidden');
+            } else {
+                tooltip.classList.add('hidden');
+            }
+        }
+
         function openLabModal() {
             initStoredApiKey();
             const modal = document.getElementById('lab-modal');
@@ -2563,6 +2723,9 @@
         }
 
         function closeLabModal() {
+            stopLabVoiceDictation();
+            const tooltip = document.getElementById('lab-mic-tooltip');
+            if (tooltip) tooltip.classList.add('hidden');
             const modal = document.getElementById('lab-modal');
             const content = document.getElementById('lab-modal-content');
             modal.classList.add('opacity-0');
@@ -4462,6 +4625,13 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     closeMobileMenu();
                 }
             }
+
+            const micTooltip = document.getElementById('lab-mic-tooltip');
+            if (micTooltip && !micTooltip.classList.contains('hidden')) {
+                if (!micTooltip.contains(e.target)) {
+                    micTooltip.classList.add('hidden');
+                }
+            }
         });
 
         // ==========================================
@@ -4508,9 +4678,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (!container) return;
 
             const totalMissions = levels.length;
-            const unlockedCount = simulationCompleted ? totalMissions : Math.min(totalMissions, highestUnlockedLevel + 1);
             const beatenCount = simulationCompleted ? totalMissions : completedLevels.length;
-            const progressPercent = Math.round((unlockedCount / totalMissions) * 100);
+            const progressPercent = Math.round((beatenCount / totalMissions) * 100);
 
             // Update Header Status Banner
             const statusText = document.getElementById('navigator-status-text');
@@ -4519,9 +4688,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
             if (statusText) {
                 if (simulationCompleted) {
-                    statusText.innerHTML = `<strong>🏆 Simulación Completada:</strong> Tienes acceso libre a todas las 9 misiones y resúmenes.`;
+                    statusText.innerHTML = `<strong>🏆 Simulación Completada:</strong> Has superado las 9 misiones. Tienes acceso libre a todo.`;
                 } else {
-                    statusText.innerHTML = `Disponibles: <strong>${unlockedCount} de 9 misiones</strong> · Superadas: <strong>${beatenCount}</strong>`;
+                    statusText.innerHTML = `Progreso: <strong>${beatenCount} de ${totalMissions} misiones superadas</strong>`;
                 }
             }
             if (progressBar) {
