@@ -2560,63 +2560,13 @@
 
         let labSpeechRecognition = null;
         let isLabRecording = false;
-
-        function initLabSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                return null;
-            }
-            const recognition = new SpeechRecognition();
-            recognition.continuous = true;
-            recognition.interimResults = true;
-            recognition.lang = 'es-ES';
-
-            recognition.onstart = () => {
-                isLabRecording = true;
-                updateLabMicUI(true);
-            };
-
-            recognition.onresult = (event) => {
-                const textarea = document.getElementById('lab-prompt-input');
-                if (!textarea) return;
-
-                let finalTranscript = '';
-                for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript;
-                    }
-                }
-
-                if (finalTranscript) {
-                    const currentVal = textarea.value;
-                    const needsSpace = currentVal.length > 0 && !currentVal.endsWith(' ') && !currentVal.endsWith('\n');
-                    textarea.value = currentVal + (needsSpace ? ' ' : '') + finalTranscript;
-                    const countEl = document.getElementById('lab-char-count');
-                    if (countEl) countEl.textContent = `${textarea.value.length} caracteres`;
-                }
-            };
-
-            recognition.onerror = (event) => {
-                console.warn('Speech recognition error:', event.error);
-                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                    alert('Permiso de micrófono no concedido en tu navegador.');
-                }
-                stopLabVoiceDictation();
-            };
-
-            recognition.onend = () => {
-                if (isLabRecording) {
-                    stopLabVoiceDictation();
-                }
-            };
-
-            return recognition;
-        }
+        let labSpeechBaseText = '';
+        let labSpeechRestartTimer = null;
 
         function toggleLabVoiceDictation() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert('Tu navegador no cuenta con soporte nativo para reconocimiento de voz Web Speech.');
+                alert('Tu navegador no cuenta con soporte nativo para reconocimiento de voz (Web Speech API). Prueba en Chrome, Edge o Safari.');
                 return;
             }
 
@@ -2628,33 +2578,133 @@
         }
 
         function startLabVoiceDictation() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) return;
+
+            if (labSpeechRestartTimer) {
+                clearTimeout(labSpeechRestartTimer);
+                labSpeechRestartTimer = null;
+            }
+
+            if (labSpeechRecognition) {
+                try {
+                    labSpeechRecognition.abort();
+                } catch(e) {}
+                labSpeechRecognition = null;
+            }
+
+            const textarea = document.getElementById('lab-prompt-input');
+            if (textarea) {
+                textarea.focus();
+                // Posicionar el cursor al final
+                const len = textarea.value.length;
+                textarea.setSelectionRange(len, len);
+                labSpeechBaseText = textarea.value;
+            } else {
+                labSpeechBaseText = '';
+            }
+
             try {
-                if (!labSpeechRecognition) {
-                    labSpeechRecognition = initLabSpeechRecognition();
-                }
-                if (!labSpeechRecognition) {
-                    alert('Reconocimiento de voz no disponible en este dispositivo.');
-                    return;
-                }
-                labSpeechRecognition.start();
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'es-ES';
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => {
+                    isLabRecording = true;
+                    updateLabMicUI(true);
+                };
+
+                recognition.onresult = (event) => {
+                    const input = document.getElementById('lab-prompt-input');
+                    if (!input) return;
+
+                    let finalStr = '';
+                    let interimStr = '';
+
+                    for (let i = 0; i < event.results.length; ++i) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalStr += transcript;
+                        } else {
+                            interimStr += transcript;
+                        }
+                    }
+
+                    const speechChunk = (finalStr + (interimStr ? ' ' + interimStr : '')).trim();
+                    if (speechChunk) {
+                        const separator = (labSpeechBaseText && !labSpeechBaseText.endsWith(' ') && !labSpeechBaseText.endsWith('\n')) ? ' ' : '';
+                        const fullText = labSpeechBaseText ? (labSpeechBaseText + separator + speechChunk) : speechChunk;
+                        input.value = fullText;
+                        
+                        const countEl = document.getElementById('lab-char-count');
+                        if (countEl) countEl.textContent = `${fullText.length} caracteres`;
+                        
+                        input.scrollTop = input.scrollHeight;
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.warn('Speech recognition status/error:', event.error);
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        alert('Permiso de micrófono no concedido. Habilita el permiso del micrófono en los ajustes de tu navegador para usar el dictado por voz.');
+                        stopLabVoiceDictation();
+                    } else if (event.error === 'no-speech') {
+                        // En móviles 'no-speech' salta tras silencio breve; no interrumpir agresivamente
+                    } else if (event.error !== 'aborted') {
+                        // Otros errores leves
+                    }
+                };
+
+                recognition.onend = () => {
+                    // Si el usuario aún no pulsó detener y el motor cerró la sesión por silencio, intentar reiniciar suavemente si sigue grabando
+                    if (isLabRecording) {
+                        const input = document.getElementById('lab-prompt-input');
+                        if (input) labSpeechBaseText = input.value;
+                        labSpeechRestartTimer = setTimeout(() => {
+                            if (isLabRecording) {
+                                try {
+                                    recognition.start();
+                                } catch(e) {
+                                    isLabRecording = false;
+                                    updateLabMicUI(false);
+                                }
+                            }
+                        }, 200);
+                    } else {
+                        updateLabMicUI(false);
+                        labSpeechRecognition = null;
+                    }
+                };
+
+                labSpeechRecognition = recognition;
+                recognition.start();
                 isLabRecording = true;
                 updateLabMicUI(true);
             } catch (e) {
-                console.warn('Error al iniciar reconocimiento de voz:', e);
-                try {
-                    if (labSpeechRecognition) labSpeechRecognition.stop();
-                } catch(err) {}
+                console.warn('Error al inicializar dictado por voz:', e);
                 isLabRecording = false;
                 updateLabMicUI(false);
+                labSpeechRecognition = null;
             }
         }
 
         function stopLabVoiceDictation() {
             isLabRecording = false;
+            if (labSpeechRestartTimer) {
+                clearTimeout(labSpeechRestartTimer);
+                labSpeechRestartTimer = null;
+            }
             if (labSpeechRecognition) {
                 try {
                     labSpeechRecognition.stop();
                 } catch (e) {}
+                labSpeechRecognition = null;
+            }
+            const input = document.getElementById('lab-prompt-input');
+            if (input) {
+                labSpeechBaseText = input.value;
             }
             updateLabMicUI(false);
         }
@@ -2663,6 +2713,7 @@
             const micBtn = document.getElementById('lab-mic-btn');
             const micText = document.getElementById('lab-mic-btn-text');
             const micIcon = document.getElementById('lab-mic-icon');
+            const input = document.getElementById('lab-prompt-input');
             if (!micBtn) return;
 
             if (recording) {
@@ -2673,6 +2724,9 @@
                     micIcon.classList.remove('text-blue-600', 'dark:text-sky-400');
                     micIcon.classList.add('text-white');
                 }
+                if (input) {
+                    input.classList.add('ring-2', 'ring-red-400/50', 'border-red-400');
+                }
             } else {
                 micBtn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200');
                 micBtn.classList.remove('bg-red-500', 'hover:bg-red-600', 'text-white', 'animate-pulse', 'border-red-600');
@@ -2680,6 +2734,9 @@
                 if (micIcon) {
                     micIcon.classList.add('text-blue-600', 'dark:text-sky-400');
                     micIcon.classList.remove('text-white');
+                }
+                if (input) {
+                    input.classList.remove('ring-2', 'ring-red-400/50', 'border-red-400');
                 }
             }
         }
