@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "build": "mkdir -p public && cp index.html public/index.html",
+    "build": "mkdir -p public && cp index.html public/index.html && (cp firebase-applet-config.json public/ || true)",
     "lint": "echo 'No lint step required'"
   },
   "dependencies": {

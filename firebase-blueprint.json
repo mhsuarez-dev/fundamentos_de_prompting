@@ -1,0 +1,50 @@
+{
+  "entities": {
+    "UserProgress": {
+      "title": "UserProgress",
+      "description": "Stores user simulation progress, mission states, and completion milestones",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The Firebase Auth UID of the user owning this progress"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name"
+        },
+        "highestUnlockedLevel": {
+          "type": "number",
+          "description": "Highest mission level unlocked (0 to 8, or 9 for finished)"
+        },
+        "currentLevelIdx": {
+          "type": "number",
+          "description": "Current active mission index"
+        },
+        "simulationCompleted": {
+          "type": "boolean",
+          "description": "Whether all 9 missions have been mastered"
+        },
+        "completedLevels": {
+          "type": "array",
+          "description": "Array of completed mission IDs"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        }
+      },
+      "required": ["userId", "highestUnlockedLevel", "currentLevelIdx"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/progress/simulation": {
+      "schema": "UserProgress",
+      "description": "Private user simulation progress document"
+    }
+  }
+}

@@ -52,6 +52,10 @@
     <meta property="og:description" content="Un simulador interactivo de Prompt Engineering para dominar el método C.O.N.T.E.X.T.O.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Firebase SDK (Compat) for Auth & Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -138,7 +142,7 @@
             box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
         }
 
-        #onboarding-modal.hidden { display: none !important; }
+        #welcome-modal.hidden, #onboarding-modal.hidden { display: none !important; }
         #mission-modal.hidden, #feedback-modal.hidden, #completion-modal.hidden, #level-summary-modal.hidden { display: none !important; }
         
         /* Estilos editoriales para respuestas formateadas y tablas Markdown */
@@ -384,16 +388,105 @@
 
     <div class="w-full h-full flex flex-col overflow-hidden relative">
         
+        <!-- Pantalla de Bienvenida Inicial (Welcome Screen) -->
+        <div id="welcome-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 md:p-6 bg-slate-900/70 dark:bg-black/85 backdrop-blur-md transition-opacity duration-300 flex items-center justify-center">
+            <div id="welcome-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg sm:max-w-xl w-full p-5 sm:p-6 md:p-7 shadow-2xl relative my-auto max-h-[92dvh] flex flex-col text-left overflow-y-auto">
+                
+                <!-- Badge superior -->
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800/60 shadow-xs">
+                        <span>⚡</span>
+                        <span>Metodología C-O-N-T-E-X-T-O</span>
+                    </span>
+                </div>
+
+                <!-- Título y Breve Explicación -->
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mt-2.5">
+                    Simulador Interactivo de Prompts para IA
+                </h1>
+                
+                <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                    Aprende a formular instrucciones de alto impacto con casos prácticos guiados y experimentación con IA en vivo.
+                </p>
+
+                <!-- Grid Armonioso 2x2 de 4 Tarjetas -->
+                <div class="grid grid-cols-2 gap-3 my-4">
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-xl sm:text-2xl mb-1.5 block">🎯</span>
+                        <div>
+                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">9 Misiones</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">Casos reales paso a paso</div>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-xl sm:text-2xl mb-1.5 block">🧠</span>
+                        <div>
+                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Marco CONTEXTO</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">8 variables estratégicas</div>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-xl sm:text-2xl mb-1.5 block">🔍</span>
+                        <div>
+                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Auditoría Técnica</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">Análisis de fallos y aciertos</div>
+                        </div>
+                    </div>
+                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-xl sm:text-2xl mb-1.5 block">🧪</span>
+                        <div>
+                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Laboratorio IA</div>
+                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">Experimentación en vivo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de continuación de progreso previo (si existe guardado) -->
+                <div id="welcome-resume-section" class="hidden mb-3">
+                    <button onclick="continueExistingSimulation()" type="button" class="w-full flex items-center justify-between p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700/80 text-emerald-900 dark:text-emerald-200 transition-all cursor-pointer group shadow-xs">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xl">▶️</span>
+                            <div class="text-left">
+                                <div class="text-sm font-bold">Continuar donde lo dejé</div>
+                                <div class="text-xs text-emerald-700 dark:text-emerald-300 font-medium" id="welcome-resume-desc">Misión activa</div>
+                            </div>
+                        </div>
+                        <span class="text-xs sm:text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">Reanudar →</span>
+                    </button>
+                </div>
+
+                <!-- Acciones Principales -->
+                <div class="space-y-2.5 pt-1">
+                    <!-- Opción 1: Empezar desde cero -->
+                    <button onclick="startFromZero()" type="button" class="w-full btn-evaluate font-bold py-3 px-4 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-all active:scale-[0.99]">
+                        <span>🚀 Empezar desde cero</span>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+
+                    <!-- Opción 2: Ya tengo cuenta / Cargar mi progreso -->
+                    <button onclick="welcomeLoadAccountProgress()" type="button" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                        <span>🔑 Ya tengo cuenta (Cargar progreso)</span>
+                    </button>
+                </div>
+
+                <!-- Nota informativa -->
+                <div class="mt-3.5 py-2 px-3 rounded-lg bg-blue-50/70 dark:bg-sky-950/40 border border-blue-200/80 dark:border-sky-800/60 text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed flex items-center gap-2.5">
+                    <span class="text-sm shrink-0">💡</span>
+                    <span>Tu avance se guarda automáticamente en este navegador. Puedes iniciar sesión desde el menú para sincronizarlo en la nube.</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Onboarding Wizard Modal -->
-        <div id="onboarding-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 lg:p-8 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm transition-opacity duration-300">
-            <div id="onboarding-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl lg:max-w-5xl w-full p-5 sm:p-7 lg:p-8 shadow-2xl relative max-h-[94vh] overflow-y-auto flex flex-col justify-between">
+        <div id="onboarding-modal" class="fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 md:p-6 lg:p-8 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center hidden opacity-0">
+            <div id="onboarding-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl lg:max-w-5xl w-full p-4 sm:p-6 lg:p-7 shadow-2xl relative my-auto max-h-[90dvh] flex flex-col">
                 <!-- Botón Cerrar (visible siempre) -->
-                <button onclick="closeOnboarding()" id="onboarding-close-x" type="button" aria-label="Cerrar guía" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10 cursor-pointer">
+                <button onclick="closeOnboarding()" id="onboarding-close-x" type="button" aria-label="Cerrar guía" class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10 cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
                 
                 <!-- Wizard Navigation Header -->
-                <div class="pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="shrink-0 pb-3 border-b border-slate-100 dark:border-slate-800 pr-10">
                     <div class="flex items-center justify-between gap-2">
                         <div>
                             <h2 class="text-sm sm:text-base font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider">Fundamentos de Prompting</h2>
@@ -402,112 +495,115 @@
                     </div>
                 </div>
 
-                <!-- Wizard Step 1: El Escenario -->
-                <div id="onboarding-step-1" class="my-4 sm:my-5 space-y-4">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">¿Usas la IA de forma profesional?</h2>
-                        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Pon a prueba tu criterio al redactar instrucciones para una IA y descubre la metodología que marca la diferencia entre respuestas mediocres y resultados de alto impacto.</p>
-                    </div>
-
-                    <div class="p-4 sm:p-6 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs sm:text-sm font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider font-mono bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">El Escenario</span>
-                        </div>
-                        <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-                            Estás a cargo de la estrategia de contenido para una campaña de concienciación sobre el impacto del uso excesivo de pantallas y redes sociales en el sueño, la salud mental y el bienestar integral.
-                        </p>
-                        <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
-                            Tu meta es guiar al asistente de inteligencia artificial a lo largo de <strong class="text-slate-900 dark:text-white font-semibold">nueve tareas cotidianas (misiones)</strong> donde aprenderás a aplicar los fundamentos para obtener respuestas precisas, rigurosas y libres de alucinaciones.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Wizard Step 2: Instrucciones -->
-                <div id="onboarding-step-2" class="hidden my-4 sm:my-5 space-y-4">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Instrucciones de la Simulación</h2>
-                        <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Sigue estas cuatro instrucciones clave para interactuar con el simulador en cada una de las 9 misiones:</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-                        <div class="bg-slate-50/80 dark:bg-slate-900/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-2">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">01</span>
-                                <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Analizar la misión</h4>
-                            </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Analizar y leer detenidamente la misión y la tarea asignada para resolver en la campaña.</p>
-                        </div>
-
-                        <div class="bg-slate-50/80 dark:bg-slate-900/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-2">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">02</span>
-                                <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Revisar y elegir</h4>
-                            </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Revisar la interacción inicial en el chat y seleccionar la opción de prompt correspondiente. <strong class="text-slate-800 dark:text-slate-200 font-semibold">En móviles, presiona el botón inferior para desplegar las opciones.</strong></p>
-                        </div>
-
-                        <div class="bg-slate-50/80 dark:bg-slate-900/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-2">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">03</span>
-                                <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Evaluar respuesta</h4>
-                            </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Leer con atención la respuesta generada por la IA para determinar si lo hizo bien de acuerdo a tu criterio.</p>
-                        </div>
-
-                        <div class="bg-slate-50/80 dark:bg-slate-900/60 p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-2">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">04</span>
-                                <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Mostrar veredicto</h4>
-                            </div>
-                            <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Pulsar en «Mostrar veredicto» para saber si la opción fue la correcta y descubrir las claves metodológicas.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Wizard Step 3: Herramienta Adicional (Laboratorio de Prompts) -->
-                <div id="onboarding-step-3" class="hidden my-4 sm:my-5 space-y-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                            </svg>
-                        </div>
+                <!-- Wizard Scrollable Body -->
+                <div id="onboarding-modal-body" class="flex-1 min-h-0 overflow-y-auto py-3 sm:py-4 pr-0.5 sm:pr-1">
+                    <!-- Wizard Step 1: El Escenario -->
+                    <div id="onboarding-step-1" class="space-y-3 sm:space-y-4">
                         <div>
-                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Herramienta Adicional: Laboratorio de Prompts</h2>
-                            <p class="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-medium">Experimentación y auditoría en vivo con Gemini</p>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">¿Usas la IA de forma profesional?</h2>
+                            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Pon a prueba tu criterio al redactar instrucciones para una IA y descubre la metodología que marca la diferencia entre respuestas mediocres y resultados de alto impacto.</p>
                         </div>
-                    </div>
 
-                    <div class="space-y-3 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-sm sm:text-base leading-relaxed">
-                        <div>
-                            <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
-                                <span class="text-base">🧪</span>
-                                <span>¿Qué es el Laboratorio de Prompts?</span>
-                            </h4>
-                            <p class="text-slate-600 dark:text-slate-300">
-                                Es un entorno libre donde puedes redactar y probar tus propias instrucciones, ver cómo responde la inteligencia artificial en tiempo real y solicitar una <strong>Auditoría Técnica</strong> para optimizar y perfeccionar tus prompts.
+                        <div class="p-4 sm:p-5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs sm:text-sm font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider font-mono bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">El Escenario</span>
+                            </div>
+                            <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                                Estás a cargo de la estrategia de contenido para una campaña de concienciación sobre el impacto del uso excesivo de pantallas y redes sociales en el sueño, la salud mental y el bienestar integral.
                             </p>
-                        </div>
-
-                        <div class="pt-2 border-t border-slate-200/70 dark:border-slate-700/60">
-                            <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
-                                <span class="text-base">🎯</span>
-                                <span>¿Cuándo usarlo?</span>
-                            </h4>
-                            <p class="text-slate-600 dark:text-slate-300">
-                                Te sugerimos <strong>completar primero las 9 misiones</strong> del simulador para dominar los fundamentos y, a continuación, utilizar el Laboratorio para poner a prueba, perfeccionar y llevar a un nivel profesional tus propios prompts de trabajo o proyectos personales.
+                            <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                                Tu meta es guiar al asistente de inteligencia artificial a lo largo de <strong class="text-slate-900 dark:text-white font-semibold">nueve tareas cotidianas (misiones)</strong> donde aprenderás a aplicar los fundamentos para obtener respuestas precisas, rigurosas y libres de alucinaciones.
                             </p>
                         </div>
                     </div>
 
-                    <div class="p-3.5 sm:p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm flex items-center gap-2.5 leading-relaxed">
-                        <span class="text-base shrink-0">⚡</span>
-                        <span>También podrás acceder al Laboratorio en todo momento pulsando el botón «Laboratorio» en la barra superior.</span>
+                    <!-- Wizard Step 2: Instrucciones -->
+                    <div id="onboarding-step-2" class="hidden space-y-3 sm:space-y-4">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Instrucciones de la Simulación</h2>
+                            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Sigue estas cuatro instrucciones clave para interactuar con el simulador en cada una de las 9 misiones:</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">01</span>
+                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Analizar la misión</h4>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Analizar y leer detenidamente la misión y la tarea asignada para resolver en la campaña.</p>
+                            </div>
+
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">02</span>
+                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Revisar y elegir</h4>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Revisar la interacción inicial en el chat y seleccionar la opción de prompt correspondiente. <strong class="text-slate-800 dark:text-slate-200 font-semibold">En móviles, presiona el botón inferior para desplegar las opciones.</strong></p>
+                            </div>
+
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">03</span>
+                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Evaluar respuesta</h4>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Leer con atención la respuesta generada por la IA para determinar si lo hizo bien de acuerdo a tu criterio.</p>
+                            </div>
+
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">04</span>
+                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Mostrar veredicto</h4>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Pulsar en «Mostrar veredicto» para saber si la opción fue la correcta y descubrir las claves metodológicas.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wizard Step 3: Herramienta Adicional (Laboratorio de Prompts) -->
+                    <div id="onboarding-step-3" class="hidden space-y-3 sm:space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Herramienta Adicional: Laboratorio de Prompts</h2>
+                                <p class="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-medium">Experimentación y auditoría en vivo con Gemini</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 bg-slate-50 dark:bg-slate-800/40 p-3.5 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-sm leading-relaxed">
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                                    <span class="text-base">🧪</span>
+                                    <span>¿Qué es el Laboratorio de Prompts?</span>
+                                </h4>
+                                <p class="text-slate-600 dark:text-slate-300">
+                                    Es un entorno libre donde puedes redactar y probar tus propias instrucciones, ver cómo responde la inteligencia artificial en tiempo real y solicitar una <strong>Auditoría Técnica</strong> para optimizar y perfeccionar tus prompts.
+                                </p>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-200/70 dark:border-slate-700/60">
+                                <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                                    <span class="text-base">🎯</span>
+                                    <span>¿Cuándo usarlo?</span>
+                                </h4>
+                                <p class="text-slate-600 dark:text-slate-300">
+                                    Te sugerimos <strong>completar primero las 9 misiones</strong> del simulador para dominar los fundamentos y, a continuación, utilizar el Laboratorio para poner a prueba, perfeccionar y llevar a un nivel profesional tus propios prompts de trabajo o proyectos personales.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-3 sm:p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm flex items-center gap-2.5 leading-relaxed">
+                            <span class="text-base shrink-0">⚡</span>
+                            <span>También podrás acceder al Laboratorio en todo momento pulsando el botón «Laboratorio» en la barra superior o en el menú de navegación.</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Wizard Navigation Footer -->
-                <div class="pt-4 border-t border-slate-100 dark:border-slate-800">
+                <div class="shrink-0 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <!-- Controls for Step 1 -->
                     <div id="onboarding-nav-step-1" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                         <div class="flex items-center gap-2 order-2 sm:order-1">
@@ -650,9 +746,9 @@
                 </div>
             </div>
             
-            <div class="flex items-center gap-2 shrink-0">
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <!-- Botón Volver Fijo (visible siempre en móvil y escritorio) -->
-                <button onclick="goBackAction()" id="nav-back-btn" type="button" title="Volver al nivel anterior o al inicio" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-colors">
+                <button onclick="goBackAction()" id="nav-back-btn" type="button" title="Volver al nivel anterior o al inicio" class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-colors cursor-pointer">
                     <svg class="w-3.5 h-3.5 text-slate-600 dark:text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -670,7 +766,7 @@
                     </button>
 
                     <!-- Theme Toggle Button -->
-                    <button onclick="toggleTheme()" id="theme-toggle-btn" type="button" title="Alternar tema Claro / Oscuro" aria-label="Alternar tema Claro / Oscuro" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors">
+                    <button onclick="toggleTheme()" id="theme-toggle-btn" type="button" title="Alternar tema Claro / Oscuro" aria-label="Alternar tema Claro / Oscuro" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer">
                         <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
@@ -687,7 +783,7 @@
                 </div>
 
                 <!-- Menú de tres líneas (Hamburguesa móvil) -->
-                <button onclick="toggleMobileMenu()" id="mobile-menu-toggle-btn" type="button" aria-label="Abrir menú" class="md:hidden p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+                <button onclick="toggleMobileMenu()" id="mobile-menu-toggle-btn" type="button" aria-label="Abrir menú" class="md:hidden p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
@@ -707,6 +803,35 @@
                 </div>
 
                 <div class="space-y-2.5">
+                    <button onclick="closeMobileMenu(); openMissionsNavigator();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 border border-blue-200 dark:border-sky-800/80 text-blue-800 dark:text-sky-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                            <span>Ver Progreso y Misiones</span>
+                        </div>
+                        <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold">Ver Mapa →</span>
+                    </button>
+
+                    <button onclick="closeMobileMenu(); openAuthModal(currentUser ? 'profile' : 'signup');" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">☁️</span>
+                            <div class="text-left">
+                                <span class="block" id="mobile-auth-btn-label">Crear cuenta para guardar progreso</span>
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-normal block" id="mobile-auth-btn-sub">Guarda tu avance y accede desde otros dispositivos</span>
+                            </div>
+                        </div>
+                        <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold" id="mobile-auth-status-tag">Guardar →</span>
+                    </button>
+
+                    <button onclick="closeMobileMenu(); openWelcomeModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xl">ℹ️</span>
+                            <span>Acerca del Simulador / Inicio</span>
+                        </div>
+                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Ver →</span>
+                    </button>
+
                     <button onclick="closeMobileMenu(); openLabIntroModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -765,13 +890,15 @@
                     <div class="flex items-center gap-2 shrink-0">
                         <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400 hidden sm:inline">Simulación Guiada</span>
                         <span class="text-slate-300 dark:text-slate-700 hidden sm:inline" aria-hidden="true">·</span>
-                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 text-blue-700 dark:text-sky-300 font-mono text-xs font-bold shadow-xs">
-                            <svg class="w-3 h-3 text-blue-500 dark:text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        <!-- Badge interactivo de Progreso con el icono de mapa -->
+                        <button onclick="openMissionsNavigator()" type="button" title="Ver progreso y ruta de misiones (clic para abrir)" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/80 dark:hover:bg-sky-900/80 border border-blue-200 dark:border-sky-800/60 text-blue-700 dark:text-sky-300 font-mono text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer group" id="chat-progress-badge">
+                            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400 shrink-0 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
-                            <span class="text-[10px] uppercase font-sans font-semibold text-slate-500 dark:text-slate-400 tracking-wider">Progreso</span>
-                            <span id="chat-progress-text" class="text-blue-700 dark:text-sky-300 font-bold">1 de 9</span>
-                        </div>
+                            <span class="text-[11px] font-sans font-semibold text-slate-700 dark:text-slate-200 tracking-tight">Ver progreso</span>
+                            <span class="text-slate-300 dark:text-slate-600 font-normal">·</span>
+                            <span id="chat-progress-text" class="text-blue-700 dark:text-sky-300 font-bold font-mono">1 de 9</span>
+                        </button>
                     </div>
                 </div>
 
@@ -792,11 +919,11 @@
                         </div>
                         <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate" id="side-mission-title">Título de la Misión</h2>
                     </div>
-                    <button onclick="viewMissionModal()" type="button" class="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
+                    <button onclick="viewMissionModal()" type="button" class="shrink-0 flex items-center gap-1.5 text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 transition-colors" title="Ver detalles y objetivo de la misión">
                         <svg class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Ver Misión</span>
+                        <span>Ver Detalles</span>
                     </button>
                 </div>
 
@@ -850,7 +977,10 @@
                         <span id="modal-mission-category" class="text-xs font-medium text-slate-500 dark:text-slate-400">Campaña de Salud Mental</span>
                     </div>
                 </div>
-                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-snug" id="mission-title">Tarea: Publicaciones sobre el uso de redes sociales</h2>
+                <div class="pt-1">
+                    <span class="text-xs font-mono font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider block mb-1" id="mission-modal-header-tag">Detalles de la Misión</span>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-snug" id="mission-title">Tarea: Publicaciones sobre el uso de redes sociales</h2>
+                </div>
                 <div class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed space-y-2 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800" id="mission-desc">
                     <!-- Populated by JS -->
                 </div>
@@ -895,7 +1025,7 @@
                 <div class="bg-blue-50/60 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-900/50 p-4 sm:p-5 relative border-l-4 border-l-blue-600 dark:border-l-sky-500">
                     <div class="flex items-center gap-1.5 mb-1.5 text-blue-700 dark:text-sky-400 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider" id="modal-concept-letter">
                         <span>💡</span>
-                        <span>COMPONENTE CLAVE</span>
+                        <span>APRENDIZAJES CLAVE</span>
                     </div>
                     <p id="modal-concept-title" class="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg mb-1"></p>
                     <p id="modal-concept-text" class="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed"></p>
@@ -1082,6 +1212,33 @@
                             <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Optimización:</strong> Pide a la IA autoverificar su respuesta antes de entregarla, evaluar con criterios objetivos y justificar sus conclusiones.</span>
                         </div>
                     </div>
+
+                    <div class="mt-3.5 p-3.5 sm:p-4 rounded-xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 text-amber-900 dark:text-amber-200 text-xs sm:text-sm leading-relaxed flex items-start gap-3">
+                        <span class="text-base sm:text-lg shrink-0 mt-0.5">🔄</span>
+                        <div>
+                            <strong class="font-bold text-slate-900 dark:text-white block mb-0.5">Principio Esencial: El Humano en el Bucle (Human-in-the-Loop)</strong>
+                            <p class="text-slate-700 dark:text-slate-300">
+                                La IA rara vez proporciona una respuesta perfecta al primer intento. El dominio del prompting no busca una perfección mágica e inmediata, sino una base sólida para iterar, contrastar y refinar. Evita asumir que la IA entrega todo resuelto de forma perfecta: <strong>audita, verifica y valida siempre</strong> cada resultado con tu propio criterio.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Cloud Save Card inside Completion Modal -->
+                    <div id="completion-cloud-save-card" class="mt-3.5 p-3.5 sm:p-4 rounded-xl bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-700/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 text-xl shadow-xs">
+                                ☁️
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">¿Guardar tu progreso en la nube?</h4>
+                                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300" id="completion-cloud-status">Crea una cuenta opcional o inicia sesión con Google para conservar tus 9 misiones superadas.</p>
+                            </div>
+                        </div>
+                        <button onclick="openAuthModal()" id="completion-cloud-btn" type="button" class="w-full sm:w-auto shrink-0 py-2 sm:py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer">
+                            <span>Conectar Cuenta</span>
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div id="share-toast" class="hidden mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-500/50 rounded-xl text-center text-sm text-emerald-800 dark:text-emerald-300 font-medium fade-in">
@@ -1108,6 +1265,9 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver al Simulador</span>
                     </button>
+                    <button onclick="closeCompletionModal(); openMissionsNavigator();" class="py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/70 dark:hover:bg-sky-900/70 border border-blue-200 dark:border-sky-800/80 text-blue-700 dark:text-sky-300 font-semibold text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>🧭 Mapa de Misiones</span>
+                    </button>
                     <button onclick="openLabIntroModal()" class="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-semibold text-sm sm:text-base bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
                         <svg class="w-4 h-4 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -1115,6 +1275,176 @@
                         <span>Laboratorio de Prompts</span>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Missions Navigator Modal -->
+        <div id="missions-navigator-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-2 sm:p-4 md:p-6 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative max-h-[92dvh] flex flex-col" id="missions-navigator-content">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3 shrink-0">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-base sm:text-xl font-bold text-slate-900 dark:text-white truncate">Ver Progreso · Ruta de Misiones</h2>
+                                <span id="nav-modal-badge" class="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800/60">Simulador</span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">Retrocede libremente a cualquier misión, revisa sus detalles o aprendizajes y continúa tu camino.</p>
+                        </div>
+                    </div>
+                    <button onclick="closeMissionsNavigator()" type="button" aria-label="Cerrar" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Info Bar / Status Banner -->
+                <div id="navigator-status-banner" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="text-base shrink-0">📊</span>
+                        <span id="navigator-status-text" class="text-slate-700 dark:text-slate-300">Desbloqueadas: <strong>1 de 9 misiones</strong></span>
+                    </div>
+                    <div class="w-full sm:w-48 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shrink-0">
+                        <div id="navigator-progress-bar" class="bg-blue-600 dark:bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 11%;"></div>
+                    </div>
+                </div>
+
+                <!-- Scrollable Body with 3 Levels and 9 Missions -->
+                <div class="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1" id="navigator-levels-container">
+                    <!-- Contenido renderizado por renderNavigatorLevels() -->
+                </div>
+
+                <!-- Footer -->
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
+                    <button onclick="openAuthModal()" type="button" class="py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                        <span>☁️</span>
+                        <span id="nav-cloud-footer-text">Guardar progreso en la nube</span>
+                    </button>
+                    <button onclick="closeMissionsNavigator()" type="button" class="py-2.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-colors cursor-pointer text-center">
+                        Cerrar Navegador
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Firebase Auth & Cloud Sync Modal -->
+        <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[70] overflow-y-auto p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative text-left" id="auth-modal-content">
+                
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 text-lg">
+                            ☁️
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Guardar Progreso en la Nube</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Firebase Firestore & Auth</p>
+                        </div>
+                    </div>
+                    <button onclick="closeAuthModal()" type="button" aria-label="Cerrar" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <!-- Not Logged In View -->
+                <div id="auth-logged-out-view" class="space-y-4">
+                    <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        Conecta tu cuenta para sincronizar tus misiones desbloqueadas y retomar tu avance desde cualquier dispositivo:
+                    </p>
+
+                    <!-- Google Sign In Button -->
+                    <button onclick="handleGoogleSignIn()" type="button" class="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-800 dark:text-slate-100 font-semibold text-sm shadow-xs transition-colors cursor-pointer">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        <span>Continuar con Google</span>
+                    </button>
+
+                    <div class="flex items-center gap-2 my-2">
+                        <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+                        <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">o con correo</span>
+                        <div class="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
+                    </div>
+
+                    <!-- Auth Mode Toggle Tabs -->
+                    <div class="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
+                        <button onclick="setAuthTab('login')" id="auth-tab-login" type="button" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all">
+                            Iniciar Sesión
+                        </button>
+                        <button onclick="setAuthTab('signup')" id="auth-tab-signup" type="button" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                            Crear Cuenta
+                        </button>
+                    </div>
+
+                    <!-- Email & Password Form -->
+                    <form onsubmit="handleEmailAuthSubmit(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="auth-email">Correo Electrónico</label>
+                            <input id="auth-email" type="email" required placeholder="tu@email.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1" for="auth-password">Contraseña</label>
+                            <input id="auth-password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div id="auth-error-msg" class="hidden text-xs text-red-600 dark:text-red-400 p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 leading-relaxed"></div>
+
+                        <button id="auth-submit-btn" type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
+                            <span>Iniciar Sesión</span>
+                        </button>
+                    </form>
+
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
+                        El guardado en la nube es <strong>opcional</strong>. Si decides no conectarte, tus avances se seguirán guardando en este navegador.
+                    </p>
+                </div>
+
+                <!-- Logged In View -->
+                <div id="auth-logged-in-view" class="hidden space-y-4">
+                    <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-3">
+                        <div id="user-avatar-badge" class="w-11 h-11 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-base shrink-0 shadow-xs">
+                            U
+                        </div>
+                        <div class="min-w-0">
+                            <h4 id="user-display-name" class="font-bold text-slate-900 dark:text-white text-sm sm:text-base truncate">Usuario Conectado</h4>
+                            <p id="user-email-text" class="text-xs text-slate-500 dark:text-slate-400 truncate">usuario@email.com</p>
+                            <span class="inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span>Sincronizado con Firestore</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm space-y-1.5">
+                        <div class="flex justify-between text-slate-600 dark:text-slate-300">
+                            <span>Misiones Desbloqueadas:</span>
+                            <strong id="user-unlocked-count" class="text-slate-900 dark:text-white">1 de 9</strong>
+                        </div>
+                        <div class="flex justify-between text-slate-600 dark:text-slate-300">
+                            <span>Estado de la Campaña:</span>
+                            <strong id="user-campaign-status" class="text-slate-900 dark:text-white">En Curso</strong>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2.5 pt-2">
+                        <button id="manual-sync-btn" onclick="triggerManualSync(this)" type="button" class="flex-1 py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/80 dark:hover:bg-sky-900/80 border border-blue-200 dark:border-sky-800/60 text-blue-700 dark:text-sky-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                            <span>🔄 Sincronizar Ahora</span>
+                        </button>
+                        <button onclick="handleSignOut()" type="button" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors cursor-pointer">
+                            Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -1744,25 +2074,25 @@
                     {
                         tag: "A",
                         isMaster: false,
-                        text: "Elabora una guía práctica para que las personas realicen un detox de dopamina este fin de semana, partiendo de que es una estrategia demostrada para limpiar los receptores cerebrales y restablecer la sensibilidad ante los estímulos cotidianos.",
-                        aiResponse: "¡Excelente iniciativa! El detox de dopamina es sumamente efectivo. Paso 1: Elimina todo estímulo digital durante 24 horas para vaciar los depósitos de dopamina. Paso 2: Permite que tus receptores dopamínicos se limpien y descansen. Paso 3: Retoma tus tareas con la mente renovada y libre de toxinas cognitivas.",
-                        feedbackTitle: "❌ Sesgo de Complacencia y Validación de Mitos",
-                        feedbackSubtitle: "La IA te dio la razón y validó un mito pseudocientífico.",
-                        feedbackText: "Al asumir una postura previa afirmativa ('ya que es una estrategia demostrada'), la IA se limitó a complacer tu sesgo sin advertir que la dopamina no es una toxina acumulable ni los receptores se resetean en un día de ayuno.",
-                        conceptTitle: "Sesgo de Confirmación en la IA",
-                        conceptText: "Si en tu prompt tomas una postura como un hecho incuestionable, el modelo tenderá a validarla acríticamente. Para obtener rigor, nunca des por sentado un mito popular.",
+                        text: "Dime si el detox de dopamina es verdad o es un mito. Respóndeme en un párrafo directo y sin rodeos diciéndome si sirve para reiniciar la mente o no, así decidimos rápido si lo incluimos en la campaña.",
+                        aiResponse: "El detox de dopamina es en parte real y en parte mito: aunque no es un procedimiento médico ni elimina toxinas del cuerpo, desconectarse por 24 horas te ayuda a reiniciar la mente, calmar la sobrecarga sensorial y volver al trabajo con mucha más concentración y claridad mental. Si buscan un enfoque práctico y motivador para la campaña, sin duda vale la pena recomendarlo.",
+                        feedbackTitle: "❌ Ausencia de Criterios y Validación Previa",
+                        feedbackSubtitle: "Una respuesta superficial y ambigua que mezcla hechos con mitos.",
+                        feedbackText: "Al pedir un veredicto apresurado en un párrafo sin exigir criterios de evaluación objetivos ni pedirle al modelo que valide la evidencia biológica antes de responder, la IA recurrió a generalizaciones populares de internet ('en parte sí y en parte no'), avalando una idea falsa sin desmentir la pseudociencia.",
+                        conceptTitle: "Falta de Rúbrica y Validación Previa (O)",
+                        conceptText: "La variable de Optimización (O) exige no conformarse con preguntas rápidas o binarias. Sin directrices explícitas para que la IA aplique criterios científicos y verifique su análisis previamente, el modelo entrega síntesis ambiguas basadas en la opinión popular de la web.",
                         icon: "❌", iconBg: "bg-red-500/20 text-red-400 border border-red-500/40", btnClass: "bg-slate-700 hover:bg-slate-600 border border-slate-600"
                     },
                     {
                         tag: "B",
                         isMaster: false,
-                        text: "Redacta un artículo de opinión convincente sobre el detox de dopamina, defendiendo por qué desconectarse de la tecnología es una medida indispensable para desintoxicar los circuitos de gratificación y recuperar la concentración en el trabajo.",
-                        aiResponse: "El detox de dopamina es una práctica que todos deberíamos incorporar a nuestras rutinas. Desconectarse por completo de la dopamina digital durante un fin de semana permite desintoxicar los circuitos del placer y volver a apreciar las cosas simples sin la esclavitud constante de las notificaciones.",
-                        feedbackTitle: "⚠️ Propagación de Desinformación sin Criterios",
-                        feedbackSubtitle: "Un texto convincente pero sin metodología científica ni contraste.",
-                        feedbackText: "Pedir que justifique 'por qué todo el mundo debería practicarlo' forzó a la IA a fabricar argumentos a favor de una premisa errónea, sin aplicar criterios de evaluación objetivos ni contrastar evidencias neurobiológicas reales.",
-                        conceptTitle: "Riesgo de Omitir Criterios de Evaluación",
-                        conceptText: "Los modelos de lenguaje generan justificaciones convincentes para premisas falsas si la instrucción no impone criterios objetivos de evaluación fáctica ni exige validar la respuesta con evidencia antes de emitir un veredicto.",
+                        text: "Compara las dos posturas sobre el detox de dopamina: haz una lista con los argumentos a favor de que ayuda a resetear los circuitos cerebrales y otra con los argumentos en contra de quienes dicen que es falso, para ver cuál posición tiene más peso.",
+                        aiResponse: "Argumentos a favor: 1) Permite que los receptores dopamínicos descansen y recuperen sensibilidad tras jornadas de hiperestimulación. 2) Numerosos testimonios reportan un efecto 'reset' mental tras 24 horas sin pantallas. 3) Reduce los picos compulsivos de gratificación inmediata.\n\nArgumentos en contra: 1) La dopamina es un neurotransmisor natural continuo, no una toxina. 2) No existen ensayos clínicos que demuestren un 'reinicio' de receptores en 24 horas. 3) La abstinencia abrupta puede causar ansiedad temporal.\n\nConclusión: Ambas posturas aportan puntos válidos; depende del enfoque de salud o bienestar que elija la campaña.",
+                        feedbackTitle: "⚠️ Falsa Equivalencia y Falta de Justificación Metodológica",
+                        feedbackSubtitle: "La IA equiparó mitos de redes sociales con evidencia neurobiológica real.",
+                        feedbackText: "Al pedir solo 'argumentos a favor y en contra' sin definir una rúbrica científica ni requerir justificación metodológica que contraste biología vs. hábitos, la IA cayó en el sesgo de falsa equivalencia (bothsidesism), tratando afirmaciones pseudocientíficas como si tuvieran el mismo rigor que la neurociencia.",
+                        conceptTitle: "Riesgo de Falsa Simetría sin Criterios de Evaluación",
+                        conceptText: "Pedir dos posturas sin imponer criterios de rigor metodológico hace que la IA fabrique una falsa simetría, otorgando igual valor a mitos populares que a hechos demostrados. La 'O' de Optimización exige forzar a la IA a justificar su postura con rigor antes de emitir un juicio.",
                         icon: "⚠️", iconBg: "bg-amber-500/20 text-amber-400 border border-amber-500/40", btnClass: "bg-slate-700 hover:bg-slate-600"
                     },
                     {
@@ -1833,6 +2163,9 @@
         ];
 
         let currentLevelIdx = 0;
+        let highestUnlockedLevel = 0;
+        let simulationCompleted = false;
+        let completedLevels = [];
         let selectedOption = null;
         let isReviewingMission = false;
         let hasStartedSimulation = false;
@@ -2740,6 +3073,14 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (card) {
                 card.scrollTop = 0;
             }
+            const body = document.getElementById('onboarding-modal-body');
+            if (body) {
+                body.scrollTop = 0;
+            }
+            const modal = document.getElementById('onboarding-modal');
+            if (modal) {
+                modal.scrollTop = 0;
+            }
         }
 
         function nextOnboardingStep() {
@@ -2918,12 +3259,19 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
-        function saveSimulationProgress() {
+        let isCloudSyncing = false;
+        function saveSimulationProgress(skipCloudPush = false) {
             try {
                 localStorage.setItem('simulador_has_started', hasStartedSimulation ? 'true' : 'false');
                 localStorage.setItem('simulador_current_level_idx', currentLevelIdx.toString());
+                localStorage.setItem('simulador_highest_level', highestUnlockedLevel.toString());
+                localStorage.setItem('simulador_completed', simulationCompleted ? 'true' : 'false');
+                localStorage.setItem('simulador_completed_levels', JSON.stringify(completedLevels));
             } catch (e) {
                 console.warn('No se pudo guardar el progreso en caché local:', e);
+            }
+            if (!skipCloudPush && !isCloudSyncing && window.firebaseSyncProgress) {
+                window.firebaseSyncProgress();
             }
         }
 
@@ -2931,9 +3279,82 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             try {
                 localStorage.removeItem('simulador_has_started');
                 localStorage.removeItem('simulador_current_level_idx');
+                localStorage.removeItem('simulador_highest_level');
+                localStorage.removeItem('simulador_completed');
+                localStorage.removeItem('simulador_completed_levels');
             } catch (e) {
                 console.warn('No se pudo limpiar el progreso de caché local:', e);
             }
+            highestUnlockedLevel = 0;
+            simulationCompleted = false;
+            completedLevels = [];
+            if (window.firebaseSyncProgress) {
+                window.firebaseSyncProgress();
+            }
+        }
+
+        function openWelcomeModal() {
+            const modal = document.getElementById('welcome-modal');
+            const card = document.getElementById('welcome-modal-card');
+            if (!modal) return;
+
+            const resumeSection = document.getElementById('welcome-resume-section');
+            const resumeDesc = document.getElementById('welcome-resume-desc');
+            const hasStarted = localStorage.getItem('simulador_has_started') === 'true';
+            const savedIdx = localStorage.getItem('simulador_current_level_idx');
+
+            if (hasStarted && savedIdx !== null && resumeSection && resumeDesc) {
+                const idx = parseInt(savedIdx, 10);
+                if (!isNaN(idx) && idx >= 0 && idx < levels.length) {
+                    resumeSection.classList.remove('hidden');
+                    resumeDesc.textContent = `Nivel ${levels[idx].stage} · Misión ${idx + 1}: ${levels[idx].title}`;
+                }
+            } else if (resumeSection) {
+                resumeSection.classList.add('hidden');
+            }
+
+            modal.classList.remove('hidden');
+            if (modal) modal.scrollTop = 0;
+            if (card) card.scrollTop = 0;
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 20);
+        }
+
+        function closeWelcomeModal(callback) {
+            const modal = document.getElementById('welcome-modal');
+            if (!modal) {
+                if (callback) callback();
+                return;
+            }
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (callback) callback();
+            }, 200);
+        }
+
+        function startFromZero() {
+            closeWelcomeModal(() => {
+                openOnboarding();
+            });
+        }
+
+        function welcomeLoadAccountProgress() {
+            if (currentUser && typeof resolveAndSyncProgress === 'function') {
+                closeWelcomeModal();
+                resolveAndSyncProgress(currentUser, true);
+            } else {
+                openAuthModal('login');
+            }
+        }
+
+        function continueExistingSimulation() {
+            closeWelcomeModal(() => {
+                hasStartedSimulation = true;
+                saveSimulationProgress();
+                loadLevelEnvironment();
+            });
         }
 
         let isProgressInitialized = false;
@@ -2943,23 +3364,56 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             try {
                 const hasStarted = localStorage.getItem('simulador_has_started') === 'true';
                 const savedIdx = localStorage.getItem('simulador_current_level_idx');
+                const savedHighest = localStorage.getItem('simulador_highest_level');
+                const savedCompleted = localStorage.getItem('simulador_completed') === 'true';
+                const savedCompletedLevels = localStorage.getItem('simulador_completed_levels');
+
+                if (savedHighest !== null) {
+                    highestUnlockedLevel = parseInt(savedHighest, 10) || 0;
+                }
+                if (savedCompleted) {
+                    simulationCompleted = true;
+                    highestUnlockedLevel = levels.length - 1;
+                }
+                if (savedCompletedLevels) {
+                    try {
+                        completedLevels = JSON.parse(savedCompletedLevels) || [];
+                    } catch (e) {}
+                }
+
                 if (hasStarted && savedIdx !== null) {
                     const idx = parseInt(savedIdx, 10);
                     if (!isNaN(idx) && idx >= 0 && idx < levels.length) {
                         currentLevelIdx = idx;
                         hasStartedSimulation = true;
-                        
-                        // Ocultar modal de bienvenida si ya había una simulación iniciada
-                        const onboarding = document.getElementById('onboarding-modal');
-                        if (onboarding) {
-                            onboarding.classList.add('hidden');
-                            onboarding.classList.add('opacity-0');
+                        if (currentLevelIdx > highestUnlockedLevel) {
+                            highestUnlockedLevel = currentLevelIdx;
                         }
-
-                        // Cargar de inmediato la misión guardada
-                        loadLevelEnvironment();
-                        return true;
                     }
+                }
+
+                // Si aún no se ha iniciado la simulación, mostrar la Pantalla de Bienvenida inicial
+                if (!hasStartedSimulation) {
+                    const onboarding = document.getElementById('onboarding-modal');
+                    if (onboarding) {
+                        onboarding.classList.add('hidden');
+                        onboarding.classList.add('opacity-0');
+                    }
+                    openWelcomeModal();
+                } else {
+                    // Simulación previa detectada: cargar directo
+                    const welcome = document.getElementById('welcome-modal');
+                    if (welcome) {
+                        welcome.classList.add('hidden');
+                        welcome.classList.add('opacity-0');
+                    }
+                    const onboarding = document.getElementById('onboarding-modal');
+                    if (onboarding) {
+                        onboarding.classList.add('hidden');
+                        onboarding.classList.add('opacity-0');
+                    }
+                    loadLevelEnvironment();
+                    return true;
                 }
             } catch (e) {
                 console.warn('No se pudo restaurar el progreso desde caché local:', e);
@@ -2968,7 +3422,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         }
 
         function goBackAction() {
-            ['mission-modal', 'feedback-modal', 'incorrect-options-modal', 'completion-modal', 'level-summary-modal'].forEach(id => {
+            ['welcome-modal', 'mission-modal', 'feedback-modal', 'incorrect-options-modal', 'completion-modal', 'level-summary-modal', 'missions-navigator-modal', 'auth-modal'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el && !el.classList.contains('hidden')) {
                     el.classList.add('hidden');
@@ -2990,6 +3444,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         function openOnboarding() {
             const modal = document.getElementById('onboarding-modal');
             const card = document.getElementById('onboarding-modal-card');
+            const body = document.getElementById('onboarding-modal-body');
             if (!modal) return;
             onboardingCurrentStep = 1;
             updateOnboardingWizardUI();
@@ -3000,9 +3455,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             modal.classList.remove('hidden');
             if (modal) modal.scrollTop = 0;
             if (card) card.scrollTop = 0;
+            if (body) body.scrollTop = 0;
             setTimeout(() => {
-                if (modal) modal.scrollTop = 0;
-                if (card) card.scrollTop = 0;
                 modal.classList.remove('opacity-0');
             }, 20);
         }
@@ -3035,12 +3489,17 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (document.getElementById('mission-focus')) {
                 document.getElementById('mission-focus').textContent = lvl.category || "Campaña de Salud Mental";
             }
-            document.getElementById('mission-title').textContent = `Tarea: ${lvl.title}`;
+
+            const headerTag = document.getElementById('mission-modal-header-tag');
+            if (headerTag) {
+                headerTag.textContent = 'Detalles de la Misión';
+            }
+            document.getElementById('mission-title').textContent = isReview ? `Detalles: ${lvl.title}` : `Misión: ${lvl.title}`;
             document.getElementById('mission-desc').innerHTML = lvl.briefingHtml;
 
             const actionBtn = document.getElementById('mission-action-btn');
             if (isReview) {
-                actionBtn.innerHTML = `<span>Volver a las Opciones</span>`;
+                actionBtn.innerHTML = `<span>Volver al Chat / Opciones</span>`;
             } else {
                 actionBtn.innerHTML = `<span>Iniciar Conversación</span> <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
             }
@@ -3523,6 +3982,20 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Fuerza a la IA a verificar su propia lógica, evitando que dé respuestas superficiales o invente datos, lo que garantiza resultados sólidos y confiables.
                                 </div>
                             </div>
+
+                            <!-- Nota Humano en el Bucle -->
+                            <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 flex flex-col gap-2.5">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-base shrink-0 shadow-xs">🔄</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Nota Fundamental: El Humano en el Bucle (Human-in-the-Loop)</h3>
+                                </div>
+                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                    La mayoría de las veces el modelo de inteligencia artificial <strong class="text-slate-900 dark:text-white">no ofrece una respuesta perfecta al primer intento</strong>. El prompting profesional no busca una magia instantánea, sino abrir una base sólida para la iteración y el refinamiento posterior guiado por la persona.
+                                </p>
+                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                    <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Evita caer en la idea errónea de que la IA entrega todo resuelto de forma perfecta. Mantener al humano en el bucle significa que siempre debemos <strong>auditar, verificar y validar</strong> críticamente cada resultado antes de darlo por definitivo.
+                                </div>
+                            </div>
                         </div>
                     `;
                 }
@@ -3549,9 +4022,16 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             setTimeout(() => {
                 modal.classList.add('hidden');
                 if (activeSummaryLevel === 3) {
+                    simulationCompleted = true;
+                    highestUnlockedLevel = levels.length - 1;
+                    if (!completedLevels.includes(8)) completedLevels.push(8);
+                    saveSimulationProgress();
                     openCompletionModal();
                 } else {
                     currentLevelIdx++;
+                    if (currentLevelIdx > highestUnlockedLevel) {
+                        highestUnlockedLevel = currentLevelIdx;
+                    }
                     saveSimulationProgress();
                     openMissionModal(false);
                 }
@@ -3592,18 +4072,38 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 }
             }
 
-            if (opt.isMaster) {
+            if (isReviewingMission) {
+                actionBtn.textContent = "Volver a la Ruta de Misiones";
+                actionBtn.onclick = () => {
+                    closeFeedbackModal(() => {
+                        openMissionsNavigator();
+                    });
+                };
+            } else if (opt.isMaster) {
+                if (!completedLevels.includes(currentLevelIdx)) {
+                    completedLevels.push(currentLevelIdx);
+                }
+                if (currentLevelIdx + 1 > highestUnlockedLevel) {
+                    highestUnlockedLevel = Math.min(levels.length - 1, currentLevelIdx + 1);
+                }
+                if (currentLevelIdx === levels.length - 1) {
+                    simulationCompleted = true;
+                    highestUnlockedLevel = levels.length - 1;
+                }
+                saveSimulationProgress();
+
                 if (currentLevelIdx === 2) { 
-                    actionBtn.textContent = "Ver Resumen del Nivel 1";
+                    actionBtn.innerHTML = `<span>Ver Resumen del Nivel 1</span><svg class="w-4 h-4 ml-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
                     actionBtn.onclick = () => showLevelSummary(1);
-                } else if (currentLevelIdx === 5) {
-                    actionBtn.textContent = "Ver Resumen del Nivel 2";
+                } else if (currentLevelIdx === 5) { 
+                    actionBtn.innerHTML = `<span>Ver Resumen del Nivel 2</span><svg class="w-4 h-4 ml-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
                     actionBtn.onclick = () => showLevelSummary(2);
-                } else if (currentLevelIdx === 8) {
-                    actionBtn.textContent = "Ver Resumen del Nivel 3";
+                } else if (currentLevelIdx === 8) { 
+                    actionBtn.innerHTML = `<span>Ver Resumen del Nivel 3</span><svg class="w-4 h-4 ml-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
                     actionBtn.onclick = () => showLevelSummary(3);
                 } else {
-                    actionBtn.textContent = "Siguiente Misión";
+                    const nextNum = currentLevelIdx + 2;
+                    actionBtn.innerHTML = `<span>Continuar a la Misión ${nextNum}</span><svg class="w-4 h-4 ml-1.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
                     actionBtn.onclick = advanceToNextLevel;
                 }
             } else {
@@ -3647,12 +4147,20 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         function advanceToNextLevel() {
             closeFeedbackModal(() => {
                 currentLevelIdx++;
+                if (currentLevelIdx > highestUnlockedLevel) {
+                    highestUnlockedLevel = currentLevelIdx;
+                }
                 saveSimulationProgress();
+                loadLevelEnvironment();
                 openMissionModal(false);
             });
         }
 
         function finishSimulation() {
+            simulationCompleted = true;
+            highestUnlockedLevel = levels.length - 1;
+            if (!completedLevels.includes(8)) completedLevels.push(8);
+            saveSimulationProgress();
             closeFeedbackModal(() => {
                 openCompletionModal();
             });
@@ -3689,7 +4197,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         }
 
         function restartSimulation() {
-            ['mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal'].forEach(id => {
+            ['welcome-modal', 'onboarding-modal', 'mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal', 'missions-navigator-modal', 'auth-modal'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.add('opacity-0');
@@ -3721,13 +4229,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 optsSection.classList.remove('flex');
             }
 
-            const onboarding = document.getElementById('onboarding-modal');
-            if (onboarding) {
-                onboarding.classList.remove('hidden');
-                setTimeout(() => {
-                    onboarding.classList.remove('opacity-0');
-                }, 20);
-            }
+            openWelcomeModal();
         }
 
         function getShareUrl() {
@@ -3903,11 +4405,895 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
+        // ==========================================
+        // MISSION NAVIGATOR & FREE NAVIGATION LOGIC
+        // ==========================================
+        function openMissionsNavigator() {
+            closeMobileMenu();
+            const modal = document.getElementById('missions-navigator-modal');
+            const content = document.getElementById('missions-navigator-content');
+            if (!modal) return;
+
+            renderNavigatorLevels();
+
+            modal.classList.remove('hidden');
+            if (modal) modal.scrollTop = 0;
+            if (content) content.scrollTop = 0;
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if (content) {
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }
+            }, 20);
+        }
+
+        function closeMissionsNavigator(callback) {
+            const modal = document.getElementById('missions-navigator-modal');
+            const content = document.getElementById('missions-navigator-content');
+            if (!modal) return;
+
+            modal.classList.add('opacity-0');
+            if (content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                if (callback) callback();
+            }, 200);
+        }
+
+        function renderNavigatorLevels() {
+            const container = document.getElementById('navigator-levels-container');
+            if (!container) return;
+
+            const totalMissions = levels.length;
+            const unlockedCount = simulationCompleted ? totalMissions : Math.min(totalMissions, highestUnlockedLevel + 1);
+            const beatenCount = simulationCompleted ? totalMissions : completedLevels.length;
+            const progressPercent = Math.round((unlockedCount / totalMissions) * 100);
+
+            // Update Header Status Banner
+            const statusText = document.getElementById('navigator-status-text');
+            const progressBar = document.getElementById('navigator-progress-bar');
+            const badge = document.getElementById('nav-modal-badge');
+
+            if (statusText) {
+                if (simulationCompleted) {
+                    statusText.innerHTML = `<strong>🏆 Simulación Completada:</strong> Tienes acceso libre a todas las 9 misiones y resúmenes.`;
+                } else {
+                    statusText.innerHTML = `Disponibles: <strong>${unlockedCount} de 9 misiones</strong> · Superadas: <strong>${beatenCount}</strong>`;
+                }
+            }
+            if (progressBar) {
+                progressBar.style.width = `${progressPercent}%`;
+            }
+            if (badge) {
+                badge.textContent = simulationCompleted ? '🏆 Modo Libre Total' : `Nivel ${levels[currentLevelIdx].stage} · Misión ${levels[currentLevelIdx].id}`;
+            }
+
+            const stageData = [
+                {
+                    stage: 1,
+                    title: "Nivel 1: Variables C.O.N",
+                    desc: "Contexto (C), Objetivo (O) y Nivel / Rol (N)",
+                    missionIndices: [0, 1, 2],
+                    color: "blue"
+                },
+                {
+                    stage: 2,
+                    title: "Nivel 2: Variables T.E.X",
+                    desc: "Tarea (T), Especificaciones (E) y eXclusiones / Ejemplos (X)",
+                    missionIndices: [3, 4, 5],
+                    color: "indigo"
+                },
+                {
+                    stage: 3,
+                    title: "Nivel 3: Variables T.O",
+                    desc: "Tipo de Salida (T) y Optimización / Verificación (O)",
+                    missionIndices: [6, 7, 8],
+                    color: "purple"
+                }
+            ];
+
+            let html = '';
+
+            // Banner if simulation is 100% completed
+            if (simulationCompleted) {
+                html += `
+                    <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-blue-500/15 to-purple-500/15 border border-amber-300 dark:border-amber-600/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🏆</span>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">¡Simulador Superado al 100%!</h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">Todos los niveles y modales están permanentemente desbloqueados para repasar o practicar.</p>
+                            </div>
+                        </div>
+                        <button onclick="closeMissionsNavigator(); openCompletionModal();" type="button" class="shrink-0 px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs sm:text-sm transition-colors shadow-xs cursor-pointer">
+                            Ver Resumen C.O.N.T.E.X.T.O. →
+                        </button>
+                    </div>
+                `;
+            }
+
+            stageData.forEach((stg) => {
+                const isStageReached = simulationCompleted || highestUnlockedLevel >= stg.missionIndices[0] || completedLevels.includes(stg.missionIndices[0]);
+                const isStageCompleted = simulationCompleted || stg.missionIndices.every(idx => completedLevels.includes(idx));
+                const completedInStage = stg.missionIndices.filter(idx => completedLevels.includes(idx)).length;
+
+                html += `
+                    <div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 sm:p-5 bg-white/70 dark:bg-slate-900/60 shadow-xs">
+                        <!-- Cabecera de Etapa / Nivel -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-slate-200/80 dark:border-slate-800">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-blue-100 dark:bg-sky-950 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800">
+                                        Nivel ${stg.stage}
+                                    </span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">${stg.title}</h3>
+                                    ${isStageCompleted ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">Completado ✓</span>' : ''}
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${stg.desc}</p>
+                            </div>
+                            
+                            <!-- Indicador de progreso de etapa -->
+                            <div class="flex items-center gap-2">
+                                <div class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300">
+                                    ${simulationCompleted ? '3/3' : `${completedInStage}/3`} superadas
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Línea Temporal / Ruta Gamificada de Pasos -->
+                        <div class="relative pl-8 sm:pl-10 space-y-4 my-3.5 before:absolute before:left-3.5 sm:before:left-4 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+                `;
+
+                stg.missionIndices.forEach((mIdx) => {
+                    const lvl = levels[mIdx];
+                    const isUnlocked = simulationCompleted || (mIdx <= highestUnlockedLevel) || completedLevels.includes(mIdx);
+                    const isCurrent = (mIdx === currentLevelIdx) && !simulationCompleted;
+                    const isDone = completedLevels.includes(mIdx) || simulationCompleted;
+
+                    if (!isUnlocked) {
+                        // Paso Bloqueado en la Línea de Tiempo
+                        html += `
+                            <div class="relative flex items-start">
+                                <!-- Nodo Icono Bloqueado -->
+                                <div class="absolute -left-8 sm:-left-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-100 dark:bg-slate-800/90 text-slate-400 dark:text-slate-500 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs shrink-0 shadow-xs z-10">
+                                    🔒
+                                </div>
+                                <!-- Tarjeta de Paso Bloqueado -->
+                                <div class="w-full p-3 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 opacity-60 select-none">
+                                    <div class="flex items-center justify-between text-xs">
+                                        <div class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 font-mono font-bold">
+                                            <span>Misión ${lvl.id}</span>
+                                            <span>·</span>
+                                            <span class="font-normal font-sans">${lvl.category}</span>
+                                        </div>
+                                        <span class="text-[10px] font-semibold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">🔒 Bloqueada</span>
+                                    </div>
+                                    <h4 class="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1 line-clamp-1">${lvl.title}</h4>
+                                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">Completa la misión previa para desbloquear este paso</p>
+                                </div>
+                            </div>
+                        `;
+                    } else if (isCurrent) {
+                        // Paso Activo Actual en la Línea de Tiempo (Destacado)
+                        html += `
+                            <div class="relative flex items-start">
+                                <!-- Nodo Icono Misión Activa con Pulso -->
+                                <div class="absolute -left-8 sm:-left-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-lg ring-4 ring-blue-100 dark:ring-sky-950/80 animate-pulse shrink-0 z-10">
+                                    ⚡
+                                </div>
+                                <!-- Tarjeta de Paso Activo -->
+                                <div class="w-full p-3.5 sm:p-4 rounded-xl border-2 border-blue-500 dark:border-sky-500 bg-blue-50/60 dark:bg-sky-950/30 shadow-md">
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base">${lvl.emoji}</span>
+                                            <span class="font-mono font-bold text-blue-700 dark:text-sky-300">Misión ${lvl.id}</span>
+                                            <span class="text-xs text-slate-400">·</span>
+                                            <span class="text-[11px] text-slate-600 dark:text-slate-300 font-medium">${lvl.category}</span>
+                                        </div>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-xs">
+                                            Misión Activa
+                                        </span>
+                                    </div>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug">${lvl.title}</h4>
+                                    <div class="mt-3 pt-2.5 border-t border-blue-200/80 dark:border-sky-800/60 flex flex-wrap items-center gap-2">
+                                        <button onclick="navigateToMission(${mIdx})" type="button" class="py-1.5 px-3.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                            <span>💬</span>
+                                            <span>Continuar Misión →</span>
+                                        </button>
+                                        <button onclick="viewMissionBriefingFromNavigator(${mIdx})" type="button" class="py-1.5 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-colors cursor-pointer" title="Ver detalles y objetivo de la misión">
+                                            <span>📋 Detalles</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Paso Superado en la Línea de Tiempo
+                        html += `
+                            <div class="relative flex items-start">
+                                <!-- Nodo Icono Superado con Checkmark -->
+                                <div class="absolute -left-8 sm:-left-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs shadow-md ring-4 ring-emerald-100 dark:ring-emerald-950/70 shrink-0 z-10">
+                                    ✓
+                                </div>
+                                <!-- Tarjeta de Paso Superado -->
+                                <div class="w-full p-3 sm:p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50/25 dark:bg-emerald-950/10 shadow-xs hover:border-emerald-300 dark:hover:border-emerald-700 transition-all">
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base">${lvl.emoji}</span>
+                                            <span class="font-mono font-bold text-emerald-800 dark:text-emerald-300">Misión ${lvl.id}</span>
+                                            <span class="text-xs text-slate-400">·</span>
+                                            <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">${lvl.category}</span>
+                                        </div>
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                                            Superada ✓
+                                        </span>
+                                    </div>
+                                    <h4 class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white leading-snug">${lvl.title}</h4>
+                                    <div class="mt-2.5 pt-2 border-t border-emerald-100 dark:border-emerald-900/40 flex flex-wrap items-center gap-1.5">
+                                        <button onclick="navigateToMission(${mIdx})" type="button" class="py-1 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition-colors cursor-pointer flex items-center gap-1">
+                                            <span>💬</span>
+                                            <span>Ir al Chat</span>
+                                        </button>
+                                        <button onclick="viewMissionBriefingFromNavigator(${mIdx})" type="button" class="py-1 px-2.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-semibold transition-colors cursor-pointer" title="Ver detalles y objetivo de la misión">
+                                            <span>📋 Detalles</span>
+                                        </button>
+                                        <button onclick="viewMissionFeedbackFromNavigator(${mIdx})" type="button" class="py-1 px-2.5 rounded-lg bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/50 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800/80 text-amber-800 dark:text-amber-300 text-[11px] font-bold transition-colors cursor-pointer" title="Ver aprendizajes clave y solución">
+                                            <span>⭐ Aprendizajes</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                html += `
+                        </div>
+
+                        <!-- Hito de Cierre de Nivel / Resumen de Etapa -->
+                        <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                            <span class="text-xs text-slate-500 dark:text-slate-400">
+                                ${isStageCompleted ? '🏆 Etapa completada con éxito' : '🏁 Meta: Completa las 3 misiones para el resumen del nivel'}
+                            </span>
+                            ${isStageReached ? `
+                                <button onclick="closeMissionsNavigator(); showLevelSummary(${stg.stage});" type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                                    <span>📖</span>
+                                    <span>Resumen Nivel ${stg.stage}</span>
+                                </button>
+                            ` : `
+                                <button disabled type="button" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-xs font-medium flex items-center gap-1.5 opacity-60 cursor-not-allowed">
+                                    <span>🔒</span>
+                                    <span>Resumen Bloqueado</span>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function navigateToMission(missionIdx) {
+            if (missionIdx < 0 || missionIdx >= levels.length) return;
+            if (!simulationCompleted && missionIdx > highestUnlockedLevel && !completedLevels.includes(missionIdx)) {
+                return;
+            }
+
+            closeMissionsNavigator(() => {
+                currentLevelIdx = missionIdx;
+                selectedOption = null;
+                isReviewingMission = false;
+                hasStartedSimulation = true;
+                saveSimulationProgress();
+                loadLevelEnvironment();
+            });
+        }
+
+        function viewMissionBriefingFromNavigator(missionIdx) {
+            if (missionIdx < 0 || missionIdx >= levels.length) return;
+            if (!simulationCompleted && missionIdx > highestUnlockedLevel && !completedLevels.includes(missionIdx)) {
+                return;
+            }
+
+            closeMissionsNavigator(() => {
+                currentLevelIdx = missionIdx;
+                selectedOption = null;
+                hasStartedSimulation = true;
+                saveSimulationProgress();
+                loadLevelEnvironment();
+                openMissionModal(true);
+            });
+        }
+
+        function viewMissionFeedbackFromNavigator(missionIdx) {
+            if (missionIdx < 0 || missionIdx >= levels.length) return;
+            if (!simulationCompleted && missionIdx > highestUnlockedLevel && !completedLevels.includes(missionIdx)) {
+                return;
+            }
+
+            closeMissionsNavigator(() => {
+                currentLevelIdx = missionIdx;
+                const masterOpt = levels[missionIdx].options.find(o => o.isMaster) || levels[missionIdx].options[0];
+                selectedOption = masterOpt;
+                isReviewingMission = true;
+                saveSimulationProgress();
+                loadLevelEnvironment();
+                revealFeedback();
+            });
+        }
+
+
+        // ==========================================
+        // FIREBASE AUTHENTICATION & CLOUD SYNC
+        // ==========================================
+        let firebaseAuth = null;
+        let firestoreDb = null;
+        let currentUser = null;
+        let currentAuthTab = 'signup'; // 'login' | 'signup'
+
+        async function initFirebaseClient() {
+            try {
+                const response = await fetch('/firebase-applet-config.json');
+                if (!response.ok) {
+                    console.warn('No se encontró firebase-applet-config.json');
+                    return;
+                }
+                const config = await response.json();
+                if (!config || !config.apiKey) return;
+
+                if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                    firebase.initializeApp(config);
+                    firebaseAuth = firebase.auth();
+                    firestoreDb = firebase.firestore();
+
+                    let isInitialAuthCheck = true;
+                    firebaseAuth.onAuthStateChanged(async (user) => {
+                        currentUser = user;
+                        updateAuthUI(user);
+                        if (user) {
+                            const welcomeModal = document.getElementById('welcome-modal');
+                            const isWelcomeOpen = welcomeModal && !welcomeModal.classList.contains('hidden');
+                            const shouldNavigate = isWelcomeOpen || !hasStartedSimulation;
+                            await resolveAndSyncProgress(user, shouldNavigate);
+                            if (shouldNavigate) {
+                                closeWelcomeModal();
+                                closeOnboarding();
+                                closeAuthModal();
+                            }
+                        }
+                        isInitialAuthCheck = false;
+                    });
+
+                    // Wire global sync trigger
+                    window.firebaseSyncProgress = () => {
+                        if (firebaseAuth && firebaseAuth.currentUser) {
+                            pushProgressToFirestore(firebaseAuth.currentUser);
+                        }
+                    };
+                }
+            } catch (err) {
+                console.warn('Error inicializando Firebase:', err);
+            }
+        }
+
+        function updateAuthUI(user) {
+            const navAuthBtnText = document.getElementById('nav-auth-btn-text');
+            const navAuthIcon = document.getElementById('nav-auth-icon');
+            const mobileAuthLabel = document.getElementById('mobile-auth-btn-label');
+            const mobileAuthSub = document.getElementById('mobile-auth-btn-sub');
+            const mobileAuthStatus = document.getElementById('mobile-auth-status-tag');
+            const navCloudFooterText = document.getElementById('nav-cloud-footer-text');
+            const completionCloudStatus = document.getElementById('completion-cloud-status');
+            const completionCloudBtn = document.getElementById('completion-cloud-btn');
+
+            const loggedOutView = document.getElementById('auth-logged-out-view');
+            const loggedInView = document.getElementById('auth-logged-in-view');
+
+            if (user) {
+                const name = user.displayName || user.email.split('@')[0];
+                const initial = (name[0] || 'U').toUpperCase();
+
+                if (navAuthBtnText) navAuthBtnText.textContent = name;
+                if (navAuthIcon) navAuthIcon.textContent = '👤';
+                if (mobileAuthLabel) mobileAuthLabel.textContent = 'Mi Cuenta';
+                if (mobileAuthSub) mobileAuthSub.textContent = `Sincronizado (${user.email})`;
+                if (mobileAuthStatus) mobileAuthStatus.textContent = 'Conectado ✓';
+                if (navCloudFooterText) navCloudFooterText.textContent = `Nube: Conectado (${name})`;
+
+                if (completionCloudStatus) {
+                    completionCloudStatus.textContent = `Progreso respaldado en tiempo real en la cuenta ${user.email}.`;
+                }
+                if (completionCloudBtn) {
+                    completionCloudBtn.innerHTML = `<span>Ver Mi Cuenta</span>`;
+                }
+
+                if (loggedOutView) loggedOutView.classList.add('hidden');
+                if (loggedInView) loggedInView.classList.remove('hidden');
+
+                const avatar = document.getElementById('user-avatar-badge');
+                const displayName = document.getElementById('user-display-name');
+                const emailText = document.getElementById('user-email-text');
+                const unlockedCountEl = document.getElementById('user-unlocked-count');
+                const campaignStatusEl = document.getElementById('user-campaign-status');
+
+                if (avatar) avatar.textContent = initial;
+                if (displayName) displayName.textContent = user.displayName || name;
+                if (emailText) emailText.textContent = user.email || 'Sin correo asociado';
+                if (unlockedCountEl) {
+                    unlockedCountEl.textContent = simulationCompleted ? '9 de 9 (100%)' : `${highestUnlockedLevel + 1} de 9`;
+                }
+                if (campaignStatusEl) {
+                    campaignStatusEl.textContent = simulationCompleted ? '🏆 Completada' : 'En Curso';
+                }
+            } else {
+                if (navAuthBtnText) navAuthBtnText.textContent = 'Guardar progreso';
+                if (navAuthIcon) navAuthIcon.textContent = '☁️';
+                if (mobileAuthLabel) mobileAuthLabel.textContent = 'Crear cuenta para guardar progreso';
+                if (mobileAuthSub) mobileAuthSub.textContent = 'Guarda tu avance y accede desde otros dispositivos';
+                if (mobileAuthStatus) mobileAuthStatus.textContent = 'Guardar →';
+                if (navCloudFooterText) navCloudFooterText.textContent = 'Guardar progreso en la nube';
+
+                if (completionCloudStatus) {
+                    completionCloudStatus.textContent = 'Crea una cuenta opcional o inicia sesión con Google para conservar tus 9 misiones superadas.';
+                }
+                if (completionCloudBtn) {
+                    completionCloudBtn.innerHTML = `<span>Conectar Cuenta</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+                }
+
+                if (loggedOutView) loggedOutView.classList.remove('hidden');
+                if (loggedInView) loggedInView.classList.add('hidden');
+            }
+        }
+
+        function withFirestoreTimeout(promise, ms = 5000, errorMsg = 'Tiempo de espera agotado al conectar con Firestore') {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms))
+            ]);
+        }
+
+        function navigateToProgressLearnings() {
+            // Cerrar cualquier modal superpuesto de acceso o navegación
+            ['auth-modal', 'welcome-modal', 'onboarding-modal', 'missions-navigator-modal'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('opacity-0');
+                    el.classList.add('hidden');
+                }
+            });
+
+            // Determinar la última misión que el usuario superó con éxito
+            let effectiveCompleted = new Set(completedLevels || []);
+            if (highestUnlockedLevel > 0) {
+                for (let i = 0; i < highestUnlockedLevel; i++) {
+                    effectiveCompleted.add(i);
+                }
+            }
+            if (simulationCompleted) {
+                for (let i = 0; i < levels.length; i++) {
+                    effectiveCompleted.add(i);
+                }
+            }
+            const completedArr = Array.from(effectiveCompleted).sort((a, b) => a - b);
+            const lastCompletedIdx = completedArr.length > 0 ? completedArr[completedArr.length - 1] : -1;
+
+            if (simulationCompleted || lastCompletedIdx >= levels.length - 1) {
+                currentLevelIdx = levels.length - 1;
+                hasStartedSimulation = true;
+                saveSimulationProgress(true);
+                loadLevelEnvironment();
+                setTimeout(() => {
+                    openCompletionModal();
+                }, 180);
+                return;
+            }
+
+            if (lastCompletedIdx >= 0) {
+                // Posicionar en la última misión superada y mostrar sus Aprendizajes Clave
+                currentLevelIdx = lastCompletedIdx;
+                hasStartedSimulation = true;
+                const masterOpt = levels[currentLevelIdx].options.find(o => o.isMaster) || levels[currentLevelIdx].options[0];
+                selectedOption = masterOpt;
+                isReviewingMission = false; // Permite que el botón principal guíe a la siguiente misión
+                saveSimulationProgress(true);
+                loadLevelEnvironment();
+                setTimeout(() => {
+                    revealFeedback();
+                }, 180);
+            } else {
+                // Usuario en la Misión 1 (no ha completado ninguna aún)
+                currentLevelIdx = 0;
+                hasStartedSimulation = true;
+                saveSimulationProgress(true);
+                loadLevelEnvironment();
+                setTimeout(() => {
+                    openMissionModal(false);
+                }, 180);
+            }
+        }
+
+        async function resolveAndSyncProgress(user, navigateToLatest = true) {
+            if (!user) return false;
+            isCloudSyncing = true;
+            try {
+                // 1. Obtener valores locales consolidados (memoria + localStorage)
+                let localHighest = highestUnlockedLevel;
+                let localCurrent = currentLevelIdx;
+                let localCompleted = simulationCompleted;
+                let localCompletedLevels = Array.isArray(completedLevels) ? [...completedLevels] : [];
+
+                try {
+                    const storedHighest = localStorage.getItem('simulador_highest_level');
+                    if (storedHighest !== null) {
+                        localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
+                    }
+                    const storedCurrent = localStorage.getItem('simulador_current_level_idx');
+                    if (storedCurrent !== null) {
+                        localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
+                    }
+                    if (localStorage.getItem('simulador_completed') === 'true') {
+                        localCompleted = true;
+                    }
+                    const storedLevels = localStorage.getItem('simulador_completed_levels');
+                    if (storedLevels) {
+                        const parsed = JSON.parse(storedLevels);
+                        if (Array.isArray(parsed)) {
+                            localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Error leyendo localStorage:', e);
+                }
+
+                // 2. Intentar obtener estado en Firestore de forma segura (con timeout protector)
+                let cloudHighest = 0;
+                let cloudCurrent = 0;
+                let cloudCompleted = false;
+                let cloudCompletedLevels = [];
+                let firestoreConnected = false;
+
+                if (firestoreDb) {
+                    try {
+                        const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
+                        const docSnap = await withFirestoreTimeout(docRef.get(), 4000);
+                        if (docSnap && docSnap.exists) {
+                            const data = docSnap.data() || {};
+                            cloudHighest = typeof data.highestUnlockedLevel === 'number' ? data.highestUnlockedLevel : 0;
+                            cloudCurrent = typeof data.currentLevelIdx === 'number' ? data.currentLevelIdx : 0;
+                            cloudCompleted = Boolean(data.simulationCompleted);
+                            cloudCompletedLevels = Array.isArray(data.completedLevels) ? data.completedLevels : [];
+                        }
+                        firestoreConnected = true;
+                    } catch (err) {
+                        console.warn('Firestore no disponible o en espera de inicialización (se preserva progreso local):', err.message);
+                    }
+                }
+
+                // 3. Resolución sin conflictos: el mayor avance gana SIEMPRE
+                highestUnlockedLevel = Math.max(localHighest, cloudHighest);
+                simulationCompleted = localCompleted || cloudCompleted;
+                if (simulationCompleted) {
+                    highestUnlockedLevel = levels.length - 1;
+                }
+
+                let mergedLevels = new Set([...localCompletedLevels, ...cloudCompletedLevels]);
+                if (highestUnlockedLevel > 0) {
+                    for (let i = 0; i < highestUnlockedLevel; i++) {
+                        mergedLevels.add(i);
+                    }
+                }
+                if (simulationCompleted) {
+                    for (let i = 0; i < levels.length; i++) {
+                        mergedLevels.add(i);
+                    }
+                }
+                completedLevels = Array.from(mergedLevels).sort((a, b) => a - b);
+
+                // Asegurar que highestUnlockedLevel sea al menos la siguiente misión después de la última completada
+                let lastCompletedIdx = completedLevels.length > 0 ? Math.max(...completedLevels) : -1;
+                if (lastCompletedIdx >= 0 && lastCompletedIdx + 1 > highestUnlockedLevel) {
+                    highestUnlockedLevel = Math.min(levels.length - 1, lastCompletedIdx + 1);
+                }
+
+                hasStartedSimulation = true;
+
+                // 4. Guardar inmediatamente en localStorage
+                saveSimulationProgress(true);
+
+                // 5. Respaldar en Firestore si hay conexión disponible
+                if (firestoreDb && firestoreConnected) {
+                    try {
+                        const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
+                        await withFirestoreTimeout(docRef.set({
+                            userId: user.uid,
+                            highestUnlockedLevel: highestUnlockedLevel,
+                            currentLevelIdx: lastCompletedIdx >= 0 ? lastCompletedIdx : 0,
+                            simulationCompleted: simulationCompleted,
+                            completedLevels: completedLevels,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true }), 4000);
+                    } catch (err) {
+                        console.warn('No se pudo respaldar en Firestore:', err.message);
+                    }
+                }
+
+                // 6. Actualizar UI
+                updateAuthUI(user);
+                if (typeof renderNavigatorLevels === 'function') {
+                    renderNavigatorLevels();
+                }
+
+                // 7. Navegar si fue solicitado explícitamente
+                if (navigateToLatest) {
+                    navigateToProgressLearnings();
+                }
+
+                return true;
+            } catch (err) {
+                console.warn('Error resolviendo sincronización:', err);
+                return false;
+            } finally {
+                isCloudSyncing = false;
+            }
+        }
+
+        async function syncProgressFromFirestore(user, navigateToLatest = false) {
+            return await resolveAndSyncProgress(user, navigateToLatest);
+        }
+
+        async function pushProgressToFirestore(user) {
+            if (!firestoreDb || !user || isCloudSyncing) return false;
+            try {
+                const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
+                await withFirestoreTimeout(docRef.set({
+                    userId: user.uid,
+                    highestUnlockedLevel: highestUnlockedLevel,
+                    currentLevelIdx: currentLevelIdx,
+                    simulationCompleted: simulationCompleted,
+                    completedLevels: completedLevels,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }), 4500);
+                return true;
+            } catch (err) {
+                console.warn('Error guardando progreso en Firestore:', err);
+                return false;
+            }
+        }
+
+        function openAuthModal(defaultTab = 'signup') {
+            closeMobileMenu();
+            const modal = document.getElementById('auth-modal');
+            const content = document.getElementById('auth-modal-content');
+            const errorDiv = document.getElementById('auth-error-msg');
+            if (errorDiv) errorDiv.classList.add('hidden');
+
+            if (!currentUser) {
+                setAuthTab(defaultTab === 'login' ? 'login' : 'signup');
+            } else {
+                updateAuthUI(currentUser);
+            }
+
+            if (!modal) return;
+            modal.classList.remove('hidden');
+            if (modal) modal.scrollTop = 0;
+            if (content) content.scrollTop = 0;
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                if (content) {
+                    content.classList.remove('scale-95');
+                    content.classList.add('scale-100');
+                }
+            }, 20);
+        }
+
+        function closeAuthModal() {
+            const modal = document.getElementById('auth-modal');
+            const content = document.getElementById('auth-modal-content');
+            if (!modal) return;
+            modal.classList.add('opacity-0');
+            if (content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        function setAuthTab(tab) {
+            currentAuthTab = tab;
+            const loginBtn = document.getElementById('auth-tab-login');
+            const signupBtn = document.getElementById('auth-tab-signup');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const errorDiv = document.getElementById('auth-error-msg');
+            if (errorDiv) errorDiv.classList.add('hidden');
+
+            if (tab === 'login') {
+                loginBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all';
+                signupBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+                if (submitBtn) submitBtn.innerHTML = '<span>Iniciar Sesión</span>';
+            } else {
+                signupBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all';
+                loginBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
+                if (submitBtn) submitBtn.innerHTML = '<span>Crear Cuenta y Guardar</span>';
+            }
+        }
+
+        async function handleGoogleSignIn() {
+            if (!firebaseAuth) {
+                showAuthError('El servicio de autenticación no está listo aún.');
+                return;
+            }
+            const errorDiv = document.getElementById('auth-error-msg');
+            if (errorDiv) errorDiv.classList.add('hidden');
+
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const cred = await firebaseAuth.signInWithPopup(provider);
+                if (cred && cred.user) {
+                    await resolveAndSyncProgress(cred.user, true);
+                }
+                closeAuthModal();
+                closeWelcomeModal();
+                closeOnboarding();
+            } catch (err) {
+                console.error('Error Google Sign In:', err);
+                if (err.code === 'auth/popup-closed-by-user') {
+                    showAuthError('Se cerró la ventana de inicio de sesión antes de completar el acceso.');
+                } else if (err.code === 'auth/popup-blocked') {
+                    showAuthError('El navegador bloqueó la ventana emergente. Por favor, permítela para iniciar sesión con Google.');
+                } else {
+                    showAuthError(err.message || 'Ocurrió un fallo con la autenticación de Google.');
+                }
+            }
+        }
+
+        async function handleEmailAuthSubmit(e) {
+            e.preventDefault();
+            if (!firebaseAuth) {
+                showAuthError('El servicio de autenticación no está listo aún.');
+                return;
+            }
+
+            const emailInput = document.getElementById('auth-email');
+            const passInput = document.getElementById('auth-password');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passInput ? passInput.value : '';
+
+            if (!email || !password) return;
+
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="animate-spin text-sm">⏳</span> Procesando...`;
+
+            try {
+                let cred;
+                if (currentAuthTab === 'login') {
+                    cred = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                } else {
+                    cred = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+                }
+                if (cred && cred.user) {
+                    await resolveAndSyncProgress(cred.user, true);
+                }
+                closeAuthModal();
+                closeWelcomeModal();
+                closeOnboarding();
+                if (emailInput) emailInput.value = '';
+                if (passInput) passInput.value = '';
+            } catch (err) {
+                console.error('Error Email Auth:', err);
+                let msg = err.message;
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                    msg = 'Correo o contraseña incorrectos.';
+                } else if (err.code === 'auth/email-already-in-use') {
+                    msg = 'Ya existe una cuenta con este correo. Cambia a "Iniciar Sesión".';
+                } else if (err.code === 'auth/weak-password') {
+                    msg = 'La contraseña debe tener al menos 6 caracteres.';
+                } else if (err.code === 'auth/invalid-email') {
+                    msg = 'El formato del correo electrónico no es válido.';
+                }
+                showAuthError(msg);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        async function handleSignOut() {
+            if (!firebaseAuth) return;
+            try {
+                await firebaseAuth.signOut();
+                closeAuthModal();
+            } catch (err) {
+                console.warn('Error cerrando sesión:', err);
+            }
+        }
+
+        async function triggerManualSync(buttonEl) {
+            if (!firebaseAuth || !firebaseAuth.currentUser) {
+                openAuthModal('login');
+                return;
+            }
+            const btn = buttonEl || document.getElementById('manual-sync-btn') || (typeof event !== 'undefined' ? event?.currentTarget : null);
+            const origText = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span>⏳ Sincronizando avance...</span>`;
+            }
+
+            try {
+                // Sincronizar consolidando el mayor progreso entre local y nube
+                await resolveAndSyncProgress(firebaseAuth.currentUser, false);
+
+                let effectiveCompleted = new Set(completedLevels || []);
+                if (highestUnlockedLevel > 0) {
+                    for (let i = 0; i < highestUnlockedLevel; i++) effectiveCompleted.add(i);
+                }
+                const completedArr = Array.from(effectiveCompleted).sort((a, b) => a - b);
+                const lastCompleted = completedArr.length > 0 ? completedArr[completedArr.length - 1] : -1;
+
+                if (btn) {
+                    if (simulationCompleted) {
+                        btn.innerHTML = `<span>✓ ¡Sincronizado! Campaña Completa</span>`;
+                    } else if (lastCompleted >= 0) {
+                        btn.innerHTML = `<span>✓ ¡Sincronizado! Misión ${lastCompleted + 1} superada</span>`;
+                    } else {
+                        btn.innerHTML = `<span>✓ ¡Sincronizado! Listo en Misión 1</span>`;
+                    }
+                }
+
+                // Cerrar modal y llevar de inmediato a los Aprendizajes Clave de la misión superada
+                setTimeout(() => {
+                    closeAuthModal();
+                    navigateToProgressLearnings();
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = origText;
+                    }
+                }, 450);
+
+            } catch (err) {
+                console.error('Error al sincronizar:', err);
+                if (btn) {
+                    btn.innerHTML = `<span>⚠️ Error al sincronizar</span>`;
+                    setTimeout(() => {
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.innerHTML = origText;
+                        }
+                    }, 2500);
+                }
+            }
+        }
+
+        function showAuthError(msg) {
+            const errorDiv = document.getElementById('auth-error-msg');
+            if (errorDiv) {
+                errorDiv.textContent = msg;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const apiKeyModal = document.getElementById('api-key-modal');
                 if (apiKeyModal && !apiKeyModal.classList.contains('hidden')) {
                     closeApiKeyModal();
+                }
+                const navModal = document.getElementById('missions-navigator-modal');
+                if (navModal && !navModal.classList.contains('hidden')) {
+                    closeMissionsNavigator();
+                }
+                const authModal = document.getElementById('auth-modal');
+                if (authModal && !authModal.classList.contains('hidden')) {
+                    closeAuthModal();
                 }
             }
         });
@@ -3916,11 +5302,13 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             updateThemeUI();
             initStoredApiKey();
             initSimulationProgress();
+            initFirebaseClient();
         });
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             updateThemeUI();
             initStoredApiKey();
             initSimulationProgress();
+            initFirebaseClient();
         }
     </script>
 </body>
