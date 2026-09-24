@@ -52,10 +52,6 @@
     <meta property="og:description" content="Un simulador interactivo de Prompt Engineering para dominar el método C.O.N.T.E.X.T.O.">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Firebase SDK (Compat) for Auth & Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -3721,9 +3717,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             highestUnlockedLevel = 0;
             simulationCompleted = false;
             completedLevels = [];
-            if (window.firebaseSyncProgress) {
-                window.firebaseSyncProgress();
-            }
         }
 
         function openWelcomeModal() {
@@ -5270,81 +5263,14 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
 
         // ==========================================
-        // FIREBASE AUTHENTICATION & CLOUD SYNC
+        // AUTHENTICATION UI & NAVIGATION HELPERS
         // ==========================================
-        let firebaseAuth = null;
-        let firestoreDb = null;
         let currentUser = null;
         let currentAuthTab = 'signup'; // 'login' | 'signup'
 
-        async function initFirebaseClient() {
-            try {
-                const response = await fetch('/firebase-applet-config.json');
-                if (!response.ok) {
-                    console.warn('No se encontró firebase-applet-config.json');
-                    return;
-                }
-                const config = await response.json();
-                if (!config || !config.apiKey) return;
-
-                if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-                    const app = firebase.initializeApp(config);
-                    firebaseAuth = firebase.auth();
-                    
-                    // Inicializar Firestore apuntando al Database ID asignado en la configuración
-                    const dbId = config.firestoreDatabaseId;
-                    if (dbId && dbId !== '(default)') {
-                        try {
-                            firestoreDb = app.firestore(dbId);
-                        } catch (e1) {
-                            try {
-                                firestoreDb = firebase.firestore(app, dbId);
-                            } catch (e2) {
-                                firestoreDb = firebase.firestore();
-                            }
-                        }
-                    } else {
-                        firestoreDb = firebase.firestore();
-                    }
-
-                    // Test de conexión a Firestore
-                    if (firestoreDb) {
-                        try {
-                            firestoreDb.collection('test').doc('connection').get().catch(() => {});
-                        } catch (e) {}
-                    }
-
-                    let isInitialAuthCheck = true;
-                    firebaseAuth.onAuthStateChanged(async (user) => {
-                        currentUser = user;
-                        updateAuthUI(user);
-                        if (user) {
-                            const welcomeModal = document.getElementById('welcome-modal');
-                            const isWelcomeOpen = welcomeModal && !welcomeModal.classList.contains('hidden');
-                            const shouldNavigate = isWelcomeOpen || !hasStartedSimulation;
-                            await resolveAndSyncProgress(user, shouldNavigate);
-                            if (shouldNavigate) {
-                                closeWelcomeModal();
-                                closeOnboarding();
-                                closeAuthModal();
-                            }
-                        }
-                        isInitialAuthCheck = false;
-                    });
-
-                    // Wire global sync trigger
-                    window.firebaseSyncProgress = () => {
-                        if (firebaseAuth && firebaseAuth.currentUser) {
-                            pushProgressToFirestore(firebaseAuth.currentUser);
-                        }
-                    };
-                }
-            } catch (err) {
-                console.warn('Error inicializando Firebase:', err);
-            }
-        }
-
         function updateAuthUI(user) {
+            currentUser = user;
+            window.currentUser = user;
             const navAuthBtnText = document.getElementById('nav-auth-btn-text');
             const navAuthIcon = document.getElementById('nav-auth-icon');
             const mobileAuthLabel = document.getElementById('mobile-auth-btn-label');
@@ -5412,8 +5338,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 if (loggedInView) loggedInView.classList.add('hidden');
             }
         }
+        window.updateAuthUI = updateAuthUI;
 
-        function withFirestoreTimeout(promise, ms = 5000, errorMsg = 'Tiempo de espera agotado al conectar con Firestore') {
+        function withFirestoreTimeout(promise, ms = 6000, errorMsg = 'Tiempo de espera agotado al conectar con Firestore') {
             return Promise.race([
                 promise,
                 new Promise((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms))
@@ -5462,7 +5389,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 hasStartedSimulation = true;
                 const masterOpt = levels[currentLevelIdx].options.find(o => o.isMaster) || levels[currentLevelIdx].options[0];
                 selectedOption = masterOpt;
-                isReviewingMission = false; // Permite que el botón principal guíe a la siguiente misión
+                isReviewingMission = false;
                 saveSimulationProgress(true);
                 loadLevelEnvironment();
                 setTimeout(() => {
@@ -5477,194 +5404,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 setTimeout(() => {
                     openMissionModal(false);
                 }, 180);
-            }
-        }
-
-        async function resolveAndSyncProgress(user, navigateToLatest = true) {
-            if (!user) return false;
-            isCloudSyncing = true;
-            try {
-                const prevAuthUid = localStorage.getItem('simulador_auth_uid');
-                const isDifferentUser = prevAuthUid && prevAuthUid !== user.uid;
-
-                // 1. Obtener valores locales (solo válidos si es el mismo usuario o sesión de invitado previa)
-                let localHighest = 0;
-                let localCurrent = 0;
-                let localCompleted = false;
-                let localCompletedLevels = [];
-
-                if (!isDifferentUser) {
-                    localHighest = highestUnlockedLevel;
-                    localCurrent = currentLevelIdx;
-                    localCompleted = simulationCompleted;
-                    localCompletedLevels = Array.isArray(completedLevels) ? [...completedLevels] : [];
-
-                    try {
-                        const storedHighest = localStorage.getItem('simulador_highest_level');
-                        if (storedHighest !== null) {
-                            localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
-                        }
-                        const storedCurrent = localStorage.getItem('simulador_current_level_idx');
-                        if (storedCurrent !== null) {
-                            localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
-                        }
-                        if (localStorage.getItem('simulador_completed') === 'true') {
-                            localCompleted = true;
-                        }
-                        const storedLevels = localStorage.getItem('simulador_completed_levels');
-                        if (storedLevels) {
-                            const parsed = JSON.parse(storedLevels);
-                            if (Array.isArray(parsed)) {
-                                localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
-                            }
-                        }
-                    } catch (e) {
-                        console.warn('Error leyendo localStorage:', e);
-                    }
-                }
-
-                // 2. Obtener estado en Firestore del usuario activo
-                let cloudHighest = 0;
-                let cloudCurrent = 0;
-                let cloudCompleted = false;
-                let cloudCompletedLevels = [];
-                let hasCloudDoc = false;
-                let firestoreConnected = false;
-
-                if (firestoreDb) {
-                    try {
-                        const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
-                        const docSnap = await withFirestoreTimeout(docRef.get(), 6000);
-                        if (docSnap && docSnap.exists) {
-                            hasCloudDoc = true;
-                            const data = docSnap.data() || {};
-                            cloudHighest = typeof data.highestUnlockedLevel === 'number' ? data.highestUnlockedLevel : 0;
-                            cloudCurrent = typeof data.currentLevelIdx === 'number' ? data.currentLevelIdx : 0;
-                            cloudCompleted = Boolean(data.simulationCompleted);
-                            cloudCompletedLevels = Array.isArray(data.completedLevels) ? data.completedLevels : [];
-                        }
-                        firestoreConnected = true;
-                    } catch (err) {
-                        console.warn('Firestore no disponible temporalmente:', err);
-                    }
-                }
-
-                // 3. Resolución con aislamiento de cuentas:
-                if (hasCloudDoc) {
-                    // Si ya existe registro en la nube para esta cuenta, la nube es la fuente de verdad definitiva
-                    highestUnlockedLevel = cloudHighest;
-                    currentLevelIdx = (cloudCurrent >= 0 && cloudCurrent < levels.length) ? cloudCurrent : cloudHighest;
-                    simulationCompleted = cloudCompleted;
-                    completedLevels = cloudCompletedLevels;
-                } else if (!isDifferentUser && (localHighest > 0 || localCompletedLevels.length > 0)) {
-                    // Cuenta nueva creada a partir de una sesión de invitado: migrar avance local a la nube
-                    highestUnlockedLevel = localHighest;
-                    currentLevelIdx = localCurrent;
-                    simulationCompleted = localCompleted;
-                    completedLevels = localCompletedLevels;
-                } else {
-                    // Cuenta nueva limpia: iniciar desde cero
-                    highestUnlockedLevel = 0;
-                    currentLevelIdx = 0;
-                    simulationCompleted = false;
-                    completedLevels = [];
-                }
-
-                if (simulationCompleted) {
-                    highestUnlockedLevel = levels.length - 1;
-                }
-
-                let mergedLevels = new Set(completedLevels);
-                if (highestUnlockedLevel > 0) {
-                    for (let i = 0; i < highestUnlockedLevel; i++) {
-                        mergedLevels.add(i);
-                    }
-                }
-                if (simulationCompleted) {
-                    for (let i = 0; i < levels.length; i++) {
-                        mergedLevels.add(i);
-                    }
-                }
-                completedLevels = Array.from(mergedLevels).sort((a, b) => a - b);
-
-                let lastCompletedIdx = completedLevels.length > 0 ? Math.max(...completedLevels) : -1;
-                if (lastCompletedIdx >= 0 && lastCompletedIdx + 1 > highestUnlockedLevel) {
-                    highestUnlockedLevel = Math.min(levels.length - 1, lastCompletedIdx + 1);
-                }
-
-                if (currentLevelIdx < highestUnlockedLevel && completedLevels.length === 0) {
-                    currentLevelIdx = highestUnlockedLevel;
-                }
-
-                hasStartedSimulation = highestUnlockedLevel > 0 || completedLevels.length > 0 || simulationCompleted;
-
-                // 4. Guardar inmediatamente en localStorage asociado al usuario
-                localStorage.setItem('simulador_auth_uid', user.uid);
-                saveSimulationProgress(true);
-
-                // 5. Respaldar en Firestore si hay conexión disponible
-                if (firestoreDb && firestoreConnected) {
-                    try {
-                        const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
-                        await withFirestoreTimeout(docRef.set({
-                            userId: user.uid,
-                            email: user.email || '',
-                            displayName: user.displayName || '',
-                            highestUnlockedLevel: highestUnlockedLevel,
-                            currentLevelIdx: currentLevelIdx,
-                            simulationCompleted: simulationCompleted,
-                            completedLevels: completedLevels,
-                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true }), 6000);
-                    } catch (err) {
-                        console.warn('No se pudo respaldar en Firestore:', err.message);
-                    }
-                }
-
-                // 6. Actualizar UI
-                updateAuthUI(user);
-                if (typeof renderNavigatorLevels === 'function') {
-                    renderNavigatorLevels();
-                }
-
-                // 7. Navegar si fue solicitado explícitamente o cargar entorno activo
-                if (navigateToLatest && hasStartedSimulation) {
-                    navigateToProgressLearnings();
-                } else {
-                    loadLevelEnvironment();
-                }
-
-                return true;
-            } catch (err) {
-                console.warn('Error resolviendo sincronización:', err);
-                return false;
-            } finally {
-                isCloudSyncing = false;
-            }
-        }
-
-        async function syncProgressFromFirestore(user, navigateToLatest = false) {
-            return await resolveAndSyncProgress(user, navigateToLatest);
-        }
-
-        async function pushProgressToFirestore(user) {
-            if (!firestoreDb || !user || isCloudSyncing) return false;
-            try {
-                const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
-                await withFirestoreTimeout(docRef.set({
-                    userId: user.uid,
-                    email: user.email || '',
-                    displayName: user.displayName || '',
-                    highestUnlockedLevel: highestUnlockedLevel,
-                    currentLevelIdx: currentLevelIdx,
-                    simulationCompleted: simulationCompleted,
-                    completedLevels: completedLevels,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }), 6000);
-                return true;
-            } catch (err) {
-                console.warn('Error guardando progreso en Firestore:', err);
-                return false;
             }
         }
 
@@ -5734,150 +5473,20 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
-        async function handleGoogleSignIn() {
-            if (!firebaseAuth) {
-                showAuthError('El servicio de autenticación no está listo aún.');
-                return;
-            }
+        function showAuthError(msg, isHtml = false) {
             const errorDiv = document.getElementById('auth-error-msg');
-            if (errorDiv) errorDiv.classList.add('hidden');
-
-            try {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                const cred = await firebaseAuth.signInWithPopup(provider);
-                if (cred && cred.user) {
-                    await resolveAndSyncProgress(cred.user, true);
-                }
-                closeAuthModal();
-                closeWelcomeModal();
-                closeOnboarding();
-            } catch (err) {
-                console.error('Error Google Sign In:', err);
-                if (err.code === 'auth/unauthorized-domain') {
-                    showAuthError(`
-                        <div class="space-y-1.5 text-left leading-relaxed">
-                            <div class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                                <span>⚠️</span>
-                                <span>Dominio no autorizado en Firebase</span>
-                            </div>
-                            <p class="text-slate-600 dark:text-slate-300">
-                                Tu app está corriendo en <strong>${window.location.hostname}</strong>, pero este dominio aún no está en la lista de dominios autorizados de Firebase.
-                            </p>
-                            <div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
-                                <div class="font-semibold text-slate-900 dark:text-white">Para habilitarlo en 20 segundos:</div>
-                                <ol class="list-decimal list-inside space-y-1">
-                                    <li>Abre <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Settings</a></li>
-                                    <li>Baja a <strong>Authorized domains</strong> (Dominios autorizados).</li>
-                                    <li>Pulsa <strong>Agregar dominio</strong> y escribe: <code class="font-mono font-bold bg-white dark:bg-slate-900 px-1 py-0.5 rounded text-blue-600 dark:text-sky-400">${window.location.hostname}</code></li>
-                                </ol>
-                            </div>
-                        </div>
-                    `, true);
-                } else if (err.code === 'auth/popup-closed-by-user') {
-                    showAuthError('Se cerró la ventana de inicio de sesión antes de completar el acceso.');
-                } else if (err.code === 'auth/popup-blocked') {
-                    showAuthError('El navegador bloqueó la ventana emergente. Por favor, permítela para iniciar sesión con Google.');
+            if (errorDiv) {
+                if (isHtml) {
+                    errorDiv.innerHTML = msg;
                 } else {
-                    showAuthError(err.message || 'Ocurrió un fallo con la autenticación de Google.');
+                    errorDiv.textContent = msg;
                 }
-            }
-        }
-
-        async function handleEmailAuthSubmit(e) {
-            e.preventDefault();
-            if (!firebaseAuth) {
-                showAuthError('El servicio de autenticación no está listo aún.');
-                return;
-            }
-
-            const emailInput = document.getElementById('auth-email');
-            const passInput = document.getElementById('auth-password');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const email = emailInput ? emailInput.value.trim() : '';
-            const password = passInput ? passInput.value : '';
-
-            if (!email || !password) return;
-
-            const originalBtnHtml = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="animate-spin text-sm">⏳</span> Procesando...`;
-
-            try {
-                let cred;
-                if (currentAuthTab === 'login') {
-                    cred = await firebaseAuth.signInWithEmailAndPassword(email, password);
-                } else {
-                    cred = await firebaseAuth.createUserWithEmailAndPassword(email, password);
-                }
-                if (cred && cred.user) {
-                    await resolveAndSyncProgress(cred.user, true);
-                }
-                closeAuthModal();
-                closeWelcomeModal();
-                closeOnboarding();
-                if (emailInput) emailInput.value = '';
-                if (passInput) passInput.value = '';
-            } catch (err) {
-                console.error('Error Email Auth:', err);
-                if (err.code === 'auth/unauthorized-domain') {
-                    showAuthError(`
-                        <div class="space-y-1.5 text-left leading-relaxed">
-                            <div class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
-                                <span>⚠️</span>
-                                <span>Dominio no autorizado en Firebase</span>
-                            </div>
-                            <p class="text-slate-600 dark:text-slate-300">
-                                Agrega <strong>${window.location.hostname}</strong> en <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Authorized domains</a>.
-                            </p>
-                        </div>
-                    `, true);
-                    return;
-                }
-                let msg = err.message;
-                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-                    msg = 'Correo o contraseña incorrectos.';
-                } else if (err.code === 'auth/email-already-in-use') {
-                    msg = 'Ya existe una cuenta con este correo. Cambia a "Iniciar Sesión".';
-                } else if (err.code === 'auth/weak-password') {
-                    msg = 'La contraseña debe tener al menos 6 caracteres.';
-                } else if (err.code === 'auth/invalid-email') {
-                    msg = 'El formato del correo electrónico no es válido.';
-                }
-                showAuthError(msg);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnHtml;
-            }
-        }
-
-        async function handleSignOut() {
-            if (!firebaseAuth) return;
-            try {
-                await firebaseAuth.signOut();
-                currentUser = null;
-                clearSimulationProgress();
-                currentLevelIdx = 0;
-                highestUnlockedLevel = 0;
-                simulationCompleted = false;
-                completedLevels = [];
-                hasStartedSimulation = false;
-                selectedOption = null;
-                isReviewingMission = false;
-                localStorage.removeItem('simulador_auth_uid');
-                updateAuthUI(null);
-                if (typeof renderNavigatorLevels === 'function') {
-                    renderNavigatorLevels();
-                }
-                loadLevelEnvironment();
-                closeAuthModal();
-                openWelcomeModal();
-            } catch (err) {
-                console.warn('Error cerrando sesión:', err);
+                errorDiv.classList.remove('hidden');
             }
         }
 
         async function triggerManualSync(buttonEl) {
-            if (!firebaseAuth || !firebaseAuth.currentUser) {
+            if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
                 openAuthModal('login');
                 return;
             }
@@ -5889,8 +5498,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
 
             try {
-                // Sincronizar consolidando el mayor progreso entre local y nube
-                await resolveAndSyncProgress(firebaseAuth.currentUser, false);
+                if (typeof window.resolveAndSyncProgress === 'function') {
+                    await window.resolveAndSyncProgress(window.firebaseAuth.currentUser, false);
+                }
 
                 let effectiveCompleted = new Set(completedLevels || []);
                 if (highestUnlockedLevel > 0) {
@@ -5909,7 +5519,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     }
                 }
 
-                // Cerrar modal y llevar de inmediato a los Aprendizajes Clave de la misión superada
                 setTimeout(() => {
                     closeAuthModal();
                     navigateToProgressLearnings();
@@ -5930,18 +5539,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         }
                     }, 2500);
                 }
-            }
-        }
-
-        function showAuthError(msg, isHtml = false) {
-            const errorDiv = document.getElementById('auth-error-msg');
-            if (errorDiv) {
-                if (isHtml) {
-                    errorDiv.innerHTML = msg;
-                } else {
-                    errorDiv.textContent = msg;
-                }
-                errorDiv.classList.remove('hidden');
             }
         }
 
@@ -6083,16 +5680,426 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             updateThemeUI();
             initStoredApiKey();
             initSimulationProgress();
-            initFirebaseClient();
+            if (window.initFirebaseClient) window.initFirebaseClient();
             initPullToRefresh();
         });
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             updateThemeUI();
             initStoredApiKey();
             initSimulationProgress();
-            initFirebaseClient();
+            if (window.initFirebaseClient) window.initFirebaseClient();
             initPullToRefresh();
         }
+    </script>
+
+    <!-- Firebase Modular SDK for Auth & Firestore -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signOut 
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            serverTimestamp 
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        let firebaseApp = null;
+        let firebaseAuth = null;
+        let firestoreDb = null;
+
+        async function initFirebaseClient() {
+            try {
+                const response = await fetch('/firebase-applet-config.json');
+                if (!response.ok) {
+                    console.warn('No se encontró firebase-applet-config.json');
+                    return;
+                }
+                const config = await response.json();
+                if (!config || !config.apiKey) return;
+
+                if (!firebaseApp) {
+                    firebaseApp = initializeApp(config);
+                    firebaseAuth = getAuth(firebaseApp);
+                    window.firebaseAuth = firebaseAuth;
+                    
+                    const dbId = config.firestoreDatabaseId;
+                    if (dbId && dbId !== '(default)') {
+                        firestoreDb = getFirestore(firebaseApp, dbId);
+                    } else {
+                        firestoreDb = getFirestore(firebaseApp);
+                    }
+                    window.firestoreDb = firestoreDb;
+
+                    onAuthStateChanged(firebaseAuth, async (user) => {
+                        window.currentUser = user;
+                        if (typeof window.updateAuthUI === 'function') {
+                            window.updateAuthUI(user);
+                        }
+                        if (user) {
+                            localStorage.setItem('simulador_auth_uid', user.uid);
+                            const welcomeModal = document.getElementById('welcome-modal');
+                            const isWelcomeOpen = welcomeModal && !welcomeModal.classList.contains('hidden');
+                            const shouldNavigate = isWelcomeOpen || !hasStartedSimulation;
+                            await window.resolveAndSyncProgress(user, shouldNavigate);
+                            if (shouldNavigate) {
+                                if (typeof closeWelcomeModal === 'function') closeWelcomeModal();
+                                if (typeof closeOnboarding === 'function') closeOnboarding();
+                                if (typeof closeAuthModal === 'function') closeAuthModal();
+                            }
+                        } else {
+                            if (typeof window.updateAuthUI === 'function') {
+                                window.updateAuthUI(null);
+                            }
+                        }
+                    });
+
+                    window.firebaseSyncProgress = () => {
+                        if (firebaseAuth && firebaseAuth.currentUser) {
+                            window.pushProgressToFirestore(firebaseAuth.currentUser);
+                        }
+                    };
+                }
+            } catch (err) {
+                console.warn('Error inicializando Firebase modular:', err);
+            }
+        }
+        window.initFirebaseClient = initFirebaseClient;
+
+        window.pushProgressToFirestore = async function pushProgressToFirestore(user) {
+            if (!firestoreDb || !user || isCloudSyncing) return false;
+            try {
+                const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
+                await withFirestoreTimeout(setDoc(docRef, {
+                    userId: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || '',
+                    highestUnlockedLevel: highestUnlockedLevel,
+                    currentLevelIdx: currentLevelIdx,
+                    simulationCompleted: simulationCompleted,
+                    completedLevels: completedLevels,
+                    updatedAt: serverTimestamp()
+                }, { merge: true }), 6000);
+                return true;
+            } catch (err) {
+                console.warn('Error guardando progreso en Firestore:', err);
+                return false;
+            }
+        };
+
+        window.resolveAndSyncProgress = async function resolveAndSyncProgress(user, navigateToLatest = true) {
+            if (!user) return false;
+            isCloudSyncing = true;
+            try {
+                const prevAuthUid = localStorage.getItem('simulador_auth_uid');
+                const isDifferentUser = prevAuthUid && prevAuthUid !== user.uid;
+
+                // 1. Obtener valores locales (solo válidos si es el mismo usuario o sesión de invitado previa)
+                let localHighest = 0;
+                let localCurrent = 0;
+                let localCompleted = false;
+                let localCompletedLevels = [];
+
+                if (!isDifferentUser) {
+                    localHighest = highestUnlockedLevel;
+                    localCurrent = currentLevelIdx;
+                    localCompleted = simulationCompleted;
+                    localCompletedLevels = Array.isArray(completedLevels) ? [...completedLevels] : [];
+
+                    try {
+                        const storedHighest = localStorage.getItem('simulador_highest_level');
+                        if (storedHighest !== null) {
+                            localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
+                        }
+                        const storedCurrent = localStorage.getItem('simulador_current_level_idx');
+                        if (storedCurrent !== null) {
+                            localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
+                        }
+                        if (localStorage.getItem('simulador_completed') === 'true') {
+                            localCompleted = true;
+                        }
+                        const storedLevels = localStorage.getItem('simulador_completed_levels');
+                        if (storedLevels) {
+                            const parsed = JSON.parse(storedLevels);
+                            if (Array.isArray(parsed)) {
+                                localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Error leyendo localStorage:', e);
+                    }
+                }
+
+                // 2. Obtener estado en Firestore del usuario activo
+                let cloudHighest = 0;
+                let cloudCurrent = 0;
+                let cloudCompleted = false;
+                let cloudCompletedLevels = [];
+                let hasCloudDoc = false;
+                let firestoreConnected = false;
+
+                if (firestoreDb) {
+                    try {
+                        const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
+                        const docSnap = await withFirestoreTimeout(getDoc(docRef), 6000);
+                        if (docSnap && docSnap.exists()) {
+                            hasCloudDoc = true;
+                            const data = docSnap.data() || {};
+                            cloudHighest = typeof data.highestUnlockedLevel === 'number' ? data.highestUnlockedLevel : 0;
+                            cloudCurrent = typeof data.currentLevelIdx === 'number' ? data.currentLevelIdx : 0;
+                            cloudCompleted = Boolean(data.simulationCompleted);
+                            cloudCompletedLevels = Array.isArray(data.completedLevels) ? data.completedLevels : [];
+                        }
+                        firestoreConnected = true;
+                    } catch (err) {
+                        console.warn('Firestore no disponible temporalmente:', err);
+                    }
+                }
+
+                // 3. Resolución con aislamiento de cuentas:
+                if (hasCloudDoc) {
+                    highestUnlockedLevel = cloudHighest;
+                    currentLevelIdx = (cloudCurrent >= 0 && cloudCurrent < levels.length) ? cloudCurrent : cloudHighest;
+                    simulationCompleted = cloudCompleted;
+                    completedLevels = cloudCompletedLevels;
+                } else if (!isDifferentUser && (localHighest > 0 || localCompletedLevels.length > 0)) {
+                    highestUnlockedLevel = localHighest;
+                    currentLevelIdx = localCurrent;
+                    simulationCompleted = localCompleted;
+                    completedLevels = localCompletedLevels;
+                } else {
+                    highestUnlockedLevel = 0;
+                    currentLevelIdx = 0;
+                    simulationCompleted = false;
+                    completedLevels = [];
+                }
+
+                if (simulationCompleted) {
+                    highestUnlockedLevel = levels.length - 1;
+                }
+
+                let mergedLevels = new Set(completedLevels);
+                if (highestUnlockedLevel > 0) {
+                    for (let i = 0; i < highestUnlockedLevel; i++) {
+                        mergedLevels.add(i);
+                    }
+                }
+                if (simulationCompleted) {
+                    for (let i = 0; i < levels.length; i++) {
+                        mergedLevels.add(i);
+                    }
+                }
+                completedLevels = Array.from(mergedLevels).sort((a, b) => a - b);
+
+                let lastCompletedIdx = completedLevels.length > 0 ? Math.max(...completedLevels) : -1;
+                if (lastCompletedIdx >= 0 && lastCompletedIdx + 1 > highestUnlockedLevel) {
+                    highestUnlockedLevel = Math.min(levels.length - 1, lastCompletedIdx + 1);
+                }
+
+                if (currentLevelIdx < highestUnlockedLevel && completedLevels.length === 0) {
+                    currentLevelIdx = highestUnlockedLevel;
+                }
+
+                hasStartedSimulation = highestUnlockedLevel > 0 || completedLevels.length > 0 || simulationCompleted;
+
+                // 4. Guardar inmediatamente en localStorage asociado al usuario
+                localStorage.setItem('simulador_auth_uid', user.uid);
+                saveSimulationProgress(true);
+
+                // 5. Respaldar en Firestore si hay conexión disponible
+                if (firestoreDb && firestoreConnected) {
+                    try {
+                        const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
+                        await withFirestoreTimeout(setDoc(docRef, {
+                            userId: user.uid,
+                            email: user.email || '',
+                            displayName: user.displayName || '',
+                            highestUnlockedLevel: highestUnlockedLevel,
+                            currentLevelIdx: currentLevelIdx,
+                            simulationCompleted: simulationCompleted,
+                            completedLevels: completedLevels,
+                            updatedAt: serverTimestamp()
+                        }, { merge: true }), 6000);
+                    } catch (err) {
+                        console.warn('No se pudo respaldar en Firestore:', err.message);
+                    }
+                }
+
+                // 6. Actualizar UI
+                if (typeof window.updateAuthUI === 'function') window.updateAuthUI(user);
+                if (typeof renderNavigatorLevels === 'function') {
+                    renderNavigatorLevels();
+                }
+
+                // 7. Navegar si fue solicitado explícitamente o cargar entorno activo
+                if (navigateToLatest && hasStartedSimulation) {
+                    navigateToProgressLearnings();
+                } else {
+                    loadLevelEnvironment();
+                }
+
+                return true;
+            } catch (err) {
+                console.warn('Error resolviendo sincronización:', err);
+                return false;
+            } finally {
+                isCloudSyncing = false;
+            }
+        };
+
+        window.handleGoogleSignIn = async function handleGoogleSignIn() {
+            if (!firebaseAuth) {
+                showAuthError('El servicio de autenticación no está listo aún.');
+                return;
+            }
+            const errorDiv = document.getElementById('auth-error-msg');
+            if (errorDiv) errorDiv.classList.add('hidden');
+
+            try {
+                const provider = new GoogleAuthProvider();
+                const cred = await signInWithPopup(firebaseAuth, provider);
+                if (cred && cred.user) {
+                    await window.resolveAndSyncProgress(cred.user, true);
+                }
+                closeAuthModal();
+                closeWelcomeModal();
+                closeOnboarding();
+            } catch (err) {
+                console.error('Error Google Sign In:', err);
+                if (err.code === 'auth/unauthorized-domain') {
+                    showAuthError(`
+                        <div class="space-y-1.5 text-left leading-relaxed">
+                            <div class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <span>⚠️</span>
+                                <span>Dominio no autorizado en Firebase</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300">
+                                Tu app está corriendo en <strong>${window.location.hostname}</strong>, pero este dominio aún no está en la lista de dominios autorizados de Firebase.
+                            </p>
+                            <div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
+                                <div class="font-semibold text-slate-900 dark:text-white">Para habilitarlo en 20 segundos:</div>
+                                <ol class="list-decimal list-inside space-y-1">
+                                    <li>Abre <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Settings</a></li>
+                                    <li>Baja a <strong>Authorized domains</strong> (Dominios autorizados).</li>
+                                    <li>Pulsa <strong>Agregar dominio</strong> y escribe: <code class="font-mono font-bold bg-white dark:bg-slate-900 px-1 py-0.5 rounded text-blue-600 dark:text-sky-400">${window.location.hostname}</code></li>
+                                </ol>
+                            </div>
+                        </div>
+                    `, true);
+                } else if (err.code === 'auth/popup-closed-by-user') {
+                    showAuthError('Se cerró la ventana de inicio de sesión antes de completar el acceso.');
+                } else if (err.code === 'auth/popup-blocked') {
+                    showAuthError('El navegador bloqueó la ventana emergente. Por favor, permítela para iniciar sesión con Google.');
+                } else {
+                    showAuthError(err.message || 'Ocurrió un fallo con la autenticación de Google.');
+                }
+            }
+        };
+
+        window.handleEmailAuthSubmit = async function handleEmailAuthSubmit(e) {
+            e.preventDefault();
+            if (!firebaseAuth) {
+                showAuthError('El servicio de autenticación no está listo aún.');
+                return;
+            }
+
+            const emailInput = document.getElementById('auth-email');
+            const passInput = document.getElementById('auth-password');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passInput ? passInput.value : '';
+
+            if (!email || !password) return;
+
+            const originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="animate-spin text-sm">⏳</span> Procesando...`;
+
+            try {
+                let cred;
+                if (currentAuthTab === 'login') {
+                    cred = await signInWithEmailAndPassword(firebaseAuth, email, password);
+                } else {
+                    cred = await createUserWithEmailAndPassword(firebaseAuth, email, password);
+                }
+                if (cred && cred.user) {
+                    await window.resolveAndSyncProgress(cred.user, true);
+                }
+                closeAuthModal();
+                closeWelcomeModal();
+                closeOnboarding();
+                if (emailInput) emailInput.value = '';
+                if (passInput) passInput.value = '';
+            } catch (err) {
+                console.error('Error Email Auth:', err);
+                if (err.code === 'auth/unauthorized-domain') {
+                    showAuthError(`
+                        <div class="space-y-1.5 text-left leading-relaxed">
+                            <div class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <span>⚠️</span>
+                                <span>Dominio no autorizado en Firebase</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300">
+                                Agrega <strong>${window.location.hostname}</strong> en <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Authorized domains</a>.
+                            </p>
+                        </div>
+                    `, true);
+                    return;
+                }
+                let msg = err.message;
+                if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+                    msg = 'Correo o contraseña incorrectos.';
+                } else if (err.code === 'auth/email-already-in-use') {
+                    msg = 'Ya existe una cuenta con este correo. Cambia a "Iniciar Sesión".';
+                } else if (err.code === 'auth/weak-password') {
+                    msg = 'La contraseña debe tener al menos 6 caracteres.';
+                } else if (err.code === 'auth/invalid-email') {
+                    msg = 'El formato del correo electrónico no es válido.';
+                }
+                showAuthError(msg);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+            }
+        };
+
+        window.handleSignOut = async function handleSignOut() {
+            if (!firebaseAuth) return;
+            try {
+                await signOut(firebaseAuth);
+                currentUser = null;
+                window.currentUser = null;
+                clearSimulationProgress();
+                currentLevelIdx = 0;
+                highestUnlockedLevel = 0;
+                simulationCompleted = false;
+                completedLevels = [];
+                hasStartedSimulation = false;
+                selectedOption = null;
+                isReviewingMission = false;
+                localStorage.removeItem('simulador_auth_uid');
+                window.updateAuthUI(null);
+                if (typeof renderNavigatorLevels === 'function') {
+                    renderNavigatorLevels();
+                }
+                loadLevelEnvironment();
+                closeAuthModal();
+                openWelcomeModal();
+            } catch (err) {
+                console.warn('Error cerrando sesión:', err);
+            }
+        };
+
+        // Initialize Firebase on module load
+        initFirebaseClient();
     </script>
 </body>
 </html>
