@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     }
 
     const clientKey = (req.headers && (req.headers['x-goog-api-key'] || req.headers['x-api-key'])) || undefined;
-    const apiKey = clientKey || process.env.GEMINI_API_KEY;
+    const apiKey = clientKey || process.env.GEMINI_API_KEY || process.env.API_KEY;
     if (!apiKey) {
         const errorPayload = { 
             error: 'Falta configurar la variable GEMINI_API_KEY en Vercel o falta hacer Redeploy.' 
@@ -47,28 +47,47 @@ export default async function handler(req, res) {
             body = {};
         }
 
-        let model = body.model || 'gemini-3.1-flash-lite';
-        if (model === 'gemini-flash-lite-latest' || model.includes('lite')) {
-            model = 'gemini-3.1-flash-lite';
-        }
+        const requestedModel = body.model || 'gemini-flash-latest';
+
         // Separamos campos propios para no enviar atributos inválidos a la API REST de Google
         const { model: _ignored, apiKey: _ignoredKey, ...geminiPayload } = body;
 
-        // Aseguramos límite de 1500 tokens para optimizar consumo sin truncar respuestas complejas
+        // Aseguramos límite de tokens (2048) para respuestas completas sin truncamiento
         if (!geminiPayload.generationConfig) {
             geminiPayload.generationConfig = {};
         }
-        geminiPayload.generationConfig.maxOutputTokens = 1500;
+        if (!geminiPayload.generationConfig.maxOutputTokens) {
+            geminiPayload.generationConfig.maxOutputTokens = 2048;
+        }
 
-        const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        // Modelos candidatos ligeros (sin modelos pesados/caros para proteger la cuota gratuita)
+        const lightFallbackModels = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
+        const candidateModels = [requestedModel];
+        for (const m of lightFallbackModels) {
+            if (!candidateModels.includes(m)) {
+                candidateModels.push(m);
+            }
+        }
 
-        const apiResponse = await fetch(googleUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(geminiPayload)
-        });
+        let apiResponse = null;
+        let data = null;
 
-        const data = await apiResponse.json();
+        for (const currentModel of candidateModels) {
+            try {
+                const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+                apiResponse = await fetch(googleUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(geminiPayload)
+                });
+                data = await apiResponse.json();
+                if (apiResponse.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    break;
+                }
+            } catch (fetchErr) {
+                console.warn(`Fetch error with model ${currentModel}:`, fetchErr.message);
+            }
+        }
 
         if (!apiResponse.ok) {
             const rawMsg = data?.error?.message || data?.error || '';

@@ -382,6 +382,30 @@
         .dark .markdown-rendered strong {
             color: #ffffff;
         }
+
+        /* Animación de ondas de audio (ecualizador) para dictado por voz */
+        @keyframes soundWave {
+            0%, 100% {
+                height: 4px;
+                opacity: 0.5;
+            }
+            50% {
+                height: 14px;
+                opacity: 1;
+            }
+        }
+        .audio-wave-bar {
+            width: 2.5px;
+            background-color: #ef4444;
+            border-radius: 9999px;
+            display: inline-block;
+            animation: soundWave 0.85s ease-in-out infinite;
+        }
+        .audio-wave-bar:nth-child(1) { animation-delay: 0.0s; height: 5px; }
+        .audio-wave-bar:nth-child(2) { animation-delay: 0.2s; height: 12px; }
+        .audio-wave-bar:nth-child(3) { animation-delay: 0.45s; height: 14px; }
+        .audio-wave-bar:nth-child(4) { animation-delay: 0.15s; height: 9px; }
+        .audio-wave-bar:nth-child(5) { animation-delay: 0.35s; height: 11px; }
     </style>
 </head>
 <body class="w-full h-[100dvh] min-h-[100dvh] bg-slate-50 dark:bg-[#090d16] text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden font-sans antialiased transition-colors duration-150">
@@ -1512,10 +1536,21 @@
                                 <!-- Botón Micrófono + Tooltip Info de Privacidad -->
                                 <div class="inline-flex items-center gap-1">
                                     <button id="lab-mic-btn" type="button" onclick="toggleLabVoiceDictation()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95" title="Dictar prompt por voz">
-                                        <svg id="lab-mic-icon" class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                        </svg>
+                                        <span id="lab-mic-icon-wrapper" class="flex items-center">
+                                            <svg id="lab-mic-icon" class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                            </svg>
+                                        </span>
                                         <span id="lab-mic-btn-text">Dictar por voz</span>
+                                        
+                                        <!-- Ondas de Audio Rojas Animadas (Ecualizador) -->
+                                        <div id="lab-mic-waves" class="hidden items-center gap-[2px] h-3.5 px-0.5">
+                                            <span class="audio-wave-bar"></span>
+                                            <span class="audio-wave-bar"></span>
+                                            <span class="audio-wave-bar"></span>
+                                            <span class="audio-wave-bar"></span>
+                                            <span class="audio-wave-bar"></span>
+                                        </div>
                                     </button>
 
                                     <!-- Icono 'i' con Tooltip -->
@@ -1534,12 +1569,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                                <!-- Live Mic Status Indicator -->
-                                <div id="lab-mic-live-indicator" class="hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800 text-[11px] text-red-600 dark:text-red-400 font-semibold animate-pulse">
-                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                                    <span id="lab-mic-live-text">Escuchando... habla ahora</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -1588,8 +1617,8 @@
                             </span>
                             <div class="flex items-center gap-3">
                                 <span class="text-xs font-mono text-slate-400" id="lab-output-time"></span>
-                                <button type="button" onclick="copyLabOutput()" id="lab-copy-btn" class="text-xs text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1 transition-colors">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                <button type="button" onclick="copyLabOutput('top')" id="lab-copy-btn" class="text-xs text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1 transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <span id="lab-copy-btn-text">Copiar</span>
                                 </button>
                                 <button type="button" onclick="scrollToLabPrompt()" class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1">
@@ -1601,8 +1630,28 @@
                             <!-- Injected by JS -->
                         </div>
 
+                        <!-- Encabezado Inferior Replicado al final de la respuesta (solo visible tras recibir respuesta) -->
+                        <div id="lab-output-footer-bar" class="hidden items-center justify-between pt-2 pb-1.5 border-t border-slate-100 dark:border-slate-800">
+                            <span class="text-xs sm:text-sm font-mono uppercase font-bold text-blue-600 dark:text-sky-400 tracking-wider flex items-center gap-1.5" id="lab-output-title-footer">
+                                <svg class="w-4 h-4 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <span>Respuesta de la IA (Gemini)</span>
+                            </span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-mono text-slate-400" id="lab-output-time-footer"></span>
+                                <button type="button" onclick="copyLabOutput('bottom')" id="lab-copy-btn-footer" class="text-xs text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1 transition-colors">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                    <span id="lab-copy-btn-text-footer">Copiar</span>
+                                </button>
+                                <button type="button" onclick="scrollToLabPrompt()" class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1">
+                                    ↑ Volver al prompt
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Botón replicado de Auditoría al final del resultado del prompt -->
-                        <div id="lab-output-audit-action" class="hidden pt-2">
+                        <div id="lab-output-audit-action" class="hidden pt-1">
                             <button type="button" onclick="auditLabPrompt()" id="lab-output-audit-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white font-bold py-3.5 px-4 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer">
                                 <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -1620,9 +1669,14 @@
                                 </svg>
                                 <span>Reporte de Auditoría Estructural (C.O.N.T.E.X.T.O.)</span>
                             </span>
-                            <button type="button" onclick="scrollToLabPrompt()" class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1">
-                                ↑ Volver al prompt
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="copyAuditDiagnosis(this)" title="Copiar reporte" class="p-1 rounded-lg text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/40 transition-colors cursor-pointer flex items-center justify-center">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </button>
+                                <button type="button" onclick="scrollToLabPrompt()" class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 hover:underline font-mono flex items-center gap-1">
+                                    ↑ Volver al prompt
+                                </button>
+                            </div>
                         </div>
                         <div id="lab-audit-content" class="bg-slate-50 dark:bg-indigo-950/20 border border-slate-200 dark:border-indigo-800/40 rounded-xl p-4 sm:p-5 text-slate-800 dark:text-slate-100 text-sm sm:text-base leading-relaxed space-y-4">
                             <!-- Injected by JS -->
@@ -1644,7 +1698,7 @@
                             </div>
                             <div class="flex items-center gap-2 shrink-0">
                                 <button type="button" onclick="copyOptimizedPrompt()" id="lab-copy-optimized-btn" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-sm transition-all cursor-pointer">
-                                    <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                                    <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <span id="lab-copy-optimized-text">Copiar Prompt</span>
                                 </button>
                                 <button type="button" onclick="useOptimizedPromptInLab()" class="px-3 py-2 rounded-xl bg-white dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-slate-700 active:scale-98 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-xs transition-all cursor-pointer" title="Cargar este prompt en la caja libre del laboratorio">
@@ -1658,6 +1712,20 @@
                         </div>
                         <div id="lab-optimized-content" class="bg-slate-50 dark:bg-indigo-950/20 border border-slate-200 dark:border-indigo-800/40 rounded-xl p-4 sm:p-5 text-slate-800 dark:text-slate-100 text-sm sm:text-base leading-relaxed space-y-3 font-sans shadow-sm">
                             <!-- Injected by JS: Formatted cleanly by renderOptimizedPromptHTML -->
+                        </div>
+
+                        <!-- Nota Final: El Humano en el Bucle (Human-in-the-Loop) -->
+                        <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 flex flex-col gap-2.5">
+                            <div class="flex items-center gap-3">
+                                <span class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-base shrink-0 shadow-xs">🔄</span>
+                                <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">IMPORTANTE: El Humano en el Bucle (Human-in-the-Loop)</h3>
+                            </div>
+                            <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                La mayoría de las veces el modelo de inteligencia artificial <strong class="text-slate-900 dark:text-white">no ofrece una respuesta perfecta al primer intento</strong>. El prompting profesional no busca una magia instantánea, sino abrir una base sólida para la iteración, el refinamiento y la corrección posterior guiada por la persona.
+                            </p>
+                            <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Evita caer en la idea errónea de que la IA entrega todo resuelto de forma perfecta. Mantener al humano en el bucle significa que siempre debemos <strong>iterar, auditar, verificar, validar y corregir</strong> críticamente cada resultado antes de darlo por definitivo.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1734,7 +1802,9 @@
                         </div>
                         <ol class="list-decimal list-inside space-y-1.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
                             <li>Ingresa a <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-sky-400 underline font-semibold">Google AI Studio (Get API Key)</a> con tu cuenta Google.</li>
-                            <li>Haz clic en <strong>«Create API key»</strong> (Crear clave de API).</li>
+                            <li>Haz clic en el botón <strong>«Create API key»</strong> (Crear clave de API).</li>
+                            <li>En la ventana emergente, selecciona <strong>«Create API key in new project»</strong> (o elige un proyecto existente de Google Cloud) y asígnale un nombre descriptivo a tu clave.</li>
+                            <li>Pulsa en <strong>«Create API key»</strong> para confirmar la generación.</li>
                             <li>Copia la clave generada (comienza por <code class="font-mono text-blue-600 dark:text-sky-400 bg-slate-200/60 dark:bg-slate-900 px-1 rounded">AIzaSy...</code>) y pégala arriba.</li>
                         </ol>
                     </div>
@@ -2497,7 +2567,7 @@
 
         async function callGeminiAPI(payload, maxRetries = 2) {
             const customKey = document.getElementById('lab-custom-api-key')?.value?.trim();
-            const modelName = "gemini-3.1-flash-lite";
+            const modelName = "gemini-flash-latest";
 
             try {
                 const headers = { 'Content-Type': 'application/json' };
@@ -2513,7 +2583,7 @@
 
                 if (backendResponse.ok) {
                     const data = await backendResponse.json();
-                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || data.text;
                     if (text) return text;
                     throw new Error("Respuesta vacía del modelo de IA.");
                 }
@@ -2534,21 +2604,24 @@
                 throw customErr;
 
             } catch (backendErr) {
-                // Si el usuario configuró una clave manual y el backend falló, intentar fallback directo
+                // Si el usuario configuró una clave manual y el backend falló, intentar fallback directo con modelos ligeros
                 if (customKey) {
-                    try {
-                        const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${customKey}`;
-                        const directRes = await fetch(directUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                        if (directRes.ok) {
-                            const directData = await directRes.json();
-                            const directText = directData.candidates?.[0]?.content?.parts?.[0]?.text;
-                            if (directText) return directText;
-                        }
-                    } catch(e) {}
+                    const directCandidates = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite'];
+                    for (const dm of directCandidates) {
+                        try {
+                            const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${dm}:generateContent?key=${customKey}`;
+                            const directRes = await fetch(directUrl, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(payload)
+                            });
+                            if (directRes.ok) {
+                                const directData = await directRes.json();
+                                const directText = directData.candidates?.[0]?.content?.parts?.[0]?.text || directData.text;
+                                if (directText) return directText;
+                            }
+                        } catch(e) {}
+                    }
                 }
 
                 // If already classified, pass through
@@ -2728,44 +2801,45 @@
         function updateLabMicUI(recording) {
             const micBtn = document.getElementById('lab-mic-btn');
             const micText = document.getElementById('lab-mic-btn-text');
-            const micIcon = document.getElementById('lab-mic-icon');
+            const micIconWrapper = document.getElementById('lab-mic-icon-wrapper');
+            const waves = document.getElementById('lab-mic-waves');
             const input = document.getElementById('lab-prompt-input');
-            const liveIndicator = document.getElementById('lab-mic-live-indicator');
             if (!micBtn) return;
 
             if (recording) {
-                micBtn.style.setProperty('background-color', '#ef4444', 'important');
-                micBtn.style.setProperty('border-color', '#dc2626', 'important');
-                micBtn.style.setProperty('color', '#ffffff', 'important');
-                micBtn.classList.add('animate-pulse');
+                // Estilos en rojo vivo durante la grabación
+                micBtn.style.setProperty('background-color', 'rgba(239, 68, 68, 0.14)', 'important');
+                micBtn.style.setProperty('border-color', '#ef4444', 'important');
+                micBtn.style.setProperty('color', '#ef4444', 'important');
                 
-                if (micText) micText.textContent = 'Escuchando... (Pulsar para parar)';
-                if (micIcon) {
-                    micIcon.style.setProperty('color', '#ffffff', 'important');
+                if (micText) micText.textContent = 'Detener';
+                if (micIconWrapper) {
+                    // Icono de grabación rojo parpadeante
+                    micIconWrapper.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-ping inline-block mr-0.5"></span>`;
+                }
+                if (waves) {
+                    waves.classList.remove('hidden');
+                    waves.classList.add('flex');
                 }
                 if (input) {
-                    input.classList.add('ring-2', 'ring-red-400', 'border-red-400');
-                }
-                if (liveIndicator) {
-                    liveIndicator.classList.remove('hidden');
-                    liveIndicator.classList.add('flex');
+                    input.classList.add('ring-2', 'ring-red-400/60', 'border-red-400');
                 }
             } else {
+                // Restaurar estilos en reposo
                 micBtn.style.removeProperty('background-color');
                 micBtn.style.removeProperty('border-color');
                 micBtn.style.removeProperty('color');
-                micBtn.classList.remove('animate-pulse');
 
                 if (micText) micText.textContent = 'Dictar por voz';
-                if (micIcon) {
-                    micIcon.style.removeProperty('color');
+                if (micIconWrapper) {
+                    micIconWrapper.innerHTML = `<svg id="lab-mic-icon" class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>`;
+                }
+                if (waves) {
+                    waves.classList.add('hidden');
+                    waves.classList.remove('flex');
                 }
                 if (input) {
-                    input.classList.remove('ring-2', 'ring-red-400', 'border-red-400');
-                }
-                if (liveIndicator) {
-                    liveIndicator.classList.add('hidden');
-                    liveIndicator.classList.remove('flex');
+                    input.classList.remove('ring-2', 'ring-red-400/60', 'border-red-400');
                 }
             }
         }
@@ -2827,6 +2901,11 @@
             input.value = '';
             document.getElementById('lab-char-count').textContent = `0 caracteres`;
             document.getElementById('lab-output-box').classList.add('hidden');
+            const footerBar = document.getElementById('lab-output-footer-bar');
+            if (footerBar) {
+                footerBar.classList.add('hidden');
+                footerBar.classList.remove('flex');
+            }
             document.getElementById('lab-audit-box').classList.add('hidden');
             const optBox = document.getElementById('lab-optimized-box');
             if (optBox) optBox.classList.add('hidden');
@@ -2834,6 +2913,7 @@
             if (viewAuditContainer) viewAuditContainer.classList.add('hidden');
             lastLabResponseText = '';
             lastOptimizedPromptText = '';
+            lastAuditReportText = '';
         }
 
         function scrollToLabAudit() {
@@ -2909,6 +2989,39 @@
             }
         }
 
+        let lastAuditReportText = '';
+
+        function copyAuditDiagnosis(btn) {
+            let textToCopy = lastAuditReportText;
+            if (!textToCopy) {
+                const auditElem = document.getElementById('lab-audit-content');
+                if (auditElem) {
+                    textToCopy = auditElem.innerText || '';
+                }
+            }
+            if (!textToCopy) return;
+
+            const twoSheetsSvg = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`;
+            const checkSvg = `<svg class="w-4 h-4 text-emerald-500 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+
+            const updateSuccess = () => {
+                if (btn) {
+                    btn.innerHTML = checkSvg;
+                    setTimeout(() => {
+                        btn.innerHTML = twoSheetsSvg;
+                    }, 1800);
+                }
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(updateSuccess).catch(() => {
+                    fallbackCopyText(textToCopy, updateSuccess);
+                });
+            } else {
+                fallbackCopyText(textToCopy, updateSuccess);
+            }
+        }
+
         function renderAuditReportHTML(rawText) {
             if (!rawText) return '<p class="text-slate-500">No se obtuvo respuesta.</p>';
 
@@ -2922,7 +3035,17 @@
                 // Encabezados Markdown ###
                 if (line.startsWith('###')) {
                     const headingText = escapeHtml(line.replace(/^###\s*/, ''));
-                    mainHtml += `<h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white pt-2.5 pb-1 border-b border-slate-200 dark:border-indigo-900/60 flex items-center gap-2">${headingText}</h4>`;
+                    const isDiagHeader = headingText.toLowerCase().includes('diagnóstico') || headingText.toLowerCase().includes('diagnostico');
+                    if (isDiagHeader) {
+                        mainHtml += `<div class="flex items-center justify-between pt-2.5 pb-1 border-b border-slate-200 dark:border-indigo-900/60">
+                            <h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">${headingText}</h4>
+                            <button type="button" onclick="copyAuditDiagnosis(this)" title="Copiar diagnóstico" class="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-300 hover:bg-slate-200/60 dark:hover:bg-indigo-900/40 transition-colors cursor-pointer flex items-center justify-center">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            </button>
+                        </div>`;
+                    } else {
+                        mainHtml += `<h4 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white pt-2.5 pb-1 border-b border-slate-200 dark:border-indigo-900/60 flex items-center gap-2">${headingText}</h4>`;
+                    }
                     continue;
                 }
 
@@ -3007,20 +3130,26 @@
 
         let lastLabResponseText = '';
 
-        function copyLabOutput() {
+        function copyLabOutput(source) {
             if (!lastLabResponseText) return;
-            navigator.clipboard.writeText(lastLabResponseText).then(() => {
-                const btnText = document.getElementById('lab-copy-btn-text');
-                if (btnText) {
-                    const original = btnText.textContent;
-                    btnText.textContent = '¡Copiado!';
-                    setTimeout(() => {
-                        btnText.textContent = original;
-                    }, 2000);
-                }
-            }).catch(err => {
-                console.error('Error al copiar texto:', err);
-            });
+            const updateSuccess = () => {
+                const topText = document.getElementById('lab-copy-btn-text');
+                const footerText = document.getElementById('lab-copy-btn-text-footer');
+                if (topText) topText.textContent = '¡Copiado!';
+                if (footerText) footerText.textContent = '¡Copiado!';
+                setTimeout(() => {
+                    if (topText) topText.textContent = 'Copiar';
+                    if (footerText) footerText.textContent = 'Copiar';
+                }, 2000);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(lastLabResponseText).then(updateSuccess).catch(() => {
+                    fallbackCopyText(lastLabResponseText, updateSuccess);
+                });
+            } else {
+                fallbackCopyText(lastLabResponseText, updateSuccess);
+            }
         }
 
         function formatMarkdown(rawText) {
@@ -3179,15 +3308,20 @@
 
             const viewAuditContainer = document.getElementById('lab-view-audit-container');
             const bottomAuditAction = document.getElementById('lab-output-audit-action');
+            const footerBar = document.getElementById('lab-output-footer-bar');
             const optBox = document.getElementById('lab-optimized-box');
             if (viewAuditContainer) viewAuditContainer.classList.add('hidden');
             if (bottomAuditAction) bottomAuditAction.classList.add('hidden');
+            if (footerBar) {
+                footerBar.classList.add('hidden');
+                footerBar.classList.remove('flex');
+            }
             if (optBox) optBox.classList.add('hidden');
 
             btn.disabled = true;
             btn.innerHTML = `<span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Conectando...`;
             outBox.classList.remove('hidden');
-            outContent.innerHTML = `<div class="flex items-center gap-2.5 text-blue-600 dark:text-sky-400 p-3 font-sans"><span class="inline-block w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></span> Procesando instrucción con Gemini Flash-Lite...</div>`;
+            outContent.innerHTML = `<div class="flex items-center gap-2.5 text-blue-600 dark:text-sky-400 p-3 font-sans"><span class="inline-block w-4 h-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></span> Procesando instrucción con Gemini...</div>`;
 
             setTimeout(() => {
                 scrollToLabOutput();
@@ -3197,14 +3331,22 @@
                 const startTime = performance.now();
                 const payload = {
                     contents: [{ parts: [{ text: promptText }] }],
-                    systemInstruction: { parts: [{ text: "Eres un asistente de IA profesional y analítico. Responde al usuario de forma estructurada, rigurosa y directa usando formato Markdown con tablas, listas y secciones según corresponda." }] },
-                    generationConfig: { maxOutputTokens: 1500 }
+                    systemInstruction: { parts: [{ text: "Eres un asistente de IA profesional, analítico y directo. Responde a la solicitud del usuario usando formato Markdown estructurado (con tablas, listas y secciones según corresponda). REGLA FUNDAMENTAL DE LONGITUD Y COMPLETITUD: Planifica y ajusta activamente la extensión, síntesis y detalle de tu respuesta para que sea completa, autosuficiente y quede perfectamente concluida, sin truncarse jamás ni dejar ideas, listas, plantillas o párrafos incompletos o cortados al final." }] },
+                    generationConfig: { maxOutputTokens: 2048 }
                 };
                 const responseText = await callGeminiAPI(payload);
                 const duration = ((performance.now() - startTime) / 1000).toFixed(2);
                 lastLabResponseText = responseText || "";
                 outContent.innerHTML = formatMarkdown(responseText || "No se recibió respuesta del modelo.") + getKnowledgeCutoffNoticeHTML();
-                outTime.textContent = `Generado en ${duration}s`;
+                if (outTime) outTime.textContent = `Generado en ${duration}s`;
+                const outTimeFooter = document.getElementById('lab-output-time-footer');
+                if (outTimeFooter) outTimeFooter.textContent = `Generado en ${duration}s`;
+                
+                // Mostrar barra inferior y acción de auditoría solo cuando la respuesta está lista
+                if (footerBar) {
+                    footerBar.classList.remove('hidden');
+                    footerBar.classList.add('flex');
+                }
                 if (bottomAuditAction) bottomAuditAction.classList.remove('hidden');
 
                 // Scroll automático directo hacia el resultado de la IA (idéntico al de la auditoría)
@@ -3213,6 +3355,10 @@
                 }, 150);
 
             } catch (err) {
+                if (footerBar) {
+                    footerBar.classList.add('hidden');
+                    footerBar.classList.remove('flex');
+                }
                 const errorInfo = err.errorInfo || classifyError(err.status || 500, err.message);
                 outContent.innerHTML = renderLabErrorCard(errorInfo, 'executeLabPrompt');
                 setTimeout(() => {
@@ -3274,7 +3420,10 @@ Instrucciones de auditoría:
 Devuelve tu análisis estrictamente en este formato Markdown:
 ### 📊 Diagnóstico C.O.N.T.E.X.T.O.
 - **Fortalezas:** [Identifica con precisión qué variables del método están bien implementadas y explica cómo benefician el comportamiento de la IA]
-- **Puntos Ciegos:** [Identifica con precisión qué variables faltan o son débiles, y explica técnicamente por qué generan respuestas genéricas, sesgos, complacencia o riesgo de alucinación]
+- **Puntos Ciegos:** [Escribe unas cuantas líneas iniciales de evaluación general sobre las carencias del prompt y el impacto técnico global que generan en la respuesta de la IA. Justo debajo, desglosa en viñetas cada una de las variables que faltaron o requieren mejoras (Contexto, Nivel/Rol, Objetivo, Tarea, Especificaciones, eXclusiones, Tipo de salida u Optimización), explicando el motivo y riesgo técnico de cada una]:
+  - **[Nombre de la Variable que faltó o es débil]:** [Explicación concisa del fallo y su riesgo]
+  - **[Nombre de la Variable que faltó o es débil]:** [Explicación concisa del fallo y su riesgo]
+  - [Incluir viñetas para cada variable faltante o a mejorar]
 
 ### 💡 Veredicto y Sugerencias de Optimización
 [Análisis técnico y pedagógico en 2 párrafos sobre el impacto del prompt en el modelo:
@@ -3306,6 +3455,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     optPromptText = optPromptText.replace(/^["«]|["»]$/g, '').trim();
                 }
 
+                lastAuditReportText = auditPart;
                 auditContent.innerHTML = renderAuditReportHTML(auditPart) + getKnowledgeCutoffNoticeHTML();
 
                 if (optPromptText && optBox && optContent) {
