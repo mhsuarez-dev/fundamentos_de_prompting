@@ -1535,6 +1535,12 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Live Mic Status Indicator -->
+                                <div id="lab-mic-live-indicator" class="hidden items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800 text-[11px] text-red-600 dark:text-red-400 font-semibold animate-pulse">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                                    <span id="lab-mic-live-text">Escuchando... habla ahora</span>
+                                </div>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="text-xs sm:text-sm text-slate-400 font-mono" id="lab-char-count">0 caracteres</span>
@@ -2566,7 +2572,7 @@
         function toggleLabVoiceDictation() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                alert('Tu navegador no cuenta con soporte nativo para reconocimiento de voz (Web Speech API). Prueba en Chrome, Edge o Safari.');
+                alert('Tu navegador actual no tiene soporte para la API de reconocimiento de voz. Te recomendamos usar Google Chrome, Microsoft Edge o Safari.');
                 return;
             }
 
@@ -2596,9 +2602,6 @@
             const textarea = document.getElementById('lab-prompt-input');
             if (textarea) {
                 textarea.focus();
-                // Posicionar el cursor al final
-                const len = textarea.value.length;
-                textarea.setSelectionRange(len, len);
                 labSpeechBaseText = textarea.value;
             } else {
                 labSpeechBaseText = '';
@@ -2606,10 +2609,16 @@
 
             try {
                 const recognition = new SpeechRecognition();
-                recognition.continuous = true;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                // En móviles Android/iOS, continuous=false es obligatorio para que el motor procese cada frase sin bloquearse
+                recognition.continuous = !isMobile;
                 recognition.interimResults = true;
-                recognition.lang = 'es-ES';
                 recognition.maxAlternatives = 1;
+
+                // Detección de idioma preferido (español regional o es-ES)
+                const userLang = navigator.language || navigator.userLanguage || 'es-ES';
+                recognition.lang = userLang.toLowerCase().startsWith('es') ? userLang : 'es-ES';
 
                 recognition.onstart = () => {
                     isLabRecording = true;
@@ -2620,58 +2629,65 @@
                     const input = document.getElementById('lab-prompt-input');
                     if (!input) return;
 
-                    let finalStr = '';
-                    let interimStr = '';
+                    let finalChunk = '';
+                    let interimChunk = '';
 
-                    for (let i = 0; i < event.results.length; ++i) {
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
                         const transcript = event.results[i][0].transcript;
                         if (event.results[i].isFinal) {
-                            finalStr += transcript;
+                            finalChunk += transcript;
                         } else {
-                            interimStr += transcript;
+                            interimChunk += transcript;
                         }
                     }
 
-                    const speechChunk = (finalStr + (interimStr ? ' ' + interimStr : '')).trim();
-                    if (speechChunk) {
+                    if (finalChunk) {
                         const separator = (labSpeechBaseText && !labSpeechBaseText.endsWith(' ') && !labSpeechBaseText.endsWith('\n')) ? ' ' : '';
-                        const fullText = labSpeechBaseText ? (labSpeechBaseText + separator + speechChunk) : speechChunk;
-                        input.value = fullText;
-                        
-                        const countEl = document.getElementById('lab-char-count');
-                        if (countEl) countEl.textContent = `${fullText.length} caracteres`;
-                        
-                        input.scrollTop = input.scrollHeight;
+                        labSpeechBaseText = labSpeechBaseText ? (labSpeechBaseText + separator + finalChunk.trim()) : finalChunk.trim();
+                        input.value = labSpeechBaseText;
+                    } else if (interimChunk) {
+                        const separator = (labSpeechBaseText && !labSpeechBaseText.endsWith(' ') && !labSpeechBaseText.endsWith('\n')) ? ' ' : '';
+                        input.value = labSpeechBaseText ? (labSpeechBaseText + separator + interimChunk.trim()) : interimChunk.trim();
                     }
+
+                    const countEl = document.getElementById('lab-char-count');
+                    if (countEl) countEl.textContent = `${input.value.length} caracteres`;
+                    input.scrollTop = input.scrollHeight;
                 };
 
                 recognition.onerror = (event) => {
-                    console.warn('Speech recognition status/error:', event.error);
+                    console.warn('SpeechRecognition event error:', event.error);
                     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-                        alert('Permiso de micrófono no concedido. Habilita el permiso del micrófono en los ajustes de tu navegador para usar el dictado por voz.');
+                        alert('Permiso de micrófono no concedido. Por favor otorga acceso al micrófono en los ajustes de tu navegador para usar el dictado.');
                         stopLabVoiceDictation();
                     } else if (event.error === 'no-speech') {
-                        // En móviles 'no-speech' salta tras silencio breve; no interrumpir agresivamente
+                        // Silencio temporal normal; onend se encargará de reanudar
                     } else if (event.error !== 'aborted') {
-                        // Otros errores leves
+                        console.warn('Detalle de voz:', event.error);
                     }
                 };
 
                 recognition.onend = () => {
-                    // Si el usuario aún no pulsó detener y el motor cerró la sesión por silencio, intentar reiniciar suavemente si sigue grabando
+                    // Si el usuario aún no detuvo la grabación (por ejemplo en móvil al terminar una frase o tras silencio breve)
                     if (isLabRecording) {
                         const input = document.getElementById('lab-prompt-input');
                         if (input) labSpeechBaseText = input.value;
+                        
                         labSpeechRestartTimer = setTimeout(() => {
                             if (isLabRecording) {
                                 try {
                                     recognition.start();
                                 } catch(e) {
-                                    isLabRecording = false;
-                                    updateLabMicUI(false);
+                                    // Si no puede reiniciar en la misma instancia, crear nuevo ciclo
+                                    try {
+                                        startLabVoiceDictation();
+                                    } catch(err) {
+                                        isLabRecording = false;
+                                        updateLabMicUI(false);
+                                    }
                                 }
                             }
-                        }, 200);
+                        }, 100);
                     } else {
                         updateLabMicUI(false);
                         labSpeechRecognition = null;
@@ -2679,11 +2695,11 @@
                 };
 
                 labSpeechRecognition = recognition;
-                recognition.start();
                 isLabRecording = true;
                 updateLabMicUI(true);
+                recognition.start();
             } catch (e) {
-                console.warn('Error al inicializar dictado por voz:', e);
+                console.warn('Error al iniciar reconocimiento de voz:', e);
                 isLabRecording = false;
                 updateLabMicUI(false);
                 labSpeechRecognition = null;
@@ -2714,29 +2730,42 @@
             const micText = document.getElementById('lab-mic-btn-text');
             const micIcon = document.getElementById('lab-mic-icon');
             const input = document.getElementById('lab-prompt-input');
+            const liveIndicator = document.getElementById('lab-mic-live-indicator');
             if (!micBtn) return;
 
             if (recording) {
-                micBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200');
-                micBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white', 'animate-pulse', 'border-red-600');
-                if (micText) micText.textContent = 'Escuchando...';
+                micBtn.style.setProperty('background-color', '#ef4444', 'important');
+                micBtn.style.setProperty('border-color', '#dc2626', 'important');
+                micBtn.style.setProperty('color', '#ffffff', 'important');
+                micBtn.classList.add('animate-pulse');
+                
+                if (micText) micText.textContent = 'Escuchando... (Pulsar para parar)';
                 if (micIcon) {
-                    micIcon.classList.remove('text-blue-600', 'dark:text-sky-400');
-                    micIcon.classList.add('text-white');
+                    micIcon.style.setProperty('color', '#ffffff', 'important');
                 }
                 if (input) {
-                    input.classList.add('ring-2', 'ring-red-400/50', 'border-red-400');
+                    input.classList.add('ring-2', 'ring-red-400', 'border-red-400');
+                }
+                if (liveIndicator) {
+                    liveIndicator.classList.remove('hidden');
+                    liveIndicator.classList.add('flex');
                 }
             } else {
-                micBtn.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-200');
-                micBtn.classList.remove('bg-red-500', 'hover:bg-red-600', 'text-white', 'animate-pulse', 'border-red-600');
+                micBtn.style.removeProperty('background-color');
+                micBtn.style.removeProperty('border-color');
+                micBtn.style.removeProperty('color');
+                micBtn.classList.remove('animate-pulse');
+
                 if (micText) micText.textContent = 'Dictar por voz';
                 if (micIcon) {
-                    micIcon.classList.add('text-blue-600', 'dark:text-sky-400');
-                    micIcon.classList.remove('text-white');
+                    micIcon.style.removeProperty('color');
                 }
                 if (input) {
-                    input.classList.remove('ring-2', 'ring-red-400/50', 'border-red-400');
+                    input.classList.remove('ring-2', 'ring-red-400', 'border-red-400');
+                }
+                if (liveIndicator) {
+                    liveIndicator.classList.add('hidden');
+                    liveIndicator.classList.remove('flex');
                 }
             }
         }
