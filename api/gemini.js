@@ -17,7 +17,8 @@ export default async function handler(req, res) {
         });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const clientKey = (req.headers && (req.headers['x-goog-api-key'] || req.headers['x-api-key'])) || undefined;
+    const apiKey = clientKey || process.env.GEMINI_API_KEY;
     if (!apiKey) {
         const errorPayload = { 
             error: 'Falta configurar la variable GEMINI_API_KEY en Vercel o falta hacer Redeploy.' 
@@ -46,9 +47,18 @@ export default async function handler(req, res) {
             body = {};
         }
 
-        const model = body.model || 'gemini-flash-lite-latest';
-        // Separamos el campo model para no enviar atributos inválidos a la API REST de Google
-        const { model: _ignored, ...geminiPayload } = body;
+        let model = body.model || 'gemini-3.1-flash-lite';
+        if (model === 'gemini-flash-lite-latest' || model.includes('lite')) {
+            model = 'gemini-3.1-flash-lite';
+        }
+        // Separamos campos propios para no enviar atributos inválidos a la API REST de Google
+        const { model: _ignored, apiKey: _ignoredKey, ...geminiPayload } = body;
+
+        // Aseguramos límite de 1500 tokens para optimizar consumo sin truncar respuestas complejas
+        if (!geminiPayload.generationConfig) {
+            geminiPayload.generationConfig = {};
+        }
+        geminiPayload.generationConfig.maxOutputTokens = 1500;
 
         const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
@@ -59,6 +69,17 @@ export default async function handler(req, res) {
         });
 
         const data = await apiResponse.json();
+
+        if (!apiResponse.ok) {
+            const rawMsg = data?.error?.message || data?.error || '';
+            const msgLower = (typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg)).toLowerCase();
+            const isQuota = apiResponse.status === 429 || msgLower.includes('quota') || msgLower.includes('resource_exhausted');
+            
+            data.errorType = isQuota ? 'quota_exceeded' : 'overloaded';
+            data.friendlyMessage = isQuota
+                ? 'Se alcanzó el límite de uso del servicio gratuito. Puedes reintentar, esperar unos minutos para que se restablezca la cuota, o conectar tu propia API Key de Google AI Studio para continuar de inmediato.'
+                : 'El servicio de IA está saturado en este momento. Por favor, pulsa el botón para reintentar.';
+        }
 
         if (res && typeof res.status === 'function') {
             res.setHeader('Access-Control-Allow-Origin', '*');
