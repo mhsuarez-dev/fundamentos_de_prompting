@@ -792,16 +792,17 @@
                     </div>
                 </div>
 
-                <!-- Menú de tres líneas (Hamburguesa móvil) -->
-                <button onclick="toggleMobileMenu()" id="mobile-menu-toggle-btn" type="button" aria-label="Abrir menú" class="md:hidden p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer">
+                <!-- Menú de opciones (Móvil y Escritorio) -->
+                <button onclick="toggleMobileMenu(event)" id="mobile-menu-toggle-btn" type="button" aria-label="Abrir menú de opciones" class="p-2 sm:px-2.5 sm:py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0" title="Menú de navegación y opciones">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
+                    <span class="hidden md:inline text-xs font-semibold">Menú</span>
                 </button>
             </div>
 
-            <!-- Desplegable Menú Móvil -->
-            <div id="mobile-dropdown-menu" class="hidden absolute top-14 left-0 right-0 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-4 shadow-xl z-50 flex-col space-y-3 transition-all">
+            <!-- Desplegable Menú (Móvil y Escritorio) -->
+            <div id="mobile-dropdown-menu" class="hidden absolute top-14 left-0 right-0 md:left-auto md:right-4 md:w-96 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-md border-b md:border md:rounded-2xl border-slate-200 dark:border-slate-800 p-4 shadow-2xl z-50 flex-col space-y-3 transition-all max-h-[85vh] overflow-y-auto">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                     <div class="min-w-0">
                         <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 block truncate" id="mobile-menu-level-name">Nivel 1</span>
@@ -813,6 +814,7 @@
                 </div>
 
                 <div class="space-y-2.5">
+                    <!-- 1. Ver Progreso y Misiones -->
                     <button onclick="closeMobileMenu(); openMissionsNavigator();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 border border-blue-200 dark:border-sky-800/80 text-blue-800 dark:text-sky-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -823,26 +825,8 @@
                         <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold">Ver Mapa →</span>
                     </button>
 
-                    <button onclick="closeMobileMenu(); openAuthModal(currentUser ? 'profile' : 'signup');" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl">☁️</span>
-                            <div class="text-left">
-                                <span class="block" id="mobile-auth-btn-label">Crear cuenta para guardar progreso</span>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-normal block" id="mobile-auth-btn-sub">Guarda tu avance y accede desde otros dispositivos</span>
-                            </div>
-                        </div>
-                        <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold" id="mobile-auth-status-tag">Guardar →</span>
-                    </button>
-
-                    <button onclick="closeMobileMenu(); openWelcomeModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xl">ℹ️</span>
-                            <span>Acerca del Simulador / Inicio</span>
-                        </div>
-                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Ver →</span>
-                    </button>
-
-                    <button onclick="closeMobileMenu(); openLabIntroModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors">
+                    <!-- 2. Laboratorio de Prompts IA -->
+                    <button onclick="closeMobileMenu(); openLabIntroModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
@@ -852,7 +836,31 @@
                         <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold">Abrir →</span>
                     </button>
 
-                    <button onclick="toggleTheme()" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors">
+                    <!-- 3. Ver Detalles de la Misión -->
+                    <button onclick="closeMobileMenu(); viewMissionModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                            </svg>
+                            <span>Ver Detalles de la Misión</span>
+                        </div>
+                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Ver</span>
+                    </button>
+
+                    <!-- 4. Guía y Escenario Inicial -->
+                    <button onclick="closeMobileMenu(); openOnboarding();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 9.172l-2.12 5.656a1 1 0 01-.536.536l-5.656 2.12 2.12-5.656a1 1 0 01.536-.536l5.656-2.12z" />
+                            </svg>
+                            <span>Guía y Escenario Inicial</span>
+                        </div>
+                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Guía</span>
+                    </button>
+
+                    <!-- 5. Modo Claro / Oscuro -->
+                    <button onclick="toggleTheme()" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
                             <svg id="mobile-theme-icon-sun" class="w-5 h-5 text-amber-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -865,24 +873,31 @@
                         <span class="text-xs sm:text-sm font-mono font-medium text-slate-600 dark:text-slate-300" id="mobile-theme-status">Oscuro 🌙</span>
                     </button>
 
-                    <button onclick="closeMobileMenu(); viewMissionModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors">
+                    <!-- 6. (Penúltimo) Acerca del Simulador / Inicio -->
+                    <button onclick="closeMobileMenu(); openWelcomeModal();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
-                            <span>Ver Detalles de la Misión</span>
+                            <span>Acerca del Simulador / Inicio</span>
                         </div>
-                        <span class="text-xs sm:text-sm text-slate-400">Ver</span>
+                        <span class="text-xs sm:text-sm text-slate-500 font-mono font-semibold">Inicio →</span>
                     </button>
 
-                    <button onclick="closeMobileMenu(); openOnboarding();" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors">
+                    <!-- 7. (Último) Iniciar sesión o Crear cuenta -->
+                    <button onclick="closeMobileMenu(); openAuthModal(currentUser ? 'profile' : 'login');" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Guía y Escenario Inicial</span>
+                            <div class="w-8 h-8 rounded-lg bg-blue-100/70 dark:bg-sky-950/80 border border-blue-200/80 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0" id="mobile-auth-icon-container">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div class="text-left">
+                                <span class="block font-bold text-slate-900 dark:text-white" id="mobile-auth-btn-label">Iniciar sesión o Crear cuenta</span>
+                                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-normal block" id="mobile-auth-btn-sub">Guarda tu progreso o sincroniza tu avance existente</span>
+                            </div>
                         </div>
-                        <span class="text-xs sm:text-sm text-slate-400">Guía</span>
+                        <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold" id="mobile-auth-status-tag">Acceder →</span>
                     </button>
                 </div>
             </div>
@@ -1293,19 +1308,22 @@
             <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative max-h-[92dvh] flex flex-col" id="missions-navigator-content">
                 
                 <!-- Header -->
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3 shrink-0">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0">
-                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-start justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3 shrink-0">
+                    <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0 mt-0.5 sm:mt-0 shadow-xs">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
                         </div>
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h2 class="text-base sm:text-xl font-bold text-slate-900 dark:text-white truncate">Ver Progreso · Ruta de Misiones</h2>
-                                <span id="nav-modal-badge" class="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800/60">Simulador</span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Ruta de Misiones</h2>
+                                <span id="nav-modal-badge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200/80 dark:border-sky-800/60 shrink-0 whitespace-nowrap shadow-2xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-sky-400 shrink-0"></span>
+                                    <span>Nivel 1 · Misión 1</span>
+                                </span>
                             </div>
-                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">Retrocede libremente a cualquier misión, revisa sus detalles o aprendizajes y continúa tu camino.</p>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Retrocede a cualquier misión superada, revisa sus detalles o aprendizajes clave y continúa tu avance.</p>
                         </div>
                     </div>
                     <button onclick="closeMissionsNavigator()" type="button" aria-label="Cerrar" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0">
@@ -1332,8 +1350,10 @@
                 <!-- Footer -->
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
                     <button onclick="openAuthModal()" type="button" class="py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                        <span>☁️</span>
-                        <span id="nav-cloud-footer-text">Guardar progreso en la nube</span>
+                        <svg class="w-4 h-4 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <span id="nav-cloud-footer-text">Acceso y sincronización en la nube</span>
                     </button>
                     <button onclick="closeMissionsNavigator()" type="button" class="py-2.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-colors cursor-pointer text-center">
                         Cerrar Navegador
@@ -1348,11 +1368,13 @@
                 
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 text-lg">
-                            ☁️
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
                         </div>
                         <div>
-                            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Guardar Progreso en la Nube</h3>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Acceso y sincronización en la nube</h3>
                             <p class="text-xs text-slate-500 dark:text-slate-400">Firebase Firestore & Auth</p>
                         </div>
                     </div>
@@ -1364,7 +1386,7 @@
                 <!-- Not Logged In View -->
                 <div id="auth-logged-out-view" class="space-y-4">
                     <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                        Conecta tu cuenta para sincronizar tus misiones desbloqueadas y retomar tu avance desde cualquier dispositivo:
+                        Conéctate para guardar tus misiones o recuperar tu avance previo desde cualquier teléfono o computadora.
                     </p>
 
                     <!-- Google Sign In Button -->
@@ -1385,11 +1407,11 @@
                     </div>
 
                     <!-- Auth Mode Toggle Tabs -->
-                    <div class="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1">
-                        <button onclick="setAuthTab('login')" id="auth-tab-login" type="button" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all">
+                    <div class="flex rounded-xl bg-slate-100 dark:bg-slate-800 p-1 border border-slate-200/60 dark:border-slate-700/60">
+                        <button onclick="setAuthTab('login')" id="auth-tab-login" type="button" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all cursor-pointer">
                             Iniciar Sesión
                         </button>
-                        <button onclick="setAuthTab('signup')" id="auth-tab-signup" type="button" class="flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
+                        <button onclick="setAuthTab('signup')" id="auth-tab-signup" type="button" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer">
                             Crear Cuenta
                         </button>
                     </div>
@@ -1409,13 +1431,21 @@
                         <div id="auth-error-msg" class="hidden text-xs text-red-600 dark:text-red-400 p-2.5 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/40 leading-relaxed"></div>
 
                         <button id="auth-submit-btn" type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2">
-                            <span>Iniciar Sesión</span>
+                            <span>Iniciar Sesión y Cargar Avance</span>
                         </button>
                     </form>
 
-                    <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center leading-relaxed">
-                        El guardado en la nube es <strong>opcional</strong>. Si decides no conectarte, tus avances se seguirán guardando en este navegador.
+                    <!-- Switch link between login and signup -->
+                    <p class="text-xs text-center text-slate-600 dark:text-slate-400 leading-relaxed" id="auth-switch-prompt">
+                        ¿Primera vez aquí? <button type="button" onclick="setAuthTab('signup')" class="text-blue-600 dark:text-sky-400 font-bold hover:underline cursor-pointer">Crea tu cuenta gratis</button> o continúa con Google.
                     </p>
+
+                    <!-- Botón inferior para continuar sin cuenta -->
+                    <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+                        <button onclick="closeAuthModal()" type="button" class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                            <span>Continuar sin cuenta →</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Logged In View -->
@@ -4407,7 +4437,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
-        function toggleMobileMenu() {
+        function toggleMobileMenu(event) {
+            if (event && event.stopPropagation) event.stopPropagation();
             const menu = document.getElementById('mobile-dropdown-menu');
             if (!menu) return;
             if (menu.classList.contains('hidden')) {
@@ -4426,6 +4457,16 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 menu.classList.remove('flex');
             }
         }
+
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('mobile-dropdown-menu');
+            const btn = document.getElementById('mobile-menu-toggle-btn');
+            if (menu && !menu.classList.contains('hidden')) {
+                if (!menu.contains(e.target) && btn && !btn.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            }
+        });
 
         // ==========================================
         // MISSION NAVIGATOR & FREE NAVIGATION LOGIC
@@ -4491,7 +4532,11 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 progressBar.style.width = `${progressPercent}%`;
             }
             if (badge) {
-                badge.textContent = simulationCompleted ? '🏆 Modo Libre Total' : `Nivel ${levels[currentLevelIdx].stage} · Misión ${levels[currentLevelIdx].id}`;
+                if (simulationCompleted) {
+                    badge.innerHTML = `<span class="text-xs">🏆</span><span>Modo Libre Total</span>`;
+                } else {
+                    badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-sky-400 shrink-0"></span><span>Nivel ${levels[currentLevelIdx].stage} · Misión ${levels[currentLevelIdx].id}</span>`;
+                }
             }
 
             const stageData = [
@@ -4890,18 +4935,18 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     campaignStatusEl.textContent = simulationCompleted ? '🏆 Completada' : 'En Curso';
                 }
             } else {
-                if (navAuthBtnText) navAuthBtnText.textContent = 'Guardar progreso';
-                if (navAuthIcon) navAuthIcon.textContent = '☁️';
-                if (mobileAuthLabel) mobileAuthLabel.textContent = 'Crear cuenta para guardar progreso';
-                if (mobileAuthSub) mobileAuthSub.textContent = 'Guarda tu avance y accede desde otros dispositivos';
-                if (mobileAuthStatus) mobileAuthStatus.textContent = 'Guardar →';
-                if (navCloudFooterText) navCloudFooterText.textContent = 'Guardar progreso en la nube';
+                if (navAuthBtnText) navAuthBtnText.textContent = 'Acceso y sincronización';
+                if (navAuthIcon) navAuthIcon.textContent = '👤';
+                if (mobileAuthLabel) mobileAuthLabel.textContent = 'Iniciar sesión o Crear cuenta';
+                if (mobileAuthSub) mobileAuthSub.textContent = 'Guarda tu progreso o sincroniza tu avance existente';
+                if (mobileAuthStatus) mobileAuthStatus.textContent = 'Acceder →';
+                if (navCloudFooterText) navCloudFooterText.textContent = 'Acceso y sincronización en la nube';
 
                 if (completionCloudStatus) {
                     completionCloudStatus.textContent = 'Crea una cuenta opcional o inicia sesión con Google para conservar tus 9 misiones superadas.';
                 }
                 if (completionCloudBtn) {
-                    completionCloudBtn.innerHTML = `<span>Conectar Cuenta</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+                    completionCloudBtn.innerHTML = `<span>Iniciar sesión / Crear cuenta</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
                 }
 
                 if (loggedOutView) loggedOutView.classList.remove('hidden');
@@ -5124,7 +5169,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
-        function openAuthModal(defaultTab = 'signup') {
+        function openAuthModal(defaultTab = 'login') {
             closeMobileMenu();
             const modal = document.getElementById('auth-modal');
             const content = document.getElementById('auth-modal-content');
@@ -5132,7 +5177,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (errorDiv) errorDiv.classList.add('hidden');
 
             if (!currentUser) {
-                setAuthTab(defaultTab === 'login' ? 'login' : 'signup');
+                setAuthTab(defaultTab === 'signup' ? 'signup' : 'login');
             } else {
                 updateAuthUI(currentUser);
             }
@@ -5169,17 +5214,24 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             const loginBtn = document.getElementById('auth-tab-login');
             const signupBtn = document.getElementById('auth-tab-signup');
             const submitBtn = document.getElementById('auth-submit-btn');
+            const switchPrompt = document.getElementById('auth-switch-prompt');
             const errorDiv = document.getElementById('auth-error-msg');
             if (errorDiv) errorDiv.classList.add('hidden');
 
             if (tab === 'login') {
-                loginBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all';
-                signupBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
-                if (submitBtn) submitBtn.innerHTML = '<span>Iniciar Sesión</span>';
+                if (loginBtn) loginBtn.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all cursor-pointer';
+                if (signupBtn) signupBtn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer';
+                if (submitBtn) submitBtn.innerHTML = '<span>Iniciar Sesión y Cargar Avance</span>';
+                if (switchPrompt) {
+                    switchPrompt.innerHTML = '¿Primera vez aquí? <button type="button" onclick="setAuthTab(\'signup\')" class="text-blue-600 dark:text-sky-400 font-bold hover:underline cursor-pointer">Crea tu cuenta gratis</button> o continúa con Google.';
+                }
             } else {
-                signupBtn.className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all';
-                loginBtn.className = 'flex-1 py-1.5 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all';
-                if (submitBtn) submitBtn.innerHTML = '<span>Crear Cuenta y Guardar</span>';
+                if (signupBtn) signupBtn.className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs transition-all cursor-pointer';
+                if (loginBtn) loginBtn.className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all cursor-pointer';
+                if (submitBtn) submitBtn.innerHTML = '<span>Crear Cuenta y Guardar Avance</span>';
+                if (switchPrompt) {
+                    switchPrompt.innerHTML = '¿Ya tienes cuenta? <button type="button" onclick="setAuthTab(\'login\')" class="text-blue-600 dark:text-sky-400 font-bold hover:underline cursor-pointer">Inicia sesión aquí</button> para cargar tu avance.';
+                }
             }
         }
 
