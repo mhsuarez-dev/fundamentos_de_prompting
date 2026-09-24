@@ -1501,8 +1501,8 @@
         </div>
 
         <!-- Gemini AI Sandbox Modal -->
-        <div id="lab-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[60] flex items-center justify-center p-2 sm:p-4 md:p-6 hidden opacity-0 transition-opacity duration-200">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[94vh] overflow-y-auto overflow-x-hidden" id="lab-modal-content">
+        <div id="lab-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[60] flex items-center justify-center p-3 sm:p-4 md:p-6 py-4 sm:py-6 overflow-y-auto hidden opacity-0 transition-opacity duration-200">
+            <div class="bg-white dark:bg-[#0f172a] border-2 border-slate-200 dark:border-slate-700/80 rounded-2xl w-full max-w-4xl p-4 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[calc(100dvh-2.5rem)] sm:max-h-[calc(100dvh-3.5rem)] overflow-y-auto overflow-x-hidden my-auto shrink-0" id="lab-modal-content">
                 
                 <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 gap-3">
                     <div class="flex items-center gap-3 min-w-0">
@@ -1730,7 +1730,7 @@
                     </div>
                 </div>
 
-                <div class="pt-3.5 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <div class="pt-3.5 pb-1 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center shrink-0">
                     <button onclick="closeLabModal()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors cursor-pointer flex items-center gap-1.5">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver al Simulador</span>
@@ -5179,6 +5179,42 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 `;
             });
 
+            // Tarjeta de Hito Final / Trofeo y Resumen Global al final de la ruta
+            const isAllCompleted = simulationCompleted || beatenCount >= totalMissions;
+            html += `
+                <div class="border-2 ${isAllCompleted ? 'border-amber-400 dark:border-amber-500/80 bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-purple-500/10 dark:from-amber-950/40 dark:via-slate-900 dark:to-purple-950/30 shadow-md' : 'border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 opacity-80'} rounded-2xl p-4 sm:p-5 transition-all">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-xl ${isAllCompleted ? 'bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 text-amber-600 dark:text-amber-300 shadow-sm' : 'bg-slate-200 dark:bg-slate-800 text-slate-400 border border-slate-300 dark:border-slate-700'} flex items-center justify-center text-2xl shrink-0">
+                                🏆
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-sm sm:text-base">Hito Final: Trofeo y Resumen Global</h3>
+                                    ${isAllCompleted ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-900/70 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700">Desbloqueado 🏆</span>' : '<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700">🔒 Bloqueado</span>'}
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                                    ${isAllCompleted ? 'Has completado las 9 misiones. Revisa tu certificado, el desglose de las 8 variables C.O.N.T.E.X.T.O. y tus estadísticas globales.' : `Completa las 9 misiones (${beatenCount}/${totalMissions} superadas) para acceder al trofeo de graduación y resumen integral.`}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="shrink-0 pt-1 sm:pt-0">
+                            ${isAllCompleted ? `
+                                <button onclick="closeMissionsNavigator(); openCompletionModal();" type="button" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer active:scale-95">
+                                    <span>🏆</span>
+                                    <span>Ver Trofeo y Resumen Global →</span>
+                                </button>
+                            ` : `
+                                <button disabled type="button" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 text-xs font-medium flex items-center justify-center gap-1.5 opacity-60 cursor-not-allowed" title="Completa las 9 misiones para desbloquear el trofeo">
+                                    <span>🔒</span>
+                                    <span>Trofeo Bloqueado (${beatenCount}/${totalMissions})</span>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `;
+
             container.innerHTML = html;
         }
 
@@ -5252,9 +5288,31 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 if (!config || !config.apiKey) return;
 
                 if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-                    firebase.initializeApp(config);
+                    const app = firebase.initializeApp(config);
                     firebaseAuth = firebase.auth();
-                    firestoreDb = firebase.firestore();
+                    
+                    // Inicializar Firestore apuntando al Database ID asignado en la configuración
+                    const dbId = config.firestoreDatabaseId;
+                    if (dbId && dbId !== '(default)') {
+                        try {
+                            firestoreDb = app.firestore(dbId);
+                        } catch (e1) {
+                            try {
+                                firestoreDb = firebase.firestore(app, dbId);
+                            } catch (e2) {
+                                firestoreDb = firebase.firestore();
+                            }
+                        }
+                    } else {
+                        firestoreDb = firebase.firestore();
+                    }
+
+                    // Test de conexión a Firestore
+                    if (firestoreDb) {
+                        try {
+                            firestoreDb.collection('test').doc('connection').get().catch(() => {});
+                        } catch (e) {}
+                    }
 
                     let isInitialAuthCheck = true;
                     firebaseAuth.onAuthStateChanged(async (user) => {
@@ -5426,47 +5484,59 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (!user) return false;
             isCloudSyncing = true;
             try {
-                // 1. Obtener valores locales consolidados (memoria + localStorage)
-                let localHighest = highestUnlockedLevel;
-                let localCurrent = currentLevelIdx;
-                let localCompleted = simulationCompleted;
-                let localCompletedLevels = Array.isArray(completedLevels) ? [...completedLevels] : [];
+                const prevAuthUid = localStorage.getItem('simulador_auth_uid');
+                const isDifferentUser = prevAuthUid && prevAuthUid !== user.uid;
 
-                try {
-                    const storedHighest = localStorage.getItem('simulador_highest_level');
-                    if (storedHighest !== null) {
-                        localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
-                    }
-                    const storedCurrent = localStorage.getItem('simulador_current_level_idx');
-                    if (storedCurrent !== null) {
-                        localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
-                    }
-                    if (localStorage.getItem('simulador_completed') === 'true') {
-                        localCompleted = true;
-                    }
-                    const storedLevels = localStorage.getItem('simulador_completed_levels');
-                    if (storedLevels) {
-                        const parsed = JSON.parse(storedLevels);
-                        if (Array.isArray(parsed)) {
-                            localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
+                // 1. Obtener valores locales (solo válidos si es el mismo usuario o sesión de invitado previa)
+                let localHighest = 0;
+                let localCurrent = 0;
+                let localCompleted = false;
+                let localCompletedLevels = [];
+
+                if (!isDifferentUser) {
+                    localHighest = highestUnlockedLevel;
+                    localCurrent = currentLevelIdx;
+                    localCompleted = simulationCompleted;
+                    localCompletedLevels = Array.isArray(completedLevels) ? [...completedLevels] : [];
+
+                    try {
+                        const storedHighest = localStorage.getItem('simulador_highest_level');
+                        if (storedHighest !== null) {
+                            localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
                         }
+                        const storedCurrent = localStorage.getItem('simulador_current_level_idx');
+                        if (storedCurrent !== null) {
+                            localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
+                        }
+                        if (localStorage.getItem('simulador_completed') === 'true') {
+                            localCompleted = true;
+                        }
+                        const storedLevels = localStorage.getItem('simulador_completed_levels');
+                        if (storedLevels) {
+                            const parsed = JSON.parse(storedLevels);
+                            if (Array.isArray(parsed)) {
+                                localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Error leyendo localStorage:', e);
                     }
-                } catch (e) {
-                    console.warn('Error leyendo localStorage:', e);
                 }
 
-                // 2. Intentar obtener estado en Firestore de forma segura (con timeout protector)
+                // 2. Obtener estado en Firestore del usuario activo
                 let cloudHighest = 0;
                 let cloudCurrent = 0;
                 let cloudCompleted = false;
                 let cloudCompletedLevels = [];
+                let hasCloudDoc = false;
                 let firestoreConnected = false;
 
                 if (firestoreDb) {
                     try {
                         const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
-                        const docSnap = await withFirestoreTimeout(docRef.get(), 4000);
+                        const docSnap = await withFirestoreTimeout(docRef.get(), 6000);
                         if (docSnap && docSnap.exists) {
+                            hasCloudDoc = true;
                             const data = docSnap.data() || {};
                             cloudHighest = typeof data.highestUnlockedLevel === 'number' ? data.highestUnlockedLevel : 0;
                             cloudCurrent = typeof data.currentLevelIdx === 'number' ? data.currentLevelIdx : 0;
@@ -5475,18 +5545,36 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         }
                         firestoreConnected = true;
                     } catch (err) {
-                        console.warn('Firestore no disponible o en espera de inicialización (se preserva progreso local):', err.message);
+                        console.warn('Firestore no disponible temporalmente:', err);
                     }
                 }
 
-                // 3. Resolución sin conflictos: el mayor avance gana SIEMPRE
-                highestUnlockedLevel = Math.max(localHighest, cloudHighest);
-                simulationCompleted = localCompleted || cloudCompleted;
+                // 3. Resolución con aislamiento de cuentas:
+                if (hasCloudDoc) {
+                    // Si ya existe registro en la nube para esta cuenta, la nube es la fuente de verdad definitiva
+                    highestUnlockedLevel = cloudHighest;
+                    currentLevelIdx = (cloudCurrent >= 0 && cloudCurrent < levels.length) ? cloudCurrent : cloudHighest;
+                    simulationCompleted = cloudCompleted;
+                    completedLevels = cloudCompletedLevels;
+                } else if (!isDifferentUser && (localHighest > 0 || localCompletedLevels.length > 0)) {
+                    // Cuenta nueva creada a partir de una sesión de invitado: migrar avance local a la nube
+                    highestUnlockedLevel = localHighest;
+                    currentLevelIdx = localCurrent;
+                    simulationCompleted = localCompleted;
+                    completedLevels = localCompletedLevels;
+                } else {
+                    // Cuenta nueva limpia: iniciar desde cero
+                    highestUnlockedLevel = 0;
+                    currentLevelIdx = 0;
+                    simulationCompleted = false;
+                    completedLevels = [];
+                }
+
                 if (simulationCompleted) {
                     highestUnlockedLevel = levels.length - 1;
                 }
 
-                let mergedLevels = new Set([...localCompletedLevels, ...cloudCompletedLevels]);
+                let mergedLevels = new Set(completedLevels);
                 if (highestUnlockedLevel > 0) {
                     for (let i = 0; i < highestUnlockedLevel; i++) {
                         mergedLevels.add(i);
@@ -5499,15 +5587,19 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 }
                 completedLevels = Array.from(mergedLevels).sort((a, b) => a - b);
 
-                // Asegurar que highestUnlockedLevel sea al menos la siguiente misión después de la última completada
                 let lastCompletedIdx = completedLevels.length > 0 ? Math.max(...completedLevels) : -1;
                 if (lastCompletedIdx >= 0 && lastCompletedIdx + 1 > highestUnlockedLevel) {
                     highestUnlockedLevel = Math.min(levels.length - 1, lastCompletedIdx + 1);
                 }
 
-                hasStartedSimulation = true;
+                if (currentLevelIdx < highestUnlockedLevel && completedLevels.length === 0) {
+                    currentLevelIdx = highestUnlockedLevel;
+                }
 
-                // 4. Guardar inmediatamente en localStorage
+                hasStartedSimulation = highestUnlockedLevel > 0 || completedLevels.length > 0 || simulationCompleted;
+
+                // 4. Guardar inmediatamente en localStorage asociado al usuario
+                localStorage.setItem('simulador_auth_uid', user.uid);
                 saveSimulationProgress(true);
 
                 // 5. Respaldar en Firestore si hay conexión disponible
@@ -5516,12 +5608,14 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
                         await withFirestoreTimeout(docRef.set({
                             userId: user.uid,
+                            email: user.email || '',
+                            displayName: user.displayName || '',
                             highestUnlockedLevel: highestUnlockedLevel,
-                            currentLevelIdx: lastCompletedIdx >= 0 ? lastCompletedIdx : 0,
+                            currentLevelIdx: currentLevelIdx,
                             simulationCompleted: simulationCompleted,
                             completedLevels: completedLevels,
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                        }, { merge: true }), 4000);
+                        }, { merge: true }), 6000);
                     } catch (err) {
                         console.warn('No se pudo respaldar en Firestore:', err.message);
                     }
@@ -5533,9 +5627,11 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     renderNavigatorLevels();
                 }
 
-                // 7. Navegar si fue solicitado explícitamente
-                if (navigateToLatest) {
+                // 7. Navegar si fue solicitado explícitamente o cargar entorno activo
+                if (navigateToLatest && hasStartedSimulation) {
                     navigateToProgressLearnings();
+                } else {
+                    loadLevelEnvironment();
                 }
 
                 return true;
@@ -5557,12 +5653,14 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 const docRef = firestoreDb.collection('users').doc(user.uid).collection('progress').doc('simulation');
                 await withFirestoreTimeout(docRef.set({
                     userId: user.uid,
+                    email: user.email || '',
+                    displayName: user.displayName || '',
                     highestUnlockedLevel: highestUnlockedLevel,
                     currentLevelIdx: currentLevelIdx,
                     simulationCompleted: simulationCompleted,
                     completedLevels: completedLevels,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true }), 4500);
+                }, { merge: true }), 6000);
                 return true;
             } catch (err) {
                 console.warn('Error guardando progreso en Firestore:', err);
@@ -5756,7 +5854,23 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (!firebaseAuth) return;
             try {
                 await firebaseAuth.signOut();
+                currentUser = null;
+                clearSimulationProgress();
+                currentLevelIdx = 0;
+                highestUnlockedLevel = 0;
+                simulationCompleted = false;
+                completedLevels = [];
+                hasStartedSimulation = false;
+                selectedOption = null;
+                isReviewingMission = false;
+                localStorage.removeItem('simulador_auth_uid');
+                updateAuthUI(null);
+                if (typeof renderNavigatorLevels === 'function') {
+                    renderNavigatorLevels();
+                }
+                loadLevelEnvironment();
                 closeAuthModal();
+                openWelcomeModal();
             } catch (err) {
                 console.warn('Error cerrando sesión:', err);
             }
