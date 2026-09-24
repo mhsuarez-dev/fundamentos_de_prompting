@@ -784,12 +784,6 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
                     </button>
-
-                    <!-- Progress indicator -->
-                    <div class="px-2.5 sm:px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-right flex items-center gap-1.5">
-                        <span class="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Misión</span>
-                        <span class="text-xs sm:text-sm font-mono text-slate-900 dark:text-sky-400 font-bold tabular-nums" id="level-indicator">1/9</span>
-                    </div>
                 </div>
 
                 <!-- Menú de opciones (Móvil y Escritorio) -->
@@ -3635,7 +3629,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             const lvl = levels[currentLevelIdx];
             
             document.getElementById('header-level-name').textContent = `Nivel ${lvl.stage} · Misión ${lvl.id}`;
-            document.getElementById('level-indicator').textContent = `${lvl.id} / ${levels.length}`;
+            if (document.getElementById('level-indicator')) {
+                document.getElementById('level-indicator').textContent = `${lvl.id} / ${levels.length}`;
+            }
             document.getElementById('side-level-badge').textContent = `Nivel ${lvl.stage}`;
             document.getElementById('side-mission-badge').textContent = `Misión ${lvl.id}`;
             document.getElementById('side-mission-title').textContent = `Tarea: ${lvl.title}`;
