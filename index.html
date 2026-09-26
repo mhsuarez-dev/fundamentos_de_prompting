@@ -1412,6 +1412,22 @@
             </div>
         </div>
 
+        <!-- Auth Loading Overlay -->
+        <div id="auth-loading-overlay" class="fixed inset-0 bg-slate-900/80 dark:bg-black/90 backdrop-blur-md z-[80] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl space-y-4 transform transition-transform duration-300 scale-95" id="auth-loading-card">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shadow-sm">
+                    <svg class="w-8 h-8 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 id="auth-loading-title" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Iniciando sesión...</h3>
+                    <p id="auth-loading-desc" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">Cargando tu progreso en la nube...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Firebase Auth & Cloud Sync Modal -->
         <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[70] overflow-y-auto p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
             <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative text-left" id="auth-modal-content">
@@ -3891,11 +3907,26 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         }
 
         function startFromZero() {
+            if (typeof clearSimulationProgress === 'function') {
+                clearSimulationProgress();
+            }
+            try {
+                ['simulador_has_started', 'simulador_current_level_idx', 'simulador_highest_level', 'simulador_completed', 'simulador_completed_levels'].forEach(k => localStorage.removeItem(k));
+                sessionStorage.clear();
+            } catch(e) {}
+            hasStartedSimulation = false;
+            currentLevelIdx = 0;
+            highestUnlockedLevel = 0;
+            simulationCompleted = false;
+            completedLevels = [];
+            selectedOption = null;
+            isReviewingMission = false;
+            levelAttempts = 0;
+            chosenIncorrectOptions = [];
+            const chatCanvas = document.getElementById('chat-canvas');
+            if (chatCanvas) chatCanvas.innerHTML = '';
+            
             closeWelcomeModal(() => {
-                hasStartedSimulation = false;
-                currentLevelIdx = 0;
-                selectedOption = null;
-                isReviewingMission = false;
                 openOnboarding();
             });
         }
@@ -4029,11 +4060,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         function finishOnboardingAndStart() {
             closeOnboarding();
 
-            const isReturning = hasUserActiveProgress();
+            const isReturning = hasUserActiveProgress() && hasStartedSimulation;
 
             if (isReturning) {
-                // Usuario con avance previo (por ejemplo en el nivel de la misión 3 o ya inició la simulación):
-                // Vuelve a su conversación actual exactamente donde está ubicado, sin mostrarle modales de detalles de misión
                 const missionModal = document.getElementById('mission-modal');
                 if (missionModal) {
                     missionModal.classList.add('opacity-0');
@@ -4044,7 +4073,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     welcomeModal.classList.add('opacity-0');
                     welcomeModal.classList.add('hidden');
                 }
-                // Si la vista de chat no estuviera cargada, la carga manteniendo su nivel actual
                 const chatCanvas = document.getElementById('chat-canvas');
                 if (!chatCanvas || chatCanvas.children.length === 0) {
                     loadLevelEnvironment();
@@ -4052,11 +4080,12 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 return;
             }
 
-            // Usuario que ingresa por PRIMERA VEZ:
-            // Debe aparecerle los detalles de la misión 1 y luego iniciar conversación y cargar todo.
+            // Iniciar Misión 1 de forma limpia
             currentLevelIdx = 0;
+            hasStartedSimulation = true;
             selectedOption = null;
             isReviewingMission = false;
+            saveSimulationProgress(true);
 
             const welcomeModal = document.getElementById('welcome-modal');
             if (welcomeModal) {
@@ -4064,13 +4093,13 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 welcomeModal.classList.add('hidden');
             }
 
-            // Aseguramos que el chat esté limpio de fondo para no precargar mensajes antes de tiempo
             const chatCanvas = document.getElementById('chat-canvas');
             if (chatCanvas) {
                 chatCanvas.innerHTML = '';
             }
 
-            // Mostrar el modal con los detalles de la misión 1 (isReview = false)
+            loadLevelEnvironment();
+
             setTimeout(() => {
                 openMissionModal(false);
             }, 180);
@@ -5190,12 +5219,19 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 closeResetProgressModal();
                 closeMissionsNavigator();
 
+                const welcomeModal = document.getElementById('welcome-modal');
+                if (welcomeModal) {
+                    welcomeModal.classList.add('hidden');
+                    welcomeModal.classList.add('opacity-0');
+                }
+
+                // Si tiene la sesión iniciada o reinicia, se le envía directo al menú de instrucciones
                 setTimeout(() => {
-                    openWelcomeModal();
+                    openOnboarding();
                 }, 150);
 
                 const msg = res && res.cloudDone
-                    ? '✓ Progreso reiniciado con éxito en tu dispositivo y en tu cuenta.'
+                    ? '✓ Progreso reiniciado con éxito en tu cuenta y dispositivo.'
                     : '✓ Progreso reiniciado con éxito.';
                 showGlobalToast(msg);
 
@@ -5204,7 +5240,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 closeResetProgressModal();
                 closeMissionsNavigator();
                 setTimeout(() => {
-                    openWelcomeModal();
+                    openOnboarding();
                 }, 150);
                 showGlobalToast('⚠️ Progreso reiniciado.');
             } finally {
@@ -5687,7 +5723,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 }
             });
 
-            // Determinar la última misión que el usuario superó con éxito
             const state = typeof window.getSimulationState === 'function' 
                 ? window.getSimulationState() 
                 : { highestUnlockedLevel, currentLevelIdx, simulationCompleted, completedLevels };
@@ -5702,10 +5737,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     effectiveCompleted.add(i);
                 }
             }
-            const completedArr = Array.from(effectiveCompleted).sort((a, b) => a - b);
-            const lastCompletedIdx = completedArr.length > 0 ? completedArr[completedArr.length - 1] : -1;
 
-            if (state.simulationCompleted || lastCompletedIdx >= levels.length - 1) {
+            if (state.simulationCompleted || effectiveCompleted.size >= levels.length) {
                 currentLevelIdx = levels.length - 1;
                 hasStartedSimulation = true;
                 saveSimulationProgress(true);
@@ -5716,41 +5749,29 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 return;
             }
 
-            // Si hay una misión activa desbloqueada pendiente por resolver
-            let targetIdx = state.currentLevelIdx;
-            if (targetIdx >= levels.length || effectiveCompleted.has(targetIdx)) {
-                targetIdx = lastCompletedIdx + 1;
+            // Buscar la primera misión no completada (la siguiente a resolver)
+            let targetIdx = 0;
+            for (let i = 0; i < levels.length; i++) {
+                if (!effectiveCompleted.has(i)) {
+                    targetIdx = i;
+                    break;
+                }
             }
 
-            if (targetIdx >= 0 && targetIdx < levels.length && !effectiveCompleted.has(targetIdx)) {
-                currentLevelIdx = targetIdx;
-                hasStartedSimulation = true;
-                selectedOption = null;
-                isReviewingMission = false;
-                saveSimulationProgress(true);
-                loadLevelEnvironment();
-                return;
+            currentLevelIdx = targetIdx;
+            hasStartedSimulation = true;
+            selectedOption = null;
+            isReviewingMission = false;
+            saveSimulationProgress(true);
+            loadLevelEnvironment();
+
+            if (typeof renderNavigatorLevels === 'function') {
+                renderNavigatorLevels();
             }
 
-            if (lastCompletedIdx >= 0) {
-                // Posicionar en la última misión superada y mostrar sus Aprendizajes Clave
-                currentLevelIdx = lastCompletedIdx;
-                hasStartedSimulation = true;
-                const masterOpt = levels[currentLevelIdx].options.find(o => o.isMaster) || levels[currentLevelIdx].options[0];
-                selectedOption = masterOpt;
-                isReviewingMission = false;
-                saveSimulationProgress(true);
-                loadLevelEnvironment();
-                setTimeout(() => {
-                    revealFeedback();
-                }, 180);
-            } else {
-                // Usuario en la Misión 1 (no ha completado ninguna aún)
-                currentLevelIdx = 0;
-                hasStartedSimulation = true;
-                saveSimulationProgress(true);
-                loadLevelEnvironment();
-            }
+            setTimeout(() => {
+                openMissionModal(false);
+            }, 180);
         }
 
         function openAuthModal(defaultTab = 'login') {
@@ -5888,6 +5909,41 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
+        function showAuthLoading(title = 'Iniciando sesión...', desc = 'Cargando tu progreso en la nube...') {
+            const overlay = document.getElementById('auth-loading-overlay');
+            const card = document.getElementById('auth-loading-card');
+            const t = document.getElementById('auth-loading-title');
+            const d = document.getElementById('auth-loading-desc');
+            if (t) t.textContent = title;
+            if (d) d.textContent = desc;
+            if (overlay) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.remove('opacity-0');
+                    if (card) {
+                        card.classList.remove('scale-95');
+                        card.classList.add('scale-100');
+                    }
+                }, 20);
+            }
+        }
+        window.showAuthLoading = showAuthLoading;
+
+        function hideAuthLoading() {
+            const overlay = document.getElementById('auth-loading-overlay');
+            const card = document.getElementById('auth-loading-card');
+            if (!overlay) return;
+            overlay.classList.add('opacity-0');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 250);
+        }
+        window.hideAuthLoading = hideAuthLoading;
+
         let isPullToRefreshInitialized = false;
         function initPullToRefresh() {
             if (isPullToRefreshInitialized) return;
@@ -5897,7 +5953,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             let currentY = 0;
             let isPulling = false;
             let isRefreshing = false;
-            const threshold = 65;
+            const threshold = 48;
 
             const indicator = document.getElementById('pull-to-refresh-indicator');
             const icon = document.getElementById('pull-refresh-icon');
@@ -5917,8 +5973,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
             document.addEventListener('touchstart', (e) => {
                 if (isRefreshing) return;
-                // No activar si hay modales visibles abiertos
-                const openModal = document.querySelector('.fixed.z-50:not(.hidden), .fixed.z-\\[60\\]:not(.hidden)');
+                const openModal = document.querySelector('#auth-modal:not(.hidden), #welcome-modal:not(.hidden), #onboarding-modal:not(.hidden), #missions-navigator-modal:not(.hidden), #mission-modal:not(.hidden), #feedback-modal:not(.hidden)');
                 if (openModal) return;
 
                 if (isAtTop() && e.touches.length === 1) {
@@ -5934,10 +5989,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 const diff = currentY - startY;
 
                 if (diff > 0 && isAtTop()) {
-                    // Resistencia elástica progresiva
-                    const pull = Math.min(95, Math.pow(diff, 0.82));
+                    const pull = Math.min(85, diff * 0.55);
 
-                    if (pull > 8) {
+                    if (pull > 6) {
                         indicator.classList.remove('opacity-0');
                         indicator.style.transform = `translateY(${pull}px)`;
 
@@ -5968,7 +6022,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 }
                 isPulling = false;
                 const diff = currentY - startY;
-                const pull = Math.min(95, Math.pow(Math.max(0, diff), 0.82));
+                const pull = Math.min(85, Math.max(0, diff) * 0.55);
 
                 if (pull >= threshold && isAtTop()) {
                     isRefreshing = true;
@@ -5977,7 +6031,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>`;
                     icon.classList.add('animate-spin');
 
-                    // Si hay sesión de usuario, sincronizar progreso antes de recargar
                     try {
                         if (firebaseAuth && firebaseAuth.currentUser && typeof resolveAndSyncProgress === 'function') {
                             await resolveAndSyncProgress(firebaseAuth.currentUser, false);
@@ -5988,7 +6041,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
                     setTimeout(() => {
                         window.location.reload();
-                    }, 400);
+                    }, 350);
                 } else {
                     resetPullIndicator();
                 }
@@ -6092,14 +6145,16 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         }
                         if (user) {
                             localStorage.setItem('simulador_auth_uid', user.uid);
-                            const welcomeModal = document.getElementById('welcome-modal');
-                            const isWelcomeOpen = welcomeModal && !welcomeModal.classList.contains('hidden');
-                            const shouldNavigate = isWelcomeOpen || !hasStartedSimulation;
-                            await window.resolveAndSyncProgress(user, shouldNavigate);
-                            if (shouldNavigate) {
-                                if (typeof closeWelcomeModal === 'function') closeWelcomeModal();
-                                if (typeof closeOnboarding === 'function') closeOnboarding();
-                                if (typeof closeAuthModal === 'function') closeAuthModal();
+                            if (!window.isExplicitAuthInProgress) {
+                                const welcomeModal = document.getElementById('welcome-modal');
+                                const isWelcomeOpen = welcomeModal && !welcomeModal.classList.contains('hidden');
+                                const shouldNavigate = isWelcomeOpen || !hasStartedSimulation;
+                                await window.resolveAndSyncProgress(user, shouldNavigate);
+                                if (shouldNavigate) {
+                                    if (typeof closeWelcomeModal === 'function') closeWelcomeModal();
+                                    if (typeof closeOnboarding === 'function') closeOnboarding();
+                                    if (typeof closeAuthModal === 'function') closeAuthModal();
+                                }
                             }
                         } else {
                             if (typeof window.updateAuthUI === 'function') {
@@ -6341,17 +6396,58 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             const errorDiv = document.getElementById('auth-error-msg');
             if (errorDiv) errorDiv.classList.add('hidden');
 
+            window.isExplicitAuthInProgress = true;
+            closeAuthModal();
+            closeWelcomeModal();
+            closeOnboarding();
+            showAuthLoading('Iniciando sesión con Google...', 'Conectando con tu cuenta...');
+
             try {
                 const provider = new GoogleAuthProvider();
                 const cred = await signInWithPopup(firebaseAuth, provider);
                 if (cred && cred.user) {
-                    await window.resolveAndSyncProgress(cred.user, true);
+                    showAuthLoading('Cargando progreso...', 'Sincronizando tus misiones...');
+                    await window.resolveAndSyncProgress(cred.user, false);
+
+                    // Determinar la última misión no completada (la siguiente a jugar)
+                    const state = typeof window.getSimulationState === 'function' ? window.getSimulationState() : null;
+                    const compSet = new Set(state?.completedLevels || completedLevels || []);
+                    
+                    let targetMissionIdx = 0;
+                    for (let i = 0; i < levels.length; i++) {
+                        if (!compSet.has(i)) {
+                            targetMissionIdx = i;
+                            break;
+                        }
+                    }
+                    if (state?.simulationCompleted || compSet.size >= levels.length) {
+                        targetMissionIdx = levels.length - 1;
+                    }
+
+                    currentLevelIdx = targetMissionIdx;
+                    hasStartedSimulation = true;
+                    selectedOption = null;
+                    isReviewingMission = false;
+                    saveSimulationProgress(true);
+                    loadLevelEnvironment();
+
+                    if (typeof renderNavigatorLevels === 'function') {
+                        renderNavigatorLevels();
+                    }
+
+                    setTimeout(() => {
+                        hideAuthLoading();
+                        setTimeout(() => {
+                            openMissionModal(false);
+                        }, 200);
+                    }, 400);
+                } else {
+                    hideAuthLoading();
                 }
-                closeAuthModal();
-                closeWelcomeModal();
-                closeOnboarding();
             } catch (err) {
+                hideAuthLoading();
                 console.error('Error Google Sign In:', err);
+                openAuthModal('login');
                 if (err.code === 'auth/unauthorized-domain') {
                     showAuthError(`
                         <div class="space-y-1.5 text-left leading-relaxed">
@@ -6362,14 +6458,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                             <p class="text-slate-600 dark:text-slate-300">
                                 Tu app está corriendo en <strong>${window.location.hostname}</strong>, pero este dominio aún no está en la lista de dominios autorizados de Firebase.
                             </p>
-                            <div class="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 text-[11px] text-slate-700 dark:text-slate-300 space-y-1.5">
-                                <div class="font-semibold text-slate-900 dark:text-white">Para habilitarlo en 20 segundos:</div>
-                                <ol class="list-decimal list-inside space-y-1">
-                                    <li>Abre <a href="https://console.firebase.google.com/project/simulador-de-prompting/authentication/settings" target="_blank" rel="noopener" class="text-blue-600 dark:text-sky-400 font-bold underline">Firebase Console → Settings</a></li>
-                                    <li>Baja a <strong>Authorized domains</strong> (Dominios autorizados).</li>
-                                    <li>Pulsa <strong>Agregar dominio</strong> y escribe: <code class="font-mono font-bold bg-white dark:bg-slate-900 px-1 py-0.5 rounded text-blue-600 dark:text-sky-400">${window.location.hostname}</code></li>
-                                </ol>
-                            </div>
                         </div>
                     `, true);
                 } else if (err.code === 'auth/popup-closed-by-user') {
@@ -6379,6 +6467,10 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 } else {
                     showAuthError(err.message || 'Ocurrió un fallo con la autenticación de Google.');
                 }
+            } finally {
+                setTimeout(() => {
+                    window.isExplicitAuthInProgress = false;
+                }, 1000);
             }
         };
 
@@ -6397,9 +6489,11 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
             if (!email || !password) return;
 
-            const originalBtnHtml = submitBtn.innerHTML;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="animate-spin text-sm">⏳</span> Procesando...`;
+            window.isExplicitAuthInProgress = true;
+            closeAuthModal();
+            closeWelcomeModal();
+            closeOnboarding();
+            showAuthLoading(currentAuthTab === 'login' ? 'Iniciando sesión...' : 'Creando cuenta...', 'Conectando con tu cuenta...');
 
             try {
                 let cred;
@@ -6409,15 +6503,50 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     cred = await createUserWithEmailAndPassword(firebaseAuth, email, password);
                 }
                 if (cred && cred.user) {
-                    await window.resolveAndSyncProgress(cred.user, true);
+                    showAuthLoading('Cargando progreso...', 'Sincronizando tus misiones...');
+                    await window.resolveAndSyncProgress(cred.user, false);
+
+                    const state = typeof window.getSimulationState === 'function' ? window.getSimulationState() : null;
+                    const compSet = new Set(state?.completedLevels || completedLevels || []);
+                    
+                    let targetMissionIdx = 0;
+                    for (let i = 0; i < levels.length; i++) {
+                        if (!compSet.has(i)) {
+                            targetMissionIdx = i;
+                            break;
+                        }
+                    }
+                    if (state?.simulationCompleted || compSet.size >= levels.length) {
+                        targetMissionIdx = levels.length - 1;
+                    }
+
+                    currentLevelIdx = targetMissionIdx;
+                    hasStartedSimulation = true;
+                    selectedOption = null;
+                    isReviewingMission = false;
+                    saveSimulationProgress(true);
+                    loadLevelEnvironment();
+
+                    if (typeof renderNavigatorLevels === 'function') {
+                        renderNavigatorLevels();
+                    }
+
+                    if (emailInput) emailInput.value = '';
+                    if (passInput) passInput.value = '';
+
+                    setTimeout(() => {
+                        hideAuthLoading();
+                        setTimeout(() => {
+                            openMissionModal(false);
+                        }, 200);
+                    }, 400);
+                } else {
+                    hideAuthLoading();
                 }
-                closeAuthModal();
-                closeWelcomeModal();
-                closeOnboarding();
-                if (emailInput) emailInput.value = '';
-                if (passInput) passInput.value = '';
             } catch (err) {
+                hideAuthLoading();
                 console.error('Error Email Auth:', err);
+                openAuthModal(currentAuthTab);
                 if (err.code === 'auth/unauthorized-domain') {
                     showAuthError(`
                         <div class="space-y-1.5 text-left leading-relaxed">
@@ -6444,8 +6573,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 }
                 showAuthError(msg);
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalBtnHtml;
+                setTimeout(() => {
+                    window.isExplicitAuthInProgress = false;
+                }, 1000);
             }
         };
 
