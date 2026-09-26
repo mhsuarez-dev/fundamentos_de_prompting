@@ -47,7 +47,7 @@ export default async function handler(req, res) {
             body = {};
         }
 
-        const requestedModel = body.model || 'gemini-flash-latest';
+        const requestedModel = body.model || 'gemini-flash-lite-latest';
 
         // Separamos campos propios para no enviar atributos inválidos a la API REST de Google
         const { model: _ignored, apiKey: _ignoredKey, ...geminiPayload } = body;
@@ -60,10 +60,16 @@ export default async function handler(req, res) {
             geminiPayload.generationConfig.maxOutputTokens = 2048;
         }
 
-        // Modelos candidatos ligeros (sin modelos pesados/caros para proteger la cuota gratuita)
-        const lightFallbackModels = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
+        // Modelos candidatos Lite en orden estricto
+        const liteFallbackModels = [
+            'gemini-flash-lite-latest',
+            'gemini-2.5-flash-lite',
+            'gemini-3.1-flash-lite',
+            'gemini-3.5-flash-lite',
+            'gemini-3.1-flash-lite-preview'
+        ];
         const candidateModels = [requestedModel];
-        for (const m of lightFallbackModels) {
+        for (const m of liteFallbackModels) {
             if (!candidateModels.includes(m)) {
                 candidateModels.push(m);
             }

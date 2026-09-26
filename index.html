@@ -473,29 +473,42 @@
 
                 <!-- Botón de continuación de progreso previo (si existe guardado) -->
                 <div id="welcome-resume-section" class="hidden mb-3">
-                    <button onclick="continueExistingSimulation()" type="button" class="w-full flex items-center justify-between p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700/80 text-emerald-900 dark:text-emerald-200 transition-all cursor-pointer group shadow-xs">
+                    <button onclick="continueExistingSimulation()" type="button" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700/80 text-emerald-900 dark:text-emerald-200 transition-all cursor-pointer group shadow-xs text-left">
                         <div class="flex items-center gap-2.5">
                             <span class="text-xl">▶️</span>
-                            <div class="text-left">
+                            <div>
                                 <div class="text-sm font-bold">Continuar donde lo dejé</div>
                                 <div class="text-xs text-emerald-700 dark:text-emerald-300 font-medium" id="welcome-resume-desc">Misión activa</div>
                             </div>
                         </div>
-                        <span class="text-xs sm:text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">Reanudar →</span>
+                        <span class="text-xs sm:text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0">Reanudar →</span>
                     </button>
                 </div>
 
                 <!-- Acciones Principales -->
                 <div class="space-y-2.5 pt-1">
-                    <!-- Opción 1: Empezar desde cero -->
-                    <button onclick="startFromZero()" type="button" class="w-full btn-evaluate font-bold py-3 px-4 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm cursor-pointer transition-all active:scale-[0.99]">
-                        <span>🚀 Empezar desde cero</span>
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    <!-- Opción 1: Comenzar sin cuenta (solo visible si no hay avance previo) -->
+                    <button id="welcome-start-zero-btn" onclick="startFromZero()" type="button" class="w-full btn-evaluate font-bold py-3 px-4 rounded-xl text-sm sm:text-base flex items-center justify-between shadow-sm cursor-pointer transition-all active:scale-[0.99] text-left">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-xl">🚀</span>
+                            <div>
+                                <div class="font-bold text-white leading-tight">Comenzar sin cuenta</div>
+                                <div class="text-[11px] text-blue-100 dark:text-sky-200 font-normal">Juega de inmediato sin registrarte</div>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-white/90 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
 
-                    <!-- Opción 2: Ya tengo cuenta / Cargar mi progreso -->
-                    <button onclick="welcomeLoadAccountProgress()" type="button" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                        <span>🔑 Ya tengo cuenta (Cargar progreso)</span>
+                    <!-- Opción 2: Crear cuenta o Iniciar sesión -->
+                    <button onclick="welcomeLoadAccountProgress()" type="button" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer text-left">
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-lg">🔑</span>
+                            <div>
+                                <div class="font-bold text-slate-900 dark:text-white leading-tight">Crear cuenta o Iniciar sesión</div>
+                                <div class="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Guarda y sincroniza tu avance en la nube</div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-mono font-bold text-blue-600 dark:text-sky-400 shrink-0">Acceder →</span>
                     </button>
                 </div>
             </div>
@@ -504,16 +517,17 @@
         <!-- Onboarding Wizard Modal -->
         <div id="onboarding-modal" class="fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 md:p-6 lg:p-8 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center hidden opacity-0">
             <div id="onboarding-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl lg:max-w-5xl w-full p-4 sm:p-6 lg:p-7 shadow-2xl relative my-auto max-h-[90dvh] flex flex-col">
-                <!-- Botón Cerrar (visible siempre) -->
-                <button onclick="closeOnboarding()" id="onboarding-close-x" type="button" aria-label="Cerrar guía" class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10 cursor-pointer">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                <!-- Botón Saltar con X en la esquina superior derecha -->
+                <button onclick="finishOnboardingAndStart()" id="onboarding-close-x" type="button" aria-label="Saltar guía" class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 py-1 px-2.5 sm:px-3 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10 cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm font-semibold">
+                    <span class="onboarding-skip-btn-text">Saltar</span>
+                    <svg class="w-4 h-4 sm:w-4.5 sm:h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
                 
                 <!-- Wizard Navigation Header -->
-                <div class="shrink-0 pb-3 border-b border-slate-100 dark:border-slate-800 pr-10">
+                <div class="shrink-0 pb-3 border-b border-slate-100 dark:border-slate-800 pr-24">
                     <div class="flex items-center justify-between gap-2">
                         <div>
-                            <h2 class="text-sm sm:text-base font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider">Fundamentos de Prompting</h2>
+                            <h2 class="text-xs sm:text-sm font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider">Fundamentos de Prompting</h2>
                             <div id="onboarding-step-indicator" class="font-mono text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">1/3</div>
                         </div>
                     </div>
@@ -545,7 +559,7 @@
                     <div id="onboarding-step-2" class="hidden space-y-3 sm:space-y-4">
                         <div>
                             <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Instrucciones de la Simulación</h2>
-                            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Sigue estas cuatro instrucciones clave para interactuar con el simulador en cada una de las 9 misiones:</p>
+                            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Cuatro pasos para interactuar con el simulador:</p>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
@@ -629,71 +643,45 @@
                 <!-- Wizard Navigation Footer -->
                 <div class="shrink-0 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <!-- Controls for Step 1 -->
-                    <div id="onboarding-nav-step-1" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                        <div class="flex items-center gap-2 order-2 sm:order-1">
-                            <button onclick="closeOnboarding()" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Saltar la introducción e ir directo al simulador">
-                                <span>Saltar guía</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
-                            </button>
-                            <button onclick="closeOnboarding(); openLabIntroModal();" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Ir directo al Laboratorio de IA">
-                                <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                                </svg>
-                                <span>Laboratorio</span>
-                            </button>
-                        </div>
-                        <div class="order-1 sm:order-2 flex justify-end">
-                            <button onclick="nextOnboardingStep()" type="button" class="w-full sm:w-auto btn-evaluate font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                                <span>Siguiente: Instrucciones</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </button>
-                        </div>
+                    <div id="onboarding-nav-step-1" class="flex flex-row items-center justify-end">
+                        <button onclick="nextOnboardingStep()" type="button" class="btn-evaluate font-bold py-2 sm:py-2.5 px-5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ml-auto">
+                            <span>Siguiente</span>
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
                     </div>
 
                     <!-- Controls for Step 2 -->
-                    <div id="onboarding-nav-step-2" class="hidden flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                        <div class="flex items-center gap-2 order-2 sm:order-1">
-                            <button onclick="prevOnboardingStep()" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                                <span>Anterior</span>
-                            </button>
-                            <button onclick="closeOnboarding()" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Saltar la introducción e ir directo al simulador">
-                                <span>Saltar guía</span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
-                            </button>
-                            <button onclick="closeOnboarding(); openLabIntroModal();" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Ir directo al Laboratorio de IA">
-                                <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                                </svg>
-                                <span>Laboratorio</span>
-                            </button>
-                        </div>
-                        <div class="order-1 sm:order-2 flex justify-end">
-                            <button onclick="nextOnboardingStep()" type="button" class="w-full sm:w-auto btn-evaluate font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer">
-                                <span>Siguiente: Herramienta</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                            </button>
-                        </div>
+                    <div id="onboarding-nav-step-2" class="hidden flex flex-row items-center justify-between gap-2">
+                        <button onclick="prevOnboardingStep()" type="button" class="py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1 transition-colors cursor-pointer shrink-0">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <span>Anterior</span>
+                        </button>
+                        <button onclick="nextOnboardingStep()" type="button" class="btn-evaluate font-bold py-2 sm:py-2.5 px-4 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ml-auto">
+                            <span>Siguiente</span>
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
                     </div>
 
                     <!-- Controls for Step 3 -->
-                    <div id="onboarding-nav-step-3" class="hidden flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-                        <div class="flex items-center gap-2 order-2 sm:order-1">
-                            <button onclick="prevOnboardingStep()" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <div id="onboarding-nav-step-3" class="hidden grid grid-cols-3 items-center gap-1.5 sm:gap-2">
+                        <div class="flex justify-start">
+                            <button onclick="prevOnboardingStep()" type="button" class="py-2 sm:py-2.5 px-2.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1 transition-colors cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                                 <span>Anterior</span>
                             </button>
-                            <button onclick="closeOnboarding(); openLabIntroModal();" type="button" class="py-2.5 sm:py-3 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer" title="Ir directo al Laboratorio de IA">
-                                <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        </div>
+                        <div class="flex justify-center">
+                            <button onclick="closeOnboarding(); openLabIntroModal();" type="button" class="py-2 sm:py-2.5 px-2.5 sm:px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center whitespace-nowrap" title="Ir al Laboratorio de IA">
+                                <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                                 </svg>
-                                <span>Laboratorio</span>
+                                <span>Probar Laboratorio</span>
                             </button>
                         </div>
-                        <div class="order-1 sm:order-2 flex justify-end">
-                            <button onclick="closeOnboarding()" id="onboarding-start-btn" type="button" class="w-full sm:w-auto btn-evaluate font-bold py-2.5 sm:py-3 px-6 sm:px-8 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-sm text-center cursor-pointer">
-                                <span>Iniciar Simulación</span>
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <div class="flex justify-end">
+                            <button onclick="finishOnboardingAndStart()" id="onboarding-start-btn" type="button" class="btn-evaluate font-bold py-2 sm:py-2.5 px-3.5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm text-center cursor-pointer shrink-0">
+                                <span id="onboarding-start-btn-text">Iniciar</span>
+                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
                         </div>
                     </div>
@@ -741,13 +729,14 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-3">
-                    <button onclick="closeLabIntroModal()" type="button" class="w-full sm:w-auto flex-1 py-3.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm sm:text-base transition-colors text-center order-2 sm:order-1 cursor-pointer flex items-center justify-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <div class="flex flex-row items-center gap-2 sm:gap-3">
+                    <button onclick="closeLabIntroModal()" type="button" class="py-2.5 sm:py-3 px-3.5 sm:px-5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver</span>
                     </button>
-                    <button onclick="continueToLabFromIntro()" type="button" class="w-full sm:w-auto flex-1 btn-evaluate font-semibold py-3.5 px-4 rounded-xl text-sm sm:text-base transition-all shadow-sm text-center order-1 sm:order-2 cursor-pointer">
-                        Continuar al Laboratorio
+                    <button onclick="continueToLabFromIntro()" type="button" class="flex-1 btn-evaluate font-bold py-2.5 sm:py-3 px-3.5 sm:px-5 rounded-xl text-xs sm:text-sm transition-all shadow-sm text-center cursor-pointer flex items-center justify-center gap-1.5 truncate">
+                        <span class="truncate">Continuar al Laboratorio</span>
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
             </div>
@@ -779,16 +768,16 @@
                     <span>Volver</span>
                 </button>
 
+                <!-- Laboratorio IA Button (Móvil con icono de matraz, Escritorio con icono + texto) -->
+                <button onclick="openLabIntroModal()" id="nav-lab-btn" type="button" title="Laboratorio de Prompts IA" aria-label="Laboratorio de Prompts IA" class="p-2 md:px-3 md:py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <svg class="w-4 h-4 text-blue-600 dark:text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    <span class="hidden md:inline font-semibold">Laboratorio</span>
+                </button>
+
                 <!-- Desktop Controls (md+) -->
                 <div class="hidden md:flex items-center gap-2">
-                    <!-- Laboratorio IA Button -->
-                    <button onclick="openLabIntroModal()" id="nav-lab-btn" type="button" title="Abrir Laboratorio de Prompts" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm font-medium transition-colors">
-                        <svg class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                        </svg>
-                        <span class="font-semibold">Laboratorio</span>
-                    </button>
-
                     <!-- Theme Toggle Button -->
                     <button onclick="toggleTheme()" id="theme-toggle-btn" type="button" title="Alternar tema Claro / Oscuro" aria-label="Alternar tema Claro / Oscuro" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer">
                         <svg id="theme-icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -894,18 +883,16 @@
 
                     <!-- 7. Mi Cuenta / Iniciar sesión o Crear cuenta -->
                     <button onclick="closeMobileMenu(); openAuthModal(currentUser ? 'profile' : 'login');" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/70 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm sm:text-base font-semibold transition-colors cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-blue-100/70 dark:bg-sky-950/80 border border-blue-200/80 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0" id="mobile-auth-icon-container">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <div class="text-left">
-                                <span class="block font-bold text-slate-900 dark:text-white" id="mobile-auth-btn-label">Iniciar sesión o Crear cuenta</span>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400 font-normal block" id="mobile-auth-btn-sub">Guarda tu progreso o sincroniza tu avance existente</span>
+                        <div class="flex items-center gap-3 min-w-0">
+                            <svg class="w-5 h-5 text-blue-600 dark:text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            <div class="text-left min-w-0 leading-tight">
+                                <span class="block truncate" id="mobile-auth-btn-label">Iniciar sesión o Crear cuenta</span>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400 font-normal block truncate" id="mobile-auth-btn-sub">Guarda tu progreso</span>
                             </div>
                         </div>
-                        <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold" id="mobile-auth-status-tag">Acceder →</span>
+                        <span class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-mono font-semibold shrink-0 ml-2" id="mobile-auth-status-tag">Acceder →</span>
                     </button>
                 </div>
             </div>
@@ -1017,12 +1004,8 @@
                 <div class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed space-y-2 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800" id="mission-desc">
                     <!-- Populated by JS -->
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-                    <button type="button" onclick="closeMissionModal()" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                        <span>Volver</span>
-                    </button>
-                    <button id="mission-action-btn" onclick="handleMissionAction()" class="flex-1 btn-evaluate font-bold py-3.5 px-6 rounded-xl text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer order-1 sm:order-2">
+                <div class="pt-1">
+                    <button id="mission-action-btn" onclick="handleMissionAction()" class="w-full btn-evaluate font-bold py-3.5 px-6 rounded-xl text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
                         <span>Iniciar Conversación</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
@@ -1159,9 +1142,6 @@
                             🔓
                         </div>
                         <div class="min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span id="level-summary-badge" class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-400 border border-blue-200 dark:border-sky-800/50 font-bold">Progreso Guardado · Nivel 1</span>
-                            </div>
                             <h2 id="level-summary-title" class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-snug"></h2>
                         </div>
                     </div>
@@ -1313,58 +1293,120 @@
 
         <!-- Missions Navigator Modal -->
         <div id="missions-navigator-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-2 sm:p-4 md:p-6 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative max-h-[92dvh] flex flex-col" id="missions-navigator-content">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full p-3.5 sm:p-5 shadow-2xl transform scale-95 transition-transform duration-200 space-y-2.5 my-auto relative max-h-[92dvh] flex flex-col" id="missions-navigator-content">
                 
-                <!-- Header -->
-                <div class="flex items-start justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3 shrink-0">
-                    <div class="flex items-start sm:items-center gap-3 min-w-0 flex-1">
-                        <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0 mt-0.5 sm:mt-0 shadow-xs">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Header (Compact) -->
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800 gap-2 shrink-0">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0 shadow-xs">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                             </svg>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Ruta de Misiones</h2>
-                                <span id="nav-modal-badge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200/80 dark:border-sky-800/60 shrink-0 whitespace-nowrap shadow-2xs">
+                            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                <h2 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight">Ruta de Misiones</h2>
+                                <span id="nav-modal-badge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200/80 dark:border-sky-800/60 shrink-0 whitespace-nowrap shadow-2xs">
                                     <span class="w-1.5 h-1.5 rounded-full bg-blue-500 dark:bg-sky-400 shrink-0"></span>
                                     <span>Nivel 1 · Misión 1</span>
                                 </span>
                             </div>
-                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Retrocede a cualquier misión superada, revisa sus detalles o aprendizajes clave y continúa tu avance.</p>
+                            <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">Revisa misiones superadas o continúa tu avance</p>
                         </div>
                     </div>
-                    <button onclick="closeMissionsNavigator()" type="button" aria-label="Cerrar" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0">
+                    <button onclick="closeMissionsNavigator()" type="button" aria-label="Cerrar" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
-                <!-- Info Bar / Status Banner -->
-                <div id="navigator-status-banner" class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shrink-0">
-                    <div class="flex items-center gap-2">
-                        <span class="text-base shrink-0">📊</span>
-                        <span id="navigator-status-text" class="text-slate-700 dark:text-slate-300">Progreso: <strong>0 de 9 misiones superadas</strong></span>
+                <!-- Info Bar / Status Banner (Strictly 1 single line, without reset button) -->
+                <div id="navigator-status-banner" class="px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm flex items-center justify-between gap-2.5 shrink-0">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="text-sm shrink-0">📊</span>
+                        <span id="navigator-status-text" class="text-slate-700 dark:text-slate-300 truncate text-xs sm:text-sm">Progreso: <strong>0 de 9 superadas</strong></span>
                     </div>
-                    <div class="w-full sm:w-48 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shrink-0">
-                        <div id="navigator-progress-bar" class="bg-blue-600 dark:bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <div class="w-20 sm:w-36 bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden shrink-0">
+                            <div id="navigator-progress-bar" class="bg-blue-600 dark:bg-sky-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Scrollable Body with 3 Levels and 9 Missions -->
-                <div class="flex-1 min-h-0 overflow-y-auto space-y-4 pr-1" id="navigator-levels-container">
+                <div class="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1" id="navigator-levels-container">
                     <!-- Contenido renderizado por renderNavigatorLevels() -->
                 </div>
 
-                <!-- Footer -->
-                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
-                    <button onclick="openAuthModal()" type="button" class="py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                        <svg class="w-4 h-4 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                        <span id="nav-cloud-footer-text">Acceso y sincronización en la nube</span>
-                    </button>
-                    <button onclick="closeMissionsNavigator()" type="button" class="py-2.5 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-colors cursor-pointer text-center">
+                <!-- Footer (2 lines on mobile, 1 line on desktop) -->
+                <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 shrink-0">
+                    <div class="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                        <button onclick="openAuthModal()" type="button" class="py-2 px-2.5 sm:px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer truncate">
+                            <svg class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            <span id="nav-cloud-footer-text" class="truncate">Iniciar sesión</span>
+                        </button>
+                        <button onclick="openResetProgressModal()" type="button" title="Reiniciar progreso de las misiones" class="py-2 px-2.5 sm:px-3 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer truncate">
+                            <svg class="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            <span class="truncate">Reiniciar progreso</span>
+                        </button>
+                    </div>
+                    <button onclick="closeMissionsNavigator()" type="button" class="w-full sm:w-auto py-2 sm:py-2 px-4 sm:px-5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer text-center shrink-0">
                         Cerrar Navegador
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Progress Confirmation Modal -->
+        <div id="reset-progress-modal" onclick="if(event.target === this) closeResetProgressModal()" class="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm z-[90] flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col text-left space-y-4 max-h-[92vh] overflow-y-auto" id="reset-progress-modal-content">
+                
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800/80 flex items-center justify-center text-rose-600 dark:text-rose-400 shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">¿Reiniciar todo el progreso?</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Cuadro de confirmación</p>
+                        </div>
+                    </div>
+                    <button onclick="closeResetProgressModal()" type="button" aria-label="Cerrar" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
+                    <p>
+                        Tu avance volverá al inicio (<strong>Misión 1</strong>) y se borrarán las misiones superadas hasta el momento.
+                    </p>
+                    
+                    <div class="p-3 rounded-xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 text-xs sm:text-sm text-amber-900 dark:text-amber-200 flex items-start gap-2.5">
+                        <span class="text-base shrink-0 mt-0.5">⚠️</span>
+                        <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                            El reinicio se aplicará en <strong>este dispositivo</strong> y en tu <strong>cuenta sincronizada</strong> si tienes la sesión iniciada.
+                        </p>
+                    </div>
+
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        Podrás volver a recorrer toda la simulación desde cero cuando lo desees.
+                    </p>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col-reverse sm:flex-row gap-2.5 justify-end">
+                    <button onclick="closeResetProgressModal()" type="button" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors cursor-pointer text-center">
+                        Cancelar y conservar progreso
+                    </button>
+                    <button onclick="confirmResetProgress()" id="confirm-reset-progress-btn" type="button" class="py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span>Sí, reiniciar progreso</span>
                     </button>
                 </div>
             </div>
@@ -1525,13 +1567,20 @@
 
                 <div class="py-4 space-y-4">
                     <div>
-                        <div class="flex flex-wrap justify-between items-center gap-2 mb-1.5">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <label for="lab-prompt-input" class="text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200">Tu Instrucción / Prompt:</label>
+                        <label for="lab-prompt-input" class="block text-sm sm:text-base font-semibold text-slate-800 dark:text-slate-200 mb-2">Tu Instrucción / Prompt:</label>
+                        <textarea id="lab-prompt-input" rows="4" placeholder="Escribe aquí tu prompt o pulsa 'Dictar por voz' para hablar..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm sm:text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 leading-relaxed font-sans"></textarea>
+                        
+                        <!-- Barra inferior: Caracteres a la izquierda, Limpiar y Dictar a la derecha -->
+                        <div class="flex items-center justify-between gap-2 mt-2">
+                            <span class="text-xs sm:text-sm text-slate-400 font-mono" id="lab-char-count">0 caracteres</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="clearLabPrompt()" type="button" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-semibold transition-colors cursor-pointer">
+                                    Limpiar
+                                </button>
                                 
                                 <!-- Botón Micrófono + Tooltip Info de Privacidad -->
                                 <div class="inline-flex items-center gap-1">
-                                    <button id="lab-mic-btn" type="button" onclick="toggleLabVoiceDictation()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95" title="Dictar prompt por voz">
+                                    <button id="lab-mic-btn" type="button" onclick="toggleLabVoiceDictation()" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95" title="Dictar prompt por voz">
                                         <span id="lab-mic-icon-wrapper" class="flex items-center">
                                             <svg id="lab-mic-icon" class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
@@ -1551,10 +1600,12 @@
 
                                     <!-- Icono 'i' con Tooltip -->
                                     <div class="relative inline-flex items-center">
-                                        <button type="button" onclick="toggleMicPrivacyTooltip(event)" class="w-5 h-5 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors text-xs font-bold border border-slate-200 dark:border-slate-700" title="Información sobre privacidad del micrófono">
-                                            ⓘ
+                                        <button type="button" onclick="toggleMicPrivacyTooltip(event)" aria-label="Información sobre privacidad del micrófono" class="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors cursor-pointer shrink-0" title="Información sobre privacidad del micrófono">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
                                         </button>
-                                        <div id="lab-mic-tooltip" class="hidden absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-3.5rem)] p-3 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] leading-relaxed rounded-xl shadow-2xl z-50 border border-slate-700 pointer-events-auto">
+                                        <div id="lab-mic-tooltip" class="hidden absolute right-0 bottom-full mb-2 w-72 max-w-[calc(100vw-3.5rem)] p-3 bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white text-[11px] leading-relaxed rounded-xl shadow-2xl z-50 border border-slate-700 pointer-events-auto">
                                             <div class="flex items-start gap-2">
                                                 <span class="text-sm shrink-0">🔒</span>
                                                 <div class="flex-1 min-w-0 pr-1">
@@ -1567,14 +1618,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs sm:text-sm text-slate-400 font-mono" id="lab-char-count">0 caracteres</span>
-                                <button onclick="clearLabPrompt()" type="button" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-mono transition-colors">
-                                    Limpiar
-                                </button>
-                            </div>
                         </div>
-                        <textarea id="lab-prompt-input" rows="4" placeholder="Escribe aquí tu prompt o pulsa 'Dictar por voz' para hablar..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 text-slate-900 dark:text-slate-100 placeholder-slate-400 text-sm sm:text-base focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 leading-relaxed font-sans"></textarea>
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-3">
@@ -1583,13 +1627,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>1. Ejecutar con Gemini Flash-Lite</span>
+                            <span>Generar respuesta con Gemini</span>
                         </button>
                         <button onclick="auditLabPrompt()" id="lab-audit-btn" class="flex-1 bg-slate-800 hover:bg-slate-900 dark:bg-indigo-700 dark:hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-sm transition-all">
                             <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                             </svg>
-                            <span>2. Auditar Calidad del Prompt</span>
+                            <span>Auditar Calidad del Prompt</span>
                         </button>
                     </div>
 
@@ -1711,16 +1755,16 @@
                         </div>
 
                         <!-- Nota Final: El Humano en el Bucle (Human-in-the-Loop) -->
-                        <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 flex flex-col gap-2.5">
-                            <div class="flex items-center gap-3">
-                                <span class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-base shrink-0 shadow-xs">🔄</span>
-                                <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">IMPORTANTE: El Humano en el Bucle (Human-in-the-Loop)</h3>
+                        <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 space-y-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-sm shrink-0">🔄</span>
+                                <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">El Humano en el Bucle (Human-in-the-Loop)</h3>
                             </div>
-                            <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
-                                La mayoría de las veces el modelo de inteligencia artificial <strong class="text-slate-900 dark:text-white">no ofrece una respuesta perfecta al primer intento</strong>. El prompting profesional no busca una magia instantánea, sino abrir una base sólida para la iteración, el refinamiento y la corrección posterior guiada por la persona.
+                            <p class="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+                                La IA no ofrece respuestas perfectas al primer intento. El prompting profesional busca crear una base sólida para que la persona pueda <strong>iterar, refinar y corregir</strong>.
                             </p>
-                            <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                                <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Evita caer en la idea errónea de que la IA entrega todo resuelto de forma perfecta. Mantener al humano en el bucle significa que siempre debemos <strong>iterar, auditar, verificar, validar y corregir</strong> críticamente cada resultado antes de darlo por definitivo.
+                            <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+                                <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Aunque los modelos actuales cuenten con razonamiento paso a paso ('Thinking'), dar instrucciones explícitas de <strong>autoverificación y optimización</strong> reduce alucinaciones y eleva la calidad, pero la <strong>supervisión y validación humana</strong> siempre es indispensable.
                             </div>
                         </div>
                     </div>
@@ -1789,12 +1833,9 @@
                     </div>
 
                     <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl p-3.5 sm:p-4 text-xs sm:text-sm space-y-2.5">
-                        <div class="font-bold text-slate-900 dark:text-white flex items-center justify-between">
-                            <span class="flex items-center gap-2">
-                                <span>💡</span>
-                                <span>¿Cómo obtenerla gratis en 1 minuto?</span>
-                            </span>
-                            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-sky-400 font-semibold underline text-xs">Abrir AI Studio ↗</a>
+                        <div class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>💡</span>
+                            <span>¿Cómo obtenerla gratis en 1 minuto?</span>
                         </div>
                         <ol class="list-decimal list-inside space-y-1.5 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
                             <li>Ingresa a <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-sky-400 underline font-semibold">Google AI Studio (Get API Key)</a> con tu cuenta Google.</li>
@@ -1816,6 +1857,11 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Floating Global Toast -->
+        <div id="global-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] hidden opacity-0 transition-opacity duration-300 pointer-events-none px-4 py-2.5 rounded-xl bg-slate-900/95 dark:bg-white/95 text-white dark:text-slate-900 text-xs sm:text-sm font-semibold shadow-2xl border border-slate-700/50 dark:border-slate-200/50 backdrop-blur-md flex items-center gap-2">
+            <span id="global-toast-text"></span>
         </div>
 
     </div>
@@ -2357,7 +2403,6 @@
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
                 content.classList.add('scale-100');
-                if (input) input.focus();
             }, 20);
         }
 
@@ -2563,7 +2608,7 @@
 
         async function callGeminiAPI(payload, maxRetries = 2) {
             const customKey = document.getElementById('lab-custom-api-key')?.value?.trim();
-            const modelName = "gemini-flash-latest";
+            const modelName = "gemini-flash-lite-latest";
 
             try {
                 const headers = { 'Content-Type': 'application/json' };
@@ -2600,9 +2645,15 @@
                 throw customErr;
 
             } catch (backendErr) {
-                // Si el usuario configuró una clave manual y el backend falló, intentar fallback directo con modelos ligeros
+                // Si el usuario configuró una clave manual y el backend falló, intentar fallback directo con modelos lite
                 if (customKey) {
-                    const directCandidates = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite'];
+                    const directCandidates = [
+                        'gemini-flash-lite-latest',
+                        'gemini-2.5-flash-lite',
+                        'gemini-3.1-flash-lite',
+                        'gemini-3.5-flash-lite',
+                        'gemini-3.1-flash-lite-preview'
+                    ];
                     for (const dm of directCandidates) {
                         try {
                             const directUrl = `https://generativelanguage.googleapis.com/v1beta/models/${dm}:generateContent?key=${customKey}`;
@@ -3422,9 +3473,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
   - [Incluir viñetas para cada variable faltante o a mejorar]
 
 ### 💡 Veredicto y Sugerencias de Optimización
-[Análisis técnico y pedagógico en 2 párrafos sobre el impacto del prompt en el modelo:
-- Párrafo 1: Explica la diferencia entre cómo procesa el LLM este prompt en su estado actual (riesgo de vaguedad o complacencia) vs. cómo lo procesaría con una arquitectura estructurada.
-- Párrafo 2: Aborda la importancia de la O (Optimización). Enseña cómo integrarla exigiendo al modelo que autoverifique su respuesta antes de entregarla, que aplique criterios de evaluación objetivos o rúbricas, y que justifique metodológicamente sus conclusiones en la misma respuesta para reducir alucinaciones. Como tip clave, recuerda que aunque en las interfaces actuales se pueda activar el modo de razonamiento ('Thinking') o usar modelos razonadores, siempre es crucial reforzar el prompt con pautas explícitas de validación previa y criterios objetivos para blindar la precisión y rigor de la respuesta final]
+[Análisis técnico y pedagógico en un único párrafo sobre el impacto del prompt en el modelo: Explica la diferencia entre cómo procesa el LLM este prompt en su estado actual (riesgo de vaguedad, ambigüedad o complacencia) vs. cómo lo procesaría con una arquitectura estructurada, dando relevancia a la optimización o a cualquier otra variable de C.O.N.T.E.X.T.O. que sea verdaderamente crítica de acuerdo al contexto o tarea evaluada, adaptando el énfasis a las necesidades reales del caso sin asumir que la Optimización es siempre la única variable crítica]
 
 ### 🚀 Versión Optimizada Recomendada
 [Escribe aquí directamente el prompt completo, profesional y de nivel de producción aplicando las 8 variables del método C.O.N.T.E.X.T.O., estructurado con viñetas limpias (- **Contexto:** ..., - **Objetivo:** ..., - **Nivel/Rol:** ..., - **Tarea:** ..., - **Especificaciones:** ..., - **eXclusiones:** ..., - **Tipo de salida:** ..., - **Optimización:** ...), asegurando que la Optimización (O) contenga directrices claras de autoverificación previa, rúbrica objetiva y justificación metodológica. Debe entregarse listo para copiar y usar de inmediato sin introducciones ni comentarios adicionales]`;
@@ -3516,13 +3565,38 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (onboardingCurrentStep < 3) {
                 goToOnboardingStep(onboardingCurrentStep + 1);
             } else {
-                closeOnboarding();
+                finishOnboardingAndStart();
             }
         }
 
         function prevOnboardingStep() {
             if (onboardingCurrentStep > 1) {
                 goToOnboardingStep(onboardingCurrentStep - 1);
+            }
+        }
+
+        function hasUserActiveProgress() {
+            try {
+                const localStarted = localStorage.getItem('simulador_has_started') === 'true';
+                const localIdx = parseInt(localStorage.getItem('simulador_current_level_idx') || '0', 10);
+                const localCompleted = localStorage.getItem('simulador_completed') === 'true';
+                let localCompletedLevels = [];
+                try {
+                    localCompletedLevels = JSON.parse(localStorage.getItem('simulador_completed_levels') || '[]');
+                } catch(e) {}
+                
+                return !!(
+                    hasStartedSimulation || 
+                    localStarted || 
+                    currentLevelIdx > 0 || 
+                    localIdx > 0 || 
+                    simulationCompleted || 
+                    localCompleted || 
+                    (Array.isArray(completedLevels) && completedLevels.length > 0) ||
+                    (Array.isArray(localCompletedLevels) && localCompletedLevels.length > 0)
+                );
+            } catch (e) {
+                return !!(hasStartedSimulation || currentLevelIdx > 0);
             }
         }
 
@@ -3544,6 +3618,23 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     if (navContainer) navContainer.classList.add('hidden');
                 }
             }
+
+            const isReturning = hasUserActiveProgress();
+            const startBtn = document.getElementById('onboarding-start-btn');
+            if (startBtn) {
+                if (isReturning) {
+                    startBtn.innerHTML = `<span>Volver</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+                    startBtn.title = "Volver a la conversación actual";
+                } else {
+                    startBtn.innerHTML = `<span>Iniciar</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+                    startBtn.title = "Iniciar Simulación";
+                }
+            }
+
+            const skipBtns = document.querySelectorAll('.onboarding-skip-btn-text');
+            skipBtns.forEach(btn => {
+                btn.textContent = isReturning ? "Volver" : "Saltar";
+            });
 
             const card = document.getElementById('onboarding-modal-card');
             if (card) {
@@ -3688,7 +3779,29 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         }
 
-        let isCloudSyncing = false;
+        window.isCloudSyncing = false;
+        window.getSimulationState = function() {
+            return {
+                currentLevelIdx,
+                highestUnlockedLevel,
+                simulationCompleted,
+                completedLevels: Array.isArray(completedLevels) ? [...completedLevels] : [],
+                hasStartedSimulation,
+                selectedOption,
+                isReviewingMission
+            };
+        };
+        window.setSimulationState = function(state) {
+            if (!state) return;
+            if (typeof state.highestUnlockedLevel === 'number') highestUnlockedLevel = state.highestUnlockedLevel;
+            if (typeof state.currentLevelIdx === 'number') currentLevelIdx = state.currentLevelIdx;
+            if (typeof state.simulationCompleted === 'boolean') simulationCompleted = state.simulationCompleted;
+            if (Array.isArray(state.completedLevels)) completedLevels = [...state.completedLevels];
+            if (typeof state.hasStartedSimulation === 'boolean') hasStartedSimulation = state.hasStartedSimulation;
+            if (state.selectedOption !== undefined) selectedOption = state.selectedOption;
+            if (typeof state.isReviewingMission === 'boolean') isReviewingMission = state.isReviewingMission;
+        };
+
         function saveSimulationProgress(skipCloudPush = false) {
             try {
                 localStorage.setItem('simulador_has_started', hasStartedSimulation ? 'true' : 'false');
@@ -3699,7 +3812,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             } catch (e) {
                 console.warn('No se pudo guardar el progreso en caché local:', e);
             }
-            if (!skipCloudPush && !isCloudSyncing && window.firebaseSyncProgress) {
+            if (!skipCloudPush && !window.isCloudSyncing && window.firebaseSyncProgress) {
                 window.firebaseSyncProgress();
             }
         }
@@ -3726,17 +3839,34 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
             const resumeSection = document.getElementById('welcome-resume-section');
             const resumeDesc = document.getElementById('welcome-resume-desc');
-            const hasStarted = localStorage.getItem('simulador_has_started') === 'true';
-            const savedIdx = localStorage.getItem('simulador_current_level_idx');
+            const startBtn = document.getElementById('welcome-start-zero-btn');
 
-            if (hasStarted && savedIdx !== null && resumeSection && resumeDesc) {
-                const idx = parseInt(savedIdx, 10);
-                if (!isNaN(idx) && idx >= 0 && idx < levels.length) {
-                    resumeSection.classList.remove('hidden');
-                    resumeDesc.textContent = `Nivel ${levels[idx].stage} · Misión ${idx + 1}: ${levels[idx].title}`;
+            const hasProgress = typeof hasUserActiveProgress === 'function' && hasUserActiveProgress();
+
+            if (hasProgress && resumeSection && resumeDesc) {
+                let idx = 0;
+                const savedIdx = localStorage.getItem('simulador_current_level_idx');
+                if (savedIdx !== null) {
+                    const parsed = parseInt(savedIdx, 10);
+                    if (!isNaN(parsed) && parsed >= 0 && parsed < levels.length) idx = parsed;
+                } else if (typeof currentLevelIdx === 'number' && currentLevelIdx >= 0 && currentLevelIdx < levels.length) {
+                    idx = currentLevelIdx;
                 }
-            } else if (resumeSection) {
-                resumeSection.classList.add('hidden');
+                resumeSection.classList.remove('hidden');
+                resumeDesc.textContent = `Nivel ${levels[idx].stage} · Misión ${idx + 1}: ${levels[idx].title}`;
+                
+                // Si el usuario ya tiene algún avance, no debe aparecer el botón
+                if (startBtn) {
+                    startBtn.classList.add('hidden');
+                }
+            } else {
+                if (resumeSection) {
+                    resumeSection.classList.add('hidden');
+                }
+                // Si el usuario la abre por primera vez (sin avance previo), debe aparecer el botón
+                if (startBtn) {
+                    startBtn.classList.remove('hidden');
+                }
             }
 
             modal.classList.remove('hidden');
@@ -3762,6 +3892,10 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
         function startFromZero() {
             closeWelcomeModal(() => {
+                hasStartedSimulation = false;
+                currentLevelIdx = 0;
+                selectedOption = null;
+                isReviewingMission = false;
                 openOnboarding();
             });
         }
@@ -3874,10 +4008,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             if (!modal) return;
             onboardingCurrentStep = 1;
             updateOnboardingWizardUI();
-            const startBtn = document.getElementById('onboarding-start-btn');
-            if (startBtn) {
-                startBtn.textContent = hasStartedSimulation ? "Volver a la Simulación" : "Iniciar Simulación";
-            }
             modal.classList.remove('hidden');
             if (modal) modal.scrollTop = 0;
             if (card) card.scrollTop = 0;
@@ -3894,12 +4024,58 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
-
-            if (!hasStartedSimulation) {
-                hasStartedSimulation = true;
-                openMissionModal(false);
-            }
         }
+
+        function finishOnboardingAndStart() {
+            closeOnboarding();
+
+            const isReturning = hasUserActiveProgress();
+
+            if (isReturning) {
+                // Usuario con avance previo (por ejemplo en el nivel de la misión 3 o ya inició la simulación):
+                // Vuelve a su conversación actual exactamente donde está ubicado, sin mostrarle modales de detalles de misión
+                const missionModal = document.getElementById('mission-modal');
+                if (missionModal) {
+                    missionModal.classList.add('opacity-0');
+                    missionModal.classList.add('hidden');
+                }
+                const welcomeModal = document.getElementById('welcome-modal');
+                if (welcomeModal) {
+                    welcomeModal.classList.add('opacity-0');
+                    welcomeModal.classList.add('hidden');
+                }
+                // Si la vista de chat no estuviera cargada, la carga manteniendo su nivel actual
+                const chatCanvas = document.getElementById('chat-canvas');
+                if (!chatCanvas || chatCanvas.children.length === 0) {
+                    loadLevelEnvironment();
+                }
+                return;
+            }
+
+            // Usuario que ingresa por PRIMERA VEZ:
+            // Debe aparecerle los detalles de la misión 1 y luego iniciar conversación y cargar todo.
+            currentLevelIdx = 0;
+            selectedOption = null;
+            isReviewingMission = false;
+
+            const welcomeModal = document.getElementById('welcome-modal');
+            if (welcomeModal) {
+                welcomeModal.classList.add('opacity-0');
+                welcomeModal.classList.add('hidden');
+            }
+
+            // Aseguramos que el chat esté limpio de fondo para no precargar mensajes antes de tiempo
+            const chatCanvas = document.getElementById('chat-canvas');
+            if (chatCanvas) {
+                chatCanvas.innerHTML = '';
+            }
+
+            // Mostrar el modal con los detalles de la misión 1 (isReview = false)
+            setTimeout(() => {
+                openMissionModal(false);
+            }, 180);
+        }
+        window.finishOnboardingAndStart = finishOnboardingAndStart;
 
         function openMissionModal(isReview = false) {
             isReviewingMission = isReview;
@@ -3962,8 +4138,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
             setTimeout(() => {
                 modal.classList.add('hidden');
+                const wasReviewing = isReviewingMission;
                 isReviewingMission = false;
-                if (!hasStartedSimulation) {
+                if (!wasReviewing) {
                     hasStartedSimulation = true;
                     saveSimulationProgress();
                     loadLevelEnvironment();
@@ -4281,14 +4458,12 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 const title = document.getElementById('level-summary-title');
                 const body = document.getElementById('level-summary-body');
                 const btnText = document.getElementById('level-summary-btn-text');
-                const badge = document.getElementById('level-summary-badge');
                 const icon = document.getElementById('level-summary-icon');
 
                 if (modal) modal.scrollTop = 0;
                 if (content) content.scrollTop = 0;
 
                 if (levelCompleted === 1) {
-                    if (badge) badge.textContent = "Progreso Guardado · Nivel 1";
                     if (icon) icon.textContent = "🔓";
                     if (btnText) btnText.textContent = "Continuar al Nivel 2";
                     title.innerHTML = '¡Nivel 1 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-xl sm:text-2xl font-bold">Variables Dominadas: C.O.N.</span>';
@@ -4338,7 +4513,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         </div>
                     `;
                 } else if (levelCompleted === 2) {
-                    if (badge) badge.textContent = "Progreso Guardado · Nivel 2";
                     if (icon) icon.textContent = "⚙️";
                     if (btnText) btnText.textContent = "Continuar al Nivel 3";
                     title.innerHTML = '¡Nivel 2 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-xl sm:text-2xl font-bold">Variables Dominadas: T.E.X.</span>';
@@ -4388,7 +4562,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         </div>
                     `;
                 } else if (levelCompleted === 3) {
-                    if (badge) badge.textContent = "Progreso Guardado · Nivel 3";
                     if (icon) icon.textContent = "🏆";
                     if (btnText) btnText.textContent = "Ver Resumen Completo del Método";
                     title.innerHTML = '¡Nivel 3 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-xl sm:text-2xl font-bold">Variables Dominadas: T.O.</span>';
@@ -4424,16 +4597,16 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                             </div>
 
                             <!-- Nota Humano en el Bucle -->
-                            <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-base shrink-0 shadow-xs">🔄</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Nota Fundamental: El Humano en el Bucle (Human-in-the-Loop)</h3>
+                            <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 space-y-3">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-sm shrink-0">🔄</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">El Humano en el Bucle (Human-in-the-Loop)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
-                                    La mayoría de las veces el modelo de inteligencia artificial <strong class="text-slate-900 dark:text-white">no ofrece una respuesta perfecta al primer intento</strong>. El prompting profesional no busca una magia instantánea, sino abrir una base sólida para la iteración y el refinamiento posterior guiado por la persona.
+                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+                                    La IA no ofrece respuestas perfectas al primer intento. El prompting profesional busca crear una base sólida para que la persona pueda <strong>iterar, refinar y corregir</strong>.
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
-                                    <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Evita caer en la idea errónea de que la IA entrega todo resuelto de forma perfecta. Mantener al humano en el bucle significa que siempre debemos <strong>auditar, verificar y validar</strong> críticamente cada resultado antes de darlo por definitivo.
+                                <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+                                    <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Aunque los modelos actuales cuenten con razonamiento paso a paso ('Thinking'), dar instrucciones explícitas de <strong>autoverificación y optimización</strong> reduce alucinaciones y eleva la calidad, pero la <strong>supervisión y validación humana</strong> siempre es indispensable.
                                 </div>
                             </div>
                         </div>
@@ -4468,11 +4641,57 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                     saveSimulationProgress();
                     openCompletionModal();
                 } else {
-                    currentLevelIdx++;
+                    // Resumen Nivel 1 -> Siguiente es Nivel 2 -> Primera misión es Misión 4 (índice 3)
+                    // Resumen Nivel 2 -> Siguiente es Nivel 3 -> Primera misión es Misión 7 (índice 6)
+                    const targetMissionIdx = activeSummaryLevel === 1 ? 3 : (activeSummaryLevel === 2 ? 6 : 0);
+                    currentLevelIdx = targetMissionIdx;
+                    selectedOption = null;
+                    isReviewingMission = false;
+                    hasStartedSimulation = true;
+                    levelAttempts = 0;
+                    chosenIncorrectOptions = [];
                     if (currentLevelIdx > highestUnlockedLevel) {
                         highestUnlockedLevel = currentLevelIdx;
                     }
                     saveSimulationProgress();
+
+                    // Limpiar el canvas de chat para que no queden mensajes de misiones anteriores
+                    const chatCanvas = document.getElementById('chat-canvas');
+                    if (chatCanvas) chatCanvas.innerHTML = '';
+
+                    const evalView = document.getElementById('evaluation-view');
+                    if (evalView) {
+                        evalView.classList.add('hidden');
+                        evalView.classList.remove('flex');
+                    }
+                    const optsView = document.getElementById('options-view');
+                    if (optsView) {
+                        optsView.classList.remove('hidden');
+                    }
+
+                    // Sincronizar badges e indicadores de cabecera con la primera misión del siguiente nivel
+                    const nextLvl = levels[currentLevelIdx];
+                    if (nextLvl) {
+                        if (document.getElementById('header-level-name')) {
+                            document.getElementById('header-level-name').textContent = `Nivel ${nextLvl.stage} · Misión ${nextLvl.id}`;
+                        }
+                        if (document.getElementById('level-indicator')) {
+                            document.getElementById('level-indicator').textContent = `${nextLvl.id} / ${levels.length}`;
+                        }
+                        if (document.getElementById('side-level-badge')) {
+                            document.getElementById('side-level-badge').textContent = `Nivel ${nextLvl.stage}`;
+                        }
+                        if (document.getElementById('side-mission-badge')) {
+                            document.getElementById('side-mission-badge').textContent = `Misión ${nextLvl.id}`;
+                        }
+                        if (document.getElementById('side-mission-title')) {
+                            document.getElementById('side-mission-title').textContent = `Tarea: ${nextLvl.title}`;
+                        }
+                        if (document.getElementById('chat-progress-text')) {
+                            document.getElementById('chat-progress-text').textContent = `${nextLvl.id} de ${levels.length}`;
+                        }
+                    }
+
                     openMissionModal(false);
                 }
             }, 300);
@@ -4637,7 +4856,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         }
 
         function restartSimulation() {
-            ['welcome-modal', 'onboarding-modal', 'mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal', 'missions-navigator-modal', 'auth-modal'].forEach(id => {
+            ['welcome-modal', 'onboarding-modal', 'mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal', 'missions-navigator-modal', 'auth-modal', 'reset-progress-modal'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.add('opacity-0');
@@ -4748,6 +4967,10 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         function closeFeedbackModal(callback) {
             const modal = document.getElementById('feedback-modal');
             const content = document.getElementById('feedback-content');
+            if (!modal || modal.classList.contains('hidden')) {
+                if (callback) callback();
+                return;
+            }
             modal.classList.add('opacity-0');
             content.classList.remove('scale-100');
             content.classList.add('scale-95');
@@ -4902,6 +5125,113 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }, 200);
         }
 
+        function openResetProgressModal() {
+            const modal = document.getElementById('reset-progress-modal');
+            const content = document.getElementById('reset-progress-modal-content');
+            if (!modal || !content) return;
+            modal.classList.remove('hidden');
+            if (modal) modal.scrollTop = 0;
+            if (content) content.scrollTop = 0;
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                content.classList.add('scale-100');
+            }, 20);
+        }
+
+        function closeResetProgressModal() {
+            const modal = document.getElementById('reset-progress-modal');
+            const content = document.getElementById('reset-progress-modal-content');
+            if (!modal || !content) return;
+            modal.classList.add('opacity-0');
+            if (content) {
+                content.classList.remove('scale-100');
+                content.classList.add('scale-95');
+            }
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        async function confirmResetProgress() {
+            const btn = document.getElementById('confirm-reset-progress-btn');
+            const originalHtml = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Reiniciando...`;
+            }
+
+            try {
+                let res = { cloudDone: false };
+                if (typeof window.executeFullProgressReset === 'function') {
+                    res = await window.executeFullProgressReset();
+                } else {
+                    clearSimulationProgress();
+                    try {
+                        ['simulador_has_started', 'simulador_current_level_idx', 'simulador_highest_level', 'simulador_completed', 'simulador_completed_levels'].forEach(k => localStorage.removeItem(k));
+                        sessionStorage.clear();
+                    } catch(e) {}
+                    currentLevelIdx = 0;
+                    highestUnlockedLevel = 0;
+                    simulationCompleted = false;
+                    completedLevels = [];
+                    hasStartedSimulation = false;
+                    selectedOption = null;
+                    isReviewingMission = false;
+                    levelAttempts = 0;
+                    chosenIncorrectOptions = [];
+                    const chatCanvas = document.getElementById('chat-canvas');
+                    if (chatCanvas) chatCanvas.innerHTML = '';
+                    if (typeof renderNavigatorLevels === 'function') {
+                        renderNavigatorLevels();
+                    }
+                }
+
+                closeResetProgressModal();
+                closeMissionsNavigator();
+
+                setTimeout(() => {
+                    openWelcomeModal();
+                }, 150);
+
+                const msg = res && res.cloudDone
+                    ? '✓ Progreso reiniciado con éxito en tu dispositivo y en tu cuenta.'
+                    : '✓ Progreso reiniciado con éxito.';
+                showGlobalToast(msg);
+
+            } catch (err) {
+                console.error('Error al reiniciar progreso:', err);
+                closeResetProgressModal();
+                closeMissionsNavigator();
+                setTimeout(() => {
+                    openWelcomeModal();
+                }, 150);
+                showGlobalToast('⚠️ Progreso reiniciado.');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        function showGlobalToast(msg, duration = 3500) {
+            const toast = document.getElementById('global-toast');
+            const text = document.getElementById('global-toast-text');
+            if (!toast || !text) return;
+            text.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.remove('opacity-0');
+            }, 20);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, duration);
+        }
+
         function renderNavigatorLevels() {
             const container = document.getElementById('navigator-levels-container');
             if (!container) return;
@@ -4917,9 +5247,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
             if (statusText) {
                 if (simulationCompleted) {
-                    statusText.innerHTML = `<strong>🏆 Simulación Completada:</strong> Has superado las 9 misiones. Tienes acceso libre a todo.`;
+                    statusText.innerHTML = `<strong>🏆 Completado:</strong> 9 de 9 misiones`;
                 } else {
-                    statusText.innerHTML = `Progreso: <strong>${beatenCount} de ${totalMissions} misiones superadas</strong>`;
+                    statusText.innerHTML = `Progreso: <strong>${beatenCount} de ${totalMissions} superadas</strong>`;
                 }
             }
             if (progressBar) {
@@ -5157,7 +5487,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                                 ${isStageCompleted ? '🏆 Nivel completado con éxito' : `🏁 Meta: Completa las 3 misiones (${completedInStage}/3 superadas) para ver el resumen del nivel`}
                             </span>
                             ${isStageCompleted ? `
-                                <button onclick="closeMissionsNavigator(); showLevelSummary(${stg.stage});" type="button" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
+                                <button onclick="closeMissionsNavigator(() => showLevelSummary(${stg.stage}));" type="button" class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs">
                                     <span>📖</span>
                                     <span>Ver Resumen Nivel ${stg.stage}</span>
                                 </button>
@@ -5292,7 +5622,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 if (mobileAuthLabel) mobileAuthLabel.textContent = 'Mi Cuenta';
                 if (mobileAuthSub) mobileAuthSub.textContent = `Sincronizado (${user.email})`;
                 if (mobileAuthStatus) mobileAuthStatus.textContent = 'Conectado ✓';
-                if (navCloudFooterText) navCloudFooterText.textContent = `Nube: Conectado (${name})`;
+                if (navCloudFooterText) navCloudFooterText.textContent = `Mi Cuenta (${name})`;
 
                 if (completionCloudStatus) {
                     completionCloudStatus.textContent = `Progreso respaldado en tiempo real en la cuenta ${user.email}.`;
@@ -5323,9 +5653,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 if (navAuthBtnText) navAuthBtnText.textContent = 'Acceso y sincronización';
                 if (navAuthIcon) navAuthIcon.textContent = '👤';
                 if (mobileAuthLabel) mobileAuthLabel.textContent = 'Iniciar sesión o Crear cuenta';
-                if (mobileAuthSub) mobileAuthSub.textContent = 'Guarda tu progreso o sincroniza tu avance existente';
+                if (mobileAuthSub) mobileAuthSub.textContent = 'Guarda tu progreso';
                 if (mobileAuthStatus) mobileAuthStatus.textContent = 'Acceder →';
-                if (navCloudFooterText) navCloudFooterText.textContent = 'Acceso y sincronización en la nube';
+                if (navCloudFooterText) navCloudFooterText.textContent = 'Iniciar sesión';
 
                 if (completionCloudStatus) {
                     completionCloudStatus.textContent = 'Crea una cuenta opcional o inicia sesión con Google para conservar tus 9 misiones superadas.';
@@ -5358,13 +5688,16 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             });
 
             // Determinar la última misión que el usuario superó con éxito
-            let effectiveCompleted = new Set(completedLevels || []);
-            if (highestUnlockedLevel > 0) {
-                for (let i = 0; i < highestUnlockedLevel; i++) {
+            const state = typeof window.getSimulationState === 'function' 
+                ? window.getSimulationState() 
+                : { highestUnlockedLevel, currentLevelIdx, simulationCompleted, completedLevels };
+            let effectiveCompleted = new Set(state.completedLevels || []);
+            if (state.highestUnlockedLevel > 0) {
+                for (let i = 0; i < state.highestUnlockedLevel; i++) {
                     effectiveCompleted.add(i);
                 }
             }
-            if (simulationCompleted) {
+            if (state.simulationCompleted) {
                 for (let i = 0; i < levels.length; i++) {
                     effectiveCompleted.add(i);
                 }
@@ -5372,7 +5705,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             const completedArr = Array.from(effectiveCompleted).sort((a, b) => a - b);
             const lastCompletedIdx = completedArr.length > 0 ? completedArr[completedArr.length - 1] : -1;
 
-            if (simulationCompleted || lastCompletedIdx >= levels.length - 1) {
+            if (state.simulationCompleted || lastCompletedIdx >= levels.length - 1) {
                 currentLevelIdx = levels.length - 1;
                 hasStartedSimulation = true;
                 saveSimulationProgress(true);
@@ -5380,6 +5713,22 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 setTimeout(() => {
                     openCompletionModal();
                 }, 180);
+                return;
+            }
+
+            // Si hay una misión activa desbloqueada pendiente por resolver
+            let targetIdx = state.currentLevelIdx;
+            if (targetIdx >= levels.length || effectiveCompleted.has(targetIdx)) {
+                targetIdx = lastCompletedIdx + 1;
+            }
+
+            if (targetIdx >= 0 && targetIdx < levels.length && !effectiveCompleted.has(targetIdx)) {
+                currentLevelIdx = targetIdx;
+                hasStartedSimulation = true;
+                selectedOption = null;
+                isReviewingMission = false;
+                saveSimulationProgress(true);
+                loadLevelEnvironment();
                 return;
             }
 
@@ -5401,9 +5750,6 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 hasStartedSimulation = true;
                 saveSimulationProgress(true);
                 loadLevelEnvironment();
-                setTimeout(() => {
-                    openMissionModal(false);
-                }, 180);
             }
         }
 
@@ -5775,19 +6121,22 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         window.initFirebaseClient = initFirebaseClient;
 
         window.pushProgressToFirestore = async function pushProgressToFirestore(user) {
-            if (!firestoreDb || !user || isCloudSyncing) return false;
+            if (!firestoreDb || !user || window.isCloudSyncing) return false;
             try {
+                const state = typeof window.getSimulationState === 'function'
+                    ? window.getSimulationState()
+                    : { highestUnlockedLevel: 0, currentLevelIdx: 0, simulationCompleted: false, completedLevels: [] };
                 const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
-                await withFirestoreTimeout(setDoc(docRef, {
+                await setDoc(docRef, {
                     userId: user.uid,
                     email: user.email || '',
                     displayName: user.displayName || '',
-                    highestUnlockedLevel: highestUnlockedLevel,
-                    currentLevelIdx: currentLevelIdx,
-                    simulationCompleted: simulationCompleted,
-                    completedLevels: completedLevels,
+                    highestUnlockedLevel: state.highestUnlockedLevel,
+                    currentLevelIdx: state.currentLevelIdx,
+                    simulationCompleted: state.simulationCompleted,
+                    completedLevels: state.completedLevels,
                     updatedAt: serverTimestamp()
-                }, { merge: true }), 6000);
+                }, { merge: true });
                 return true;
             } catch (err) {
                 console.warn('Error guardando progreso en Firestore:', err);
@@ -5795,164 +6144,193 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             }
         };
 
+        let activeSyncPromise = null;
         window.resolveAndSyncProgress = async function resolveAndSyncProgress(user, navigateToLatest = true) {
             if (!user) return false;
-            isCloudSyncing = true;
-            try {
-                const prevAuthUid = localStorage.getItem('simulador_auth_uid');
-                const isDifferentUser = prevAuthUid && prevAuthUid !== user.uid;
-
-                // 1. Obtener valores locales (solo válidos si es el mismo usuario o sesión de invitado previa)
-                let localHighest = 0;
-                let localCurrent = 0;
-                let localCompleted = false;
-                let localCompletedLevels = [];
-
-                if (!isDifferentUser) {
-                    localHighest = highestUnlockedLevel;
-                    localCurrent = currentLevelIdx;
-                    localCompleted = simulationCompleted;
-                    localCompletedLevels = Array.isArray(completedLevels) ? [...completedLevels] : [];
-
-                    try {
-                        const storedHighest = localStorage.getItem('simulador_highest_level');
-                        if (storedHighest !== null) {
-                            localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
-                        }
-                        const storedCurrent = localStorage.getItem('simulador_current_level_idx');
-                        if (storedCurrent !== null) {
-                            localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
-                        }
-                        if (localStorage.getItem('simulador_completed') === 'true') {
-                            localCompleted = true;
-                        }
-                        const storedLevels = localStorage.getItem('simulador_completed_levels');
-                        if (storedLevels) {
-                            const parsed = JSON.parse(storedLevels);
-                            if (Array.isArray(parsed)) {
-                                localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
-                            }
-                        }
-                    } catch (e) {
-                        console.warn('Error leyendo localStorage:', e);
-                    }
-                }
-
-                // 2. Obtener estado en Firestore del usuario activo
-                let cloudHighest = 0;
-                let cloudCurrent = 0;
-                let cloudCompleted = false;
-                let cloudCompletedLevels = [];
-                let hasCloudDoc = false;
-                let firestoreConnected = false;
-
-                if (firestoreDb) {
-                    try {
-                        const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
-                        const docSnap = await withFirestoreTimeout(getDoc(docRef), 6000);
-                        if (docSnap && docSnap.exists()) {
-                            hasCloudDoc = true;
-                            const data = docSnap.data() || {};
-                            cloudHighest = typeof data.highestUnlockedLevel === 'number' ? data.highestUnlockedLevel : 0;
-                            cloudCurrent = typeof data.currentLevelIdx === 'number' ? data.currentLevelIdx : 0;
-                            cloudCompleted = Boolean(data.simulationCompleted);
-                            cloudCompletedLevels = Array.isArray(data.completedLevels) ? data.completedLevels : [];
-                        }
-                        firestoreConnected = true;
-                    } catch (err) {
-                        console.warn('Firestore no disponible temporalmente:', err);
-                    }
-                }
-
-                // 3. Resolución con aislamiento de cuentas:
-                if (hasCloudDoc) {
-                    highestUnlockedLevel = cloudHighest;
-                    currentLevelIdx = (cloudCurrent >= 0 && cloudCurrent < levels.length) ? cloudCurrent : cloudHighest;
-                    simulationCompleted = cloudCompleted;
-                    completedLevels = cloudCompletedLevels;
-                } else if (!isDifferentUser && (localHighest > 0 || localCompletedLevels.length > 0)) {
-                    highestUnlockedLevel = localHighest;
-                    currentLevelIdx = localCurrent;
-                    simulationCompleted = localCompleted;
-                    completedLevels = localCompletedLevels;
-                } else {
-                    highestUnlockedLevel = 0;
-                    currentLevelIdx = 0;
-                    simulationCompleted = false;
-                    completedLevels = [];
-                }
-
-                if (simulationCompleted) {
-                    highestUnlockedLevel = levels.length - 1;
-                }
-
-                let mergedLevels = new Set(completedLevels);
-                if (highestUnlockedLevel > 0) {
-                    for (let i = 0; i < highestUnlockedLevel; i++) {
-                        mergedLevels.add(i);
-                    }
-                }
-                if (simulationCompleted) {
-                    for (let i = 0; i < levels.length; i++) {
-                        mergedLevels.add(i);
-                    }
-                }
-                completedLevels = Array.from(mergedLevels).sort((a, b) => a - b);
-
-                let lastCompletedIdx = completedLevels.length > 0 ? Math.max(...completedLevels) : -1;
-                if (lastCompletedIdx >= 0 && lastCompletedIdx + 1 > highestUnlockedLevel) {
-                    highestUnlockedLevel = Math.min(levels.length - 1, lastCompletedIdx + 1);
-                }
-
-                if (currentLevelIdx < highestUnlockedLevel && completedLevels.length === 0) {
-                    currentLevelIdx = highestUnlockedLevel;
-                }
-
-                hasStartedSimulation = highestUnlockedLevel > 0 || completedLevels.length > 0 || simulationCompleted;
-
-                // 4. Guardar inmediatamente en localStorage asociado al usuario
-                localStorage.setItem('simulador_auth_uid', user.uid);
-                saveSimulationProgress(true);
-
-                // 5. Respaldar en Firestore si hay conexión disponible
-                if (firestoreDb && firestoreConnected) {
-                    try {
-                        const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
-                        await withFirestoreTimeout(setDoc(docRef, {
-                            userId: user.uid,
-                            email: user.email || '',
-                            displayName: user.displayName || '',
-                            highestUnlockedLevel: highestUnlockedLevel,
-                            currentLevelIdx: currentLevelIdx,
-                            simulationCompleted: simulationCompleted,
-                            completedLevels: completedLevels,
-                            updatedAt: serverTimestamp()
-                        }, { merge: true }), 6000);
-                    } catch (err) {
-                        console.warn('No se pudo respaldar en Firestore:', err.message);
-                    }
-                }
-
-                // 6. Actualizar UI
-                if (typeof window.updateAuthUI === 'function') window.updateAuthUI(user);
-                if (typeof renderNavigatorLevels === 'function') {
-                    renderNavigatorLevels();
-                }
-
-                // 7. Navegar si fue solicitado explícitamente o cargar entorno activo
-                if (navigateToLatest && hasStartedSimulation) {
-                    navigateToProgressLearnings();
-                } else {
-                    loadLevelEnvironment();
-                }
-
-                return true;
-            } catch (err) {
-                console.warn('Error resolviendo sincronización:', err);
-                return false;
-            } finally {
-                isCloudSyncing = false;
+            if (activeSyncPromise) {
+                return activeSyncPromise;
             }
+
+            activeSyncPromise = (async () => {
+                window.isCloudSyncing = true;
+                try {
+                    const prevAuthUid = localStorage.getItem('simulador_auth_uid');
+                    const isDifferentUser = prevAuthUid && prevAuthUid !== user.uid;
+
+                    // 1. Obtener valores locales (solo válidos si es el mismo usuario o sesión de invitado previa)
+                    let localHighest = 0;
+                    let localCurrent = 0;
+                    let localCompleted = false;
+                    let localCompletedLevels = [];
+
+                    if (!isDifferentUser) {
+                        const localState = typeof window.getSimulationState === 'function' ? window.getSimulationState() : null;
+                        if (localState) {
+                            localHighest = localState.highestUnlockedLevel;
+                            localCurrent = localState.currentLevelIdx;
+                            localCompleted = localState.simulationCompleted;
+                            localCompletedLevels = [...localState.completedLevels];
+                        }
+
+                        try {
+                            const storedHighest = localStorage.getItem('simulador_highest_level');
+                            if (storedHighest !== null) {
+                                localHighest = Math.max(localHighest, parseInt(storedHighest, 10) || 0);
+                            }
+                            const storedCurrent = localStorage.getItem('simulador_current_level_idx');
+                            if (storedCurrent !== null) {
+                                localCurrent = Math.max(localCurrent, parseInt(storedCurrent, 10) || 0);
+                            }
+                            if (localStorage.getItem('simulador_completed') === 'true') {
+                                localCompleted = true;
+                            }
+                            const storedLevels = localStorage.getItem('simulador_completed_levels');
+                            if (storedLevels) {
+                                const parsed = JSON.parse(storedLevels);
+                                if (Array.isArray(parsed)) {
+                                    localCompletedLevels = Array.from(new Set([...localCompletedLevels, ...parsed]));
+                                }
+                            }
+                        } catch (e) {
+                            console.warn('Error leyendo localStorage:', e);
+                        }
+                    }
+
+                    // 2. Obtener estado en Firestore del usuario activo
+                    let cloudHighest = 0;
+                    let cloudCurrent = 0;
+                    let cloudCompleted = false;
+                    let cloudCompletedLevels = [];
+                    let hasCloudDoc = false;
+
+                    if (firestoreDb) {
+                        try {
+                            const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
+                            const docSnap = await getDoc(docRef);
+                            if (docSnap && docSnap.exists()) {
+                                hasCloudDoc = true;
+                                const data = docSnap.data() || {};
+                                cloudHighest = typeof data.highestUnlockedLevel === 'number' ? data.highestUnlockedLevel : 0;
+                                cloudCurrent = typeof data.currentLevelIdx === 'number' ? data.currentLevelIdx : 0;
+                                cloudCompleted = Boolean(data.simulationCompleted);
+                                cloudCompletedLevels = Array.isArray(data.completedLevels) ? data.completedLevels : [];
+                            }
+                        } catch (err) {
+                            console.warn('Error al leer de Firestore:', err);
+                        }
+                    }
+
+                    // 3. Resolución con aislamiento de cuentas:
+                    let resolvedHighest = 0;
+                    let resolvedCurrent = 0;
+                    let resolvedCompleted = false;
+                    let resolvedCompletedLevels = [];
+
+                    if (hasCloudDoc) {
+                        // Para cuentas con progreso previo en Firestore, la nube es la fuente de verdad
+                        resolvedHighest = cloudHighest;
+                        resolvedCurrent = (cloudCurrent >= 0 && cloudCurrent < levels.length) ? cloudCurrent : cloudHighest;
+                        resolvedCompleted = cloudCompleted;
+                        resolvedCompletedLevels = cloudCompletedLevels;
+                    } else if (!isDifferentUser && (localHighest > 0 || localCompletedLevels.length > 0)) {
+                        // Para sesiones previas sin nube aún creada
+                        resolvedHighest = localHighest;
+                        resolvedCurrent = localCurrent;
+                        resolvedCompleted = localCompleted;
+                        resolvedCompletedLevels = localCompletedLevels;
+                    } else {
+                        // Cuenta nueva limpia
+                        resolvedHighest = 0;
+                        resolvedCurrent = 0;
+                        resolvedCompleted = false;
+                        resolvedCompletedLevels = [];
+                    }
+
+                    if (resolvedCompleted) {
+                        resolvedHighest = levels.length - 1;
+                    }
+
+                    let mergedLevels = new Set(resolvedCompletedLevels);
+                    if (resolvedHighest > 0) {
+                        for (let i = 0; i < resolvedHighest; i++) {
+                            mergedLevels.add(i);
+                        }
+                    }
+                    if (resolvedCompleted) {
+                        for (let i = 0; i < levels.length; i++) {
+                            mergedLevels.add(i);
+                        }
+                    }
+                    resolvedCompletedLevels = Array.from(mergedLevels).sort((a, b) => a - b);
+
+                    let lastCompletedIdx = resolvedCompletedLevels.length > 0 ? Math.max(...resolvedCompletedLevels) : -1;
+                    if (lastCompletedIdx >= 0 && lastCompletedIdx + 1 > resolvedHighest) {
+                        resolvedHighest = Math.min(levels.length - 1, lastCompletedIdx + 1);
+                    }
+
+                    if (resolvedCurrent < resolvedHighest && resolvedCompletedLevels.length === 0) {
+                        resolvedCurrent = resolvedHighest;
+                    }
+
+                    const resolvedHasStarted = resolvedHighest > 0 || resolvedCompletedLevels.length > 0 || resolvedCompleted;
+
+                    if (typeof window.setSimulationState === 'function') {
+                        window.setSimulationState({
+                            highestUnlockedLevel: resolvedHighest,
+                            currentLevelIdx: resolvedCurrent,
+                            simulationCompleted: resolvedCompleted,
+                            completedLevels: resolvedCompletedLevels,
+                            hasStartedSimulation: resolvedHasStarted
+                        });
+                    }
+
+                    // 4. Guardar inmediatamente en localStorage asociado al usuario
+                    localStorage.setItem('simulador_auth_uid', user.uid);
+                    saveSimulationProgress(true);
+
+                    // 5. Respaldar en Firestore si hay datos o si no existía el documento previo
+                    if (firestoreDb && (!hasCloudDoc || resolvedHasStarted)) {
+                        try {
+                            const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
+                            await setDoc(docRef, {
+                                userId: user.uid,
+                                email: user.email || '',
+                                displayName: user.displayName || '',
+                                highestUnlockedLevel: resolvedHighest,
+                                currentLevelIdx: resolvedCurrent,
+                                simulationCompleted: resolvedCompleted,
+                                completedLevels: resolvedCompletedLevels,
+                                updatedAt: serverTimestamp()
+                            }, { merge: true });
+                        } catch (err) {
+                            console.warn('No se pudo respaldar en Firestore:', err.message);
+                        }
+                    }
+
+                    // 6. Actualizar UI
+                    if (typeof window.updateAuthUI === 'function') window.updateAuthUI(user);
+                    if (typeof renderNavigatorLevels === 'function') {
+                        renderNavigatorLevels();
+                    }
+
+                    // 7. Navegar si fue solicitado explícitamente o cargar entorno activo
+                    if (navigateToLatest && resolvedHasStarted) {
+                        navigateToProgressLearnings();
+                    } else if (resolvedHasStarted) {
+                        loadLevelEnvironment();
+                    }
+
+                    return true;
+                } catch (err) {
+                    console.warn('Error resolviendo sincronización:', err);
+                    return false;
+                }
+            })().finally(() => {
+                activeSyncPromise = null;
+                window.isCloudSyncing = false;
+            });
+
+            return activeSyncPromise;
         };
 
         window.handleGoogleSignIn = async function handleGoogleSignIn() {
@@ -6078,24 +6456,121 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 currentUser = null;
                 window.currentUser = null;
                 clearSimulationProgress();
-                currentLevelIdx = 0;
-                highestUnlockedLevel = 0;
-                simulationCompleted = false;
-                completedLevels = [];
-                hasStartedSimulation = false;
-                selectedOption = null;
-                isReviewingMission = false;
+                if (typeof window.setSimulationState === 'function') {
+                    window.setSimulationState({
+                        highestUnlockedLevel: 0,
+                        currentLevelIdx: 0,
+                        simulationCompleted: false,
+                        completedLevels: [],
+                        hasStartedSimulation: false,
+                        selectedOption: null,
+                        isReviewingMission: false
+                    });
+                }
                 localStorage.removeItem('simulador_auth_uid');
                 window.updateAuthUI(null);
                 if (typeof renderNavigatorLevels === 'function') {
                     renderNavigatorLevels();
                 }
-                loadLevelEnvironment();
+                const chatCanvas = document.getElementById('chat-canvas');
+                if (chatCanvas) chatCanvas.innerHTML = '';
                 closeAuthModal();
                 openWelcomeModal();
             } catch (err) {
                 console.warn('Error cerrando sesión:', err);
             }
+        };
+
+        window.executeFullProgressReset = async function executeFullProgressReset() {
+            let cloudDone = false;
+
+            // 1. Resetear documento de progreso en Firestore si el usuario tiene sesión iniciada
+            if (firestoreDb && firebaseAuth && firebaseAuth.currentUser) {
+                try {
+                    const user = firebaseAuth.currentUser;
+                    const docRef = doc(firestoreDb, 'users', user.uid, 'progress', 'simulation');
+                    await setDoc(docRef, {
+                        userId: user.uid,
+                        email: user.email || '',
+                        displayName: user.displayName || '',
+                        highestUnlockedLevel: 0,
+                        currentLevelIdx: 0,
+                        simulationCompleted: false,
+                        completedLevels: [],
+                        updatedAt: serverTimestamp()
+                    });
+                    cloudDone = true;
+                } catch (err) {
+                    console.warn('Error reiniciando Firestore en reset:', err);
+                }
+            }
+
+            // 2. Limpiar almacenamiento local, de sesión y cookies
+            if (typeof clearSimulationProgress === 'function') {
+                clearSimulationProgress();
+            }
+            try {
+                const keysToRemove = [
+                    'simulador_has_started', 'simulador_current_level_idx', 
+                    'simulador_highest_level', 'simulador_completed', 
+                    'simulador_completed_levels', 'simulador_last_sync'
+                ];
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+                sessionStorage.clear();
+            } catch (e) {
+                console.warn('Error limpiando almacenamiento:', e);
+            }
+
+            // Limpieza de cookies del navegador
+            try {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i];
+                    const eqPos = cookie.indexOf("=");
+                    const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                    if (name && !name.startsWith('__')) {
+                        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                    }
+                }
+            } catch (e) {}
+
+            // 3. Resetear variables de simulación en memoria a estado limpio (no iniciado)
+            if (typeof window.setSimulationState === 'function') {
+                window.setSimulationState({
+                    highestUnlockedLevel: 0,
+                    currentLevelIdx: 0,
+                    simulationCompleted: false,
+                    completedLevels: [],
+                    hasStartedSimulation: false,
+                    selectedOption: null,
+                    isReviewingMission: false
+                });
+            }
+            hasStartedSimulation = false;
+            currentLevelIdx = 0;
+            highestUnlockedLevel = 0;
+            simulationCompleted = false;
+            completedLevels = [];
+            selectedOption = null;
+            isReviewingMission = false;
+            levelAttempts = 0;
+            chosenIncorrectOptions = [];
+
+            // 4. Limpiar el canvas del chat y opciones para que no queden rastros previos
+            const chatCanvas = document.getElementById('chat-canvas');
+            if (chatCanvas) chatCanvas.innerHTML = '';
+            const optsSection = document.getElementById('options-section');
+            if (optsSection && window.innerWidth < 768) {
+                optsSection.classList.add('hidden');
+                optsSection.classList.remove('flex');
+            }
+
+            // 5. Actualizar interfaz del mapa de misiones
+            if (typeof renderNavigatorLevels === 'function') {
+                renderNavigatorLevels();
+            }
+
+            return { cloudDone };
         };
 
         // Initialize Firebase on module load

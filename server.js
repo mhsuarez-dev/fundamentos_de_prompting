@@ -65,41 +65,41 @@ async function handleGeminiRequest(req, res) {
     }
 
     const customKey = (req.headers && (req.headers['x-goog-api-key'] || req.headers['x-api-key'])) || bodyKey;
-    const apiKey = (typeof customKey === 'string' && customKey.trim().length > 10)
-      ? customKey.trim()
-      : (process.env.GEMINI_API_KEY || process.env.API_KEY);
+    const ai = getGeminiClient(customKey);
 
-    if (!apiKey) {
-      return res.status(500).json({
-        error: 'No se encontró una clave de API configurada en el entorno.',
-        errorType: 'overloaded'
-      });
-    }
+    console.log(`[handleGeminiRequest] Received request for model: ${model}, customKey: ${Boolean(customKey)}`);
 
-    // Build model priority list (only lightweight flash models to protect free quota)
-    const requestedModel = model || 'gemini-flash-latest';
-    const lightFallbackModels = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
+    // Lista estricta de modelos Lite solicitados
+    const requestedModel = model || 'gemini-flash-lite-latest';
+    const liteFallbackModels = [
+      'gemini-flash-lite-latest',
+      'gemini-2.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite-preview'
+    ];
     const candidateModels = [requestedModel];
-    for (const m of lightFallbackModels) {
+    for (const m of liteFallbackModels) {
       if (!candidateModels.includes(m)) {
         candidateModels.push(m);
       }
     }
 
-    // Prepare payload
-    const geminiPayload = {
-      contents: Array.isArray(contents) ? contents : [{ parts: [{ text: String(contents) }] }],
-      generationConfig: {
-        maxOutputTokens: 2048,
-        ...(generationConfig || {})
+    // Format contents properly for SDK
+    let formattedContents = contents;
+    if (Array.isArray(contents)) {
+      if (contents[0]?.parts?.[0]?.text) {
+        formattedContents = contents[0].parts.map(p => p.text).join('\n');
       }
-    };
+    }
 
+    // Prepare system instruction
+    let sysInst = undefined;
     if (systemInstruction) {
       if (typeof systemInstruction === 'string') {
-        geminiPayload.systemInstruction = { parts: [{ text: systemInstruction }] };
-      } else if (systemInstruction.parts) {
-        geminiPayload.systemInstruction = systemInstruction;
+        sysInst = systemInstruction;
+      } else if (systemInstruction.parts && systemInstruction.parts[0]?.text) {
+        sysInst = systemInstruction.parts[0].text;
       }
     }
 
@@ -109,28 +109,33 @@ async function handleGeminiRequest(req, res) {
 
     for (const currentModel of candidateModels) {
       try {
-        const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
-        const apiRes = await fetch(endpointUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey,
-            'User-Agent': 'aistudio-build'
-          },
-          body: JSON.stringify(geminiPayload)
+        const response = await ai.models.generateContent({
+          model: currentModel,
+          contents: formattedContents,
+          config: {
+            maxOutputTokens: 2048,
+            ...(sysInst ? { systemInstruction: sysInst } : {}),
+            ...(generationConfig || {})
+          }
         });
 
-        const data = await apiRes.json();
-        lastStatus = apiRes.status;
-
-        if (apiRes.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          responseData = data;
+        if (response && response.text) {
+          responseData = {
+            text: response.text,
+            candidates: [{
+              content: {
+                parts: [{ text: response.text }]
+              }
+            }],
+            usedModel: currentModel
+          };
+          console.log(`[Gemini API] Solicitud exitosa con modelo: ${currentModel}`);
           break;
-        } else {
-          lastError = data?.error?.message || JSON.stringify(data?.error || data);
         }
-      } catch (fetchErr) {
-        lastError = fetchErr.message;
+      } catch (genErr) {
+        lastError = genErr.message || String(genErr);
+        lastStatus = genErr.status || (lastError.includes('429') ? 429 : 503);
+        console.warn(`[Gemini API] Error con modelo ${currentModel}: ${lastError}. Probando siguiente modelo...`);
       }
     }
 
