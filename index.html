@@ -408,6 +408,22 @@
 
     <div class="w-full h-full flex flex-col overflow-hidden relative">
         
+        <!-- App Startup Loader -->
+        <div id="app-startup-loader" class="fixed inset-0 z-[90] bg-slate-900 dark:bg-[#090d16] flex flex-col items-center justify-center p-4 transition-opacity duration-300">
+            <div class="flex flex-col items-center gap-4 text-center max-w-xs">
+                <div class="w-16 h-16 rounded-2xl bg-blue-600/10 dark:bg-sky-500/10 border border-blue-500/20 dark:border-sky-400/20 flex items-center justify-center text-blue-500 dark:text-sky-400 shadow-xl">
+                    <svg class="w-8 h-8 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base sm:text-lg font-black text-white tracking-tight">Fundamentos de Prompting</h3>
+                    <p class="text-xs text-slate-400 mt-1">Cargando simulador...</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Pull-To-Refresh Indicator for Mobile -->
         <div id="pull-to-refresh-indicator" class="pointer-events-none fixed top-14 left-0 right-0 z-40 flex items-center justify-center transition-opacity duration-150 opacity-0" style="transform: translateY(-4rem);" aria-hidden="true">
             <div id="pull-refresh-bubble" class="flex items-center gap-2.5 px-4 py-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md rounded-full shadow-lg border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 text-xs font-semibold transition-colors duration-150">
@@ -1193,45 +1209,53 @@
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">C</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Contexto:</strong> Aporta datos reales y antecedentes para evitar que la IA invente información.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">C</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Contexto:</strong> Aporta datos reales y antecedentes para evitar que la IA invente información.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">O</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Objetivo:</strong> Define el propósito de fondo y a quién va dirigida la respuesta.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">O</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Objetivo:</strong> Define el propósito de fondo y a quién va dirigida la respuesta.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">N</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Nivel/Rol:</strong> Asigna un rol experto para que la IA analice con criterio crítico en vez de darte la razón por complacencia.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">N</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Nivel/Rol:</strong> Asigna un rol experto para que la IA analice con criterio crítico en vez de darte la razón por complacencia.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">T</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Tarea:</strong> Indica la acción concreta y el entregable exacto que necesitas.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">T</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Tarea:</strong> Indica la acción concreta y el entregable exacto que necesitas.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">E</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Especificaciones:</strong> Fija el tono, la extensión y las reglas de formato para evitar textos innecesariamente largos.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">E</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Especificaciones:</strong> Fija el tono, la extensión y las reglas de formato para evitar textos innecesariamente largos.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">X</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">eXclusiones y Ejemplos:</strong> Aclara qué errores o temas evitar y aporta ejemplos para guiar el estilo desde el primer intento.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">X</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">eXclusiones y Ejemplos:</strong> Aclara qué errores o temas evitar y aporta ejemplos para guiar el estilo desde el primer intento.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">T</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Tipo Salida:</strong> Exige un formato limpio y estructurado (tablas, listas, esquemas o viñetas) sin saludos ni rodeos.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">T</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Tipo Salida:</strong> Exige un formato limpio y estructurado (tablas, listas, esquemas o viñetas) sin saludos ni rodeos.</span>
                         </div>
                         <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 mt-0.5">O</span>
-                            <span class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-snug"><strong class="text-slate-900 dark:text-white">Optimización:</strong> Pide a la IA autoverificar su respuesta antes de entregarla, evaluar con criterios objetivos y justificar sus conclusiones.</span>
+                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">O</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Optimización:</strong> Pide a la IA autoverificar su respuesta antes de entregarla, evaluar con criterios objetivos y justificar sus conclusiones.</span>
                         </div>
                     </div>
 
-                    <div class="mt-3.5 p-3.5 sm:p-4 rounded-xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 text-amber-900 dark:text-amber-200 text-xs sm:text-sm leading-relaxed flex items-start gap-3">
-                        <span class="text-base sm:text-lg shrink-0 mt-0.5">🔄</span>
-                        <div>
-                            <strong class="font-bold text-slate-900 dark:text-white block mb-0.5">Principio Esencial: El Humano en el Bucle (Human-in-the-Loop)</strong>
-                            <p class="text-slate-700 dark:text-slate-300">
-                                La IA rara vez proporciona una respuesta perfecta al primer intento. El dominio del prompting no busca una perfección mágica e inmediata, sino una base sólida para iterar, contrastar y refinar. Evita asumir que la IA entrega todo resuelto de forma perfecta: <strong>audita, verifica y valida siempre</strong> cada resultado con tu propio criterio.
+                    <div class="mt-3.5 p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed space-y-3">
+                        <div class="flex items-start gap-3">
+                            <span class="text-xl sm:text-2xl shrink-0 mt-0.5">🔄</span>
+                            <div>
+                                <strong class="font-bold text-slate-900 dark:text-white block mb-1">Principio Esencial: Human-in-the-Loop y Flexibilidad</strong>
+                                <p class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed">
+                                    La IA rara vez proporciona una respuesta perfecta al primer intento. El dominio del prompting no busca una perfección mágica e inmediata, sino una base sólida para <strong>iterar, contrastar y validar</strong> con tu propio criterio.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-3.5 sm:p-4 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-amber-200 dark:border-amber-800/60 text-slate-700 dark:text-slate-200 flex items-start gap-3">
+                            <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0 text-lg">💡</span>
+                            <p class="text-base sm:text-lg leading-relaxed">
+                                <strong class="text-slate-900 dark:text-white">Uso flexible del método:</strong> No en todas las interacciones se requiere aplicar las 8 variables de forma exhaustiva. Según la complejidad de cada tarea, puedes aplicar solo unas cuantas (ej. Rol + Tarea + Formato). C-O-N-T-E-X-T-O es una herramienta formativa para entrenar buenos hábitos y precisión, adaptable con flexibilidad a cada caso.
                             </p>
                         </div>
                     </div>
@@ -1770,17 +1794,22 @@
                             <!-- Injected by JS: Formatted cleanly by renderOptimizedPromptHTML -->
                         </div>
 
-                        <!-- Nota Final: El Humano en el Bucle (Human-in-the-Loop) -->
+                        <!-- Nota Final: El Humano en el Bucle y Flexibilidad -->
                         <div class="mt-4 p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 space-y-3">
                             <div class="flex items-center gap-2.5">
                                 <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-sm shrink-0">🔄</span>
-                                <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">El Humano en el Bucle (Human-in-the-Loop)</h3>
+                                <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Human-in-the-Loop y Flexibilidad Práctica</h3>
                             </div>
                             <p class="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
-                                La IA no ofrece respuestas perfectas al primer intento. El prompting profesional busca crear una base sólida para que la persona pueda <strong>iterar, refinar y corregir</strong>.
+                                La IA no ofrece respuestas perfectas al primer intento. El prompting profesional busca crear una base sólida para que la persona pueda <strong>iterar, refinar y validar</strong> con criterio crítico.
                             </p>
-                            <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
-                                <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Aunque los modelos actuales cuenten con razonamiento paso a paso ('Thinking'), dar instrucciones explícitas de <strong>autoverificación y optimización</strong> reduce alucinaciones y eleva la calidad, pero la <strong>supervisión y validación humana</strong> siempre es indispensable.
+                            <div class="space-y-2">
+                                <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                                    <strong class="text-slate-900 dark:text-white font-semibold">Flexibilidad del método:</strong> No en todas las interacciones con IA se debe aplicar el método exhaustivo con las 8 variables. Según la complejidad y el objetivo concreto, puedes modular y elegir únicamente las variables pertinentes (ej. Rol + Tarea + Formato). C-O-N-T-E-X-T-O es un marco formativo para crear buenos hábitos y rigor, no una imposición rígida.
+                                </div>
+                                <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border-l-4 border-indigo-500 shadow-xs text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
+                                    <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Dar instrucciones explícitas de formato y optimización reduce alucinaciones y eleva la calidad, pero la <strong>supervisión y validación humana</strong> sigue siendo insustituible.
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -3948,6 +3977,17 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             });
         }
 
+        function hideAppStartupLoader() {
+            const loader = document.getElementById('app-startup-loader');
+            if (!loader || loader.classList.contains('hidden')) return;
+            loader.classList.add('opacity-0');
+            loader.classList.add('pointer-events-none');
+            setTimeout(() => {
+                loader.classList.add('hidden');
+            }, 300);
+        }
+        window.hideAppStartupLoader = hideAppStartupLoader;
+
         let isProgressInitialized = false;
         function initSimulationProgress() {
             if (isProgressInitialized) return;
@@ -3991,6 +4031,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         onboarding.classList.add('opacity-0');
                     }
                     openWelcomeModal();
+                    setTimeout(hideAppStartupLoader, 200);
                 } else {
                     // Simulación previa detectada: cargar directo
                     const welcome = document.getElementById('welcome-modal');
@@ -4004,10 +4045,12 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         onboarding.classList.add('opacity-0');
                     }
                     loadLevelEnvironment();
+                    setTimeout(hideAppStartupLoader, 200);
                     return true;
                 }
             } catch (e) {
                 console.warn('No se pudo restaurar el progreso desde caché local:', e);
+                setTimeout(hideAppStartupLoader, 200);
             }
             return false;
         }
@@ -4457,8 +4500,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
                 if (window.innerWidth < 768) {
                     setTimeout(() => {
-                        aiMsg.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 60);
+                        evalCallout.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    }, 80);
                 } else {
                     chatCanvas.scrollTop = chatCanvas.scrollHeight;
                 }
@@ -4885,7 +4928,8 @@ Devuelve tu análisis estrictamente en este formato Markdown:
         }
 
         function restartSimulation() {
-            ['welcome-modal', 'onboarding-modal', 'mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal', 'missions-navigator-modal', 'auth-modal', 'reset-progress-modal'].forEach(id => {
+            closeCompletionModal();
+            ['welcome-modal', 'mission-modal', 'feedback-modal', 'completion-modal', 'lab-intro-modal', 'lab-modal', 'level-summary-modal', 'missions-navigator-modal', 'auth-modal', 'reset-progress-modal'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.classList.add('opacity-0');
@@ -4893,11 +4937,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 }
             });
 
-            clearSimulationProgress();
             currentLevelIdx = 0;
             selectedOption = null;
             isReviewingMission = false;
-            hasStartedSimulation = false;
             levelAttempts = 0;
             chosenIncorrectOptions = [];
 
@@ -4917,7 +4959,11 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 optsSection.classList.remove('flex');
             }
 
-            openWelcomeModal();
+            saveSimulationProgress(true);
+
+            setTimeout(() => {
+                openOnboarding();
+            }, 180);
         }
 
         function getShareUrl() {
@@ -6081,6 +6127,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             initSimulationProgress();
             if (window.initFirebaseClient) window.initFirebaseClient();
             initPullToRefresh();
+            setTimeout(() => {
+                if (typeof hideAppStartupLoader === 'function') hideAppStartupLoader();
+            }, 800);
         });
         if (document.readyState === 'complete' || document.readyState === 'interactive') {
             updateThemeUI();
@@ -6088,6 +6137,9 @@ Devuelve tu análisis estrictamente en este formato Markdown:
             initSimulationProgress();
             if (window.initFirebaseClient) window.initFirebaseClient();
             initPullToRefresh();
+            setTimeout(() => {
+                if (typeof hideAppStartupLoader === 'function') hideAppStartupLoader();
+            }, 800);
         }
     </script>
 
@@ -6585,7 +6637,49 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 await signOut(firebaseAuth);
                 currentUser = null;
                 window.currentUser = null;
-                clearSimulationProgress();
+
+                // 1. Purgar todas las cookies del navegador
+                try {
+                    const cookies = document.cookie.split(";");
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i];
+                        const eqPos = cookie.indexOf("=");
+                        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+                        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=" + window.location.hostname;
+                    }
+                } catch (e) {
+                    console.warn('Error purgando cookies:', e);
+                }
+
+                // 2. Purgar almacenamiento local y de sesión
+                try {
+                    const keysToRemove = [
+                        'simulador_has_started', 'simulador_current_level_idx',
+                        'simulador_highest_level', 'simulador_completed',
+                        'simulador_completed_levels', 'simulador_last_sync',
+                        'simulador_auth_uid'
+                    ];
+                    keysToRemove.forEach(k => localStorage.removeItem(k));
+                    sessionStorage.clear();
+                } catch (e) {
+                    console.warn('Error purgando almacenamiento local:', e);
+                }
+
+                // 3. Resetear variables de progreso en memoria
+                currentLevelIdx = 0;
+                highestUnlockedLevel = 0;
+                simulationCompleted = false;
+                completedLevels = [];
+                hasStartedSimulation = false;
+                selectedOption = null;
+                isReviewingMission = false;
+                levelAttempts = 0;
+                chosenIncorrectOptions = [];
+
+                if (typeof clearSimulationProgress === 'function') {
+                    clearSimulationProgress();
+                }
                 if (typeof window.setSimulationState === 'function') {
                     window.setSimulationState({
                         highestUnlockedLevel: 0,
@@ -6597,15 +6691,28 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                         isReviewingMission: false
                     });
                 }
-                localStorage.removeItem('simulador_auth_uid');
-                window.updateAuthUI(null);
+
+                // 4. Actualizar estado de UI
+                if (typeof window.updateAuthUI === 'function') {
+                    window.updateAuthUI(null);
+                }
                 if (typeof renderNavigatorLevels === 'function') {
                     renderNavigatorLevels();
                 }
                 const chatCanvas = document.getElementById('chat-canvas');
                 if (chatCanvas) chatCanvas.innerHTML = '';
-                closeAuthModal();
+
+                // 5. Cerrar todos los modales abiertos y abrir la Pantalla de Bienvenida limpia
+                ['auth-modal', 'onboarding-modal', 'missions-navigator-modal', 'mission-modal', 'feedback-modal', 'incorrect-options-modal', 'completion-modal', 'level-summary-modal', 'reset-progress-modal'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.classList.add('hidden');
+                        el.classList.add('opacity-0');
+                    }
+                });
+
                 openWelcomeModal();
+                showGlobalToast('✓ Has cerrado sesión. Se limpiaron los datos locales.');
             } catch (err) {
                 console.warn('Error cerrando sesión:', err);
             }
