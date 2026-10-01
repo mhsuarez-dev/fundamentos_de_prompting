@@ -60,16 +60,15 @@ export default async function handler(req, res) {
             geminiPayload.generationConfig.maxOutputTokens = 2048;
         }
 
-        // Modelos candidatos Lite en orden estricto
-        const liteFallbackModels = [
+        // Modelos candidatos gratuitos garantizados (Flash y Flash-Lite)
+        const freeTierModels = [
             'gemini-flash-lite-latest',
-            'gemini-2.5-flash-lite',
             'gemini-3.1-flash-lite',
-            'gemini-3.5-flash-lite',
-            'gemini-3.1-flash-lite-preview'
+            'gemini-flash-latest',
+            'gemini-3.8-flash'
         ];
         const candidateModels = [requestedModel];
-        for (const m of liteFallbackModels) {
+        for (const m of freeTierModels) {
             if (!candidateModels.includes(m)) {
                 candidateModels.push(m);
             }
@@ -99,11 +98,18 @@ export default async function handler(req, res) {
             const rawMsg = data?.error?.message || data?.error || '';
             const msgLower = (typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg)).toLowerCase();
             const isQuota = apiResponse.status === 429 || msgLower.includes('quota') || msgLower.includes('resource_exhausted');
+            const isInvalidKey = apiResponse.status === 400 || msgLower.includes('api key not valid') || msgLower.includes('api_key_invalid');
             
-            data.errorType = isQuota ? 'quota_exceeded' : 'overloaded';
-            data.friendlyMessage = isQuota
-                ? 'Se alcanzó el límite de uso del servicio gratuito. Puedes reintentar, esperar unos minutos para que se restablezca la cuota, o conectar tu propia API Key de Google AI Studio para continuar de inmediato.'
-                : 'El servicio de IA está saturado en este momento. Por favor, pulsa el botón para reintentar.';
+            if (isQuota) {
+                data.errorType = 'quota_exceeded';
+                data.friendlyMessage = 'Se alcanzó el límite de uso de la cuota gratuita. Puedes esperar unos minutos a que se restablezca o conectar tu propia API Key de Google AI Studio.';
+            } else if (isInvalidKey) {
+                data.errorType = 'invalid_key';
+                data.friendlyMessage = 'La API Key configurada no es válida o está deshabilitada. Por favor verifica tu clave en la configuración de secretos.';
+            } else {
+                data.errorType = 'overloaded';
+                data.friendlyMessage = 'El servicio de IA está saturado en este momento. Por favor, pulsa el botón para reintentar.';
+            }
         }
 
         if (res && typeof res.status === 'function') {

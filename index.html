@@ -2564,12 +2564,31 @@
                 return {
                     type: 'quota_exceeded',
                     title: 'Límite de cuota alcanzado',
-                    description: 'Se alcanzó el límite de cuota del servicio gratuito. Puedes reintentar ahora, esperar unos minutos para que se restablezca, o conectar tu propia API Key de Google AI Studio para continuar.',
+                    description: 'Se alcanzó el límite de uso del servicio gratuito. Puedes reintentar, esperar unos minutos a que se restablezca la cuota, o conectar tu propia API Key de Google AI Studio.',
                     btnText: 'Reintentar ahora'
                 };
             }
 
-            // 2. High Demand / Temporary Saturation (Default for all other issues on free tier)
+            // 2. Invalid Key / Missing Key (400 / 401)
+            if (
+                backendErrorType === 'invalid_key' ||
+                backendErrorType === 'missing_key' ||
+                status === 400 ||
+                status === 401 ||
+                msg.includes('api key not valid') ||
+                msg.includes('api_key_invalid') ||
+                msg.includes('no es válida') ||
+                msg.includes('falta configurar')
+            ) {
+                return {
+                    type: 'invalid_key',
+                    title: 'API Key no válida o ausente',
+                    description: 'La clave configurada no es válida o está deshabilitada en Google AI Studio. Verifica tus secretos o conecta tu propia clave.',
+                    btnText: 'Reintentar ahora'
+                };
+            }
+
+            // 3. High Demand / Temporary Saturation (Default for all other issues on free tier)
             return {
                 type: 'overloaded',
                 title: 'Servicio saturado temporalmente',
@@ -2580,24 +2599,25 @@
 
         function renderLabErrorCard(errorInfo, retryFunctionStr) {
             const isQuota = errorInfo.type === 'quota_exceeded';
+            const isInvalidKey = errorInfo.type === 'invalid_key';
 
-            const cardBorder = isQuota 
+            const cardBorder = (isQuota || isInvalidKey)
                 ? 'border-amber-300 dark:border-amber-700/60 bg-amber-50/70 dark:bg-amber-950/30' 
                 : 'border-blue-200 dark:border-sky-800/80 bg-blue-50/60 dark:bg-sky-950/30';
 
-            const iconBg = isQuota 
+            const iconBg = (isQuota || isInvalidKey)
                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/60 dark:text-amber-200 border-amber-300 dark:border-amber-700/60' 
                 : 'bg-blue-100 text-blue-700 dark:bg-sky-950 dark:text-sky-300 border-blue-200 dark:border-sky-800';
 
-            const titleColor = isQuota 
+            const titleColor = (isQuota || isInvalidKey)
                 ? 'text-amber-950 dark:text-amber-100' 
                 : 'text-slate-900 dark:text-white';
 
-            const textColor = isQuota 
+            const textColor = (isQuota || isInvalidKey)
                 ? 'text-amber-900/90 dark:text-amber-200/90' 
                 : 'text-slate-700 dark:text-slate-200';
 
-            const dividerBorder = isQuota 
+            const dividerBorder = (isQuota || isInvalidKey)
                 ? 'border-amber-200/80 dark:border-amber-800/50' 
                 : 'border-blue-200/80 dark:border-sky-800/50';
 
@@ -2609,7 +2629,7 @@
                 <div class="p-4 sm:p-5 rounded-2xl border ${cardBorder} flex flex-col gap-3.5 font-sans fade-in shadow-xs">
                     <div class="flex items-start gap-3">
                         <div class="w-10 h-10 rounded-xl border ${iconBg} flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
-                            ${isQuota ? `
+                            ${(isQuota || isInvalidKey) ? `
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                             ` : `
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -2631,7 +2651,7 @@
                             <span>${actionLabel}</span>
                         </button>
 
-                        ${isQuota ? `
+                        ${(isQuota || isInvalidKey) ? `
                             <button onclick="focusApiKeyInput()" type="button" class="text-xs sm:text-sm text-amber-700 dark:text-amber-300 hover:text-amber-800 dark:hover:text-amber-200 font-semibold flex items-center gap-1.5 underline transition-colors cursor-pointer">
                                 <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                 <span>Conectar mi propia API Key gratuita</span>
@@ -2690,14 +2710,13 @@
                 throw customErr;
 
             } catch (backendErr) {
-                // Si el usuario configuró una clave manual y el backend falló, intentar fallback directo con modelos lite
+                // Si el usuario configuró una clave manual y el backend falló, intentar fallback directo con modelos gratuitos
                 if (customKey) {
                     const directCandidates = [
                         'gemini-flash-lite-latest',
-                        'gemini-2.5-flash-lite',
                         'gemini-3.1-flash-lite',
-                        'gemini-3.5-flash-lite',
-                        'gemini-3.1-flash-lite-preview'
+                        'gemini-flash-latest',
+                        'gemini-3.8-flash'
                     ];
                     for (const dm of directCandidates) {
                         try {

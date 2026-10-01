@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
@@ -12,16 +13,43 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
+// Helper to dynamically resolve the best API key available
+function resolveApiKey(customKey) {
+  if (typeof customKey === 'string' && customKey.trim().length > 10 && customKey.trim() !== 'MY_GEMINI_API_KEY') {
+    return customKey.trim();
+  }
+
+  // Check dynamically in .dev.env.json (updated by AI Studio UI when secrets are modified)
+  try {
+    const devEnvPaths = [
+      path.join(__dirname, '../.dev.env.json'),
+      path.join(__dirname, '.dev.env.json'),
+      '/app/.dev.env.json'
+    ];
+    for (const p of devEnvPaths) {
+      if (fs.existsSync(p)) {
+        const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
+        const secret = parsed.GEMINI_API_KEY || parsed.API_KEY;
+        if (typeof secret === 'string' && secret.trim().length > 10 && secret.trim() !== 'MY_GEMINI_API_KEY') {
+          return secret.trim();
+        }
+      }
+    }
+  } catch (err) {}
+
+  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 10 && process.env.GEMINI_API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
+    return process.env.GEMINI_API_KEY.trim();
+  }
+  if (process.env.API_KEY && process.env.API_KEY.trim().length > 10 && process.env.API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
+    return process.env.API_KEY.trim();
+  }
+
+  return undefined;
+}
+
 // Helper to get GoogleGenAI client with proper API key
 function getGeminiClient(customKey) {
-  let key = undefined;
-  if (typeof customKey === 'string' && customKey.trim().length > 10) {
-    key = customKey.trim();
-  } else if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 5) {
-    key = process.env.GEMINI_API_KEY.trim();
-  } else if (process.env.API_KEY && process.env.API_KEY.trim().length > 5) {
-    key = process.env.API_KEY.trim();
-  }
+  const key = resolveApiKey(customKey);
 
   console.log('Gemini client key available:', key ? `${key.slice(0, 8)}... (len ${key.length})` : 'none');
 
@@ -36,7 +64,7 @@ function getGeminiClient(customKey) {
     options.apiKey = key;
   }
 
-  return new GoogleGenAI(options);
+  return { ai: new GoogleGenAI(options), hasKey: Boolean(key) };
 }
 
 // Serve the main HTML file at root, mapping to the user's HTML entry point
@@ -65,21 +93,30 @@ async function handleGeminiRequest(req, res) {
     }
 
     const customKey = (req.headers && (req.headers['x-goog-api-key'] || req.headers['x-api-key'])) || bodyKey;
-    const ai = getGeminiClient(customKey);
+    const { ai, hasKey } = getGeminiClient(customKey);
+
+    if (!hasKey) {
+      return res.status(401).json({
+        error: 'No se encontró una API Key configurada. Por favor, asegúrate de ingresar una API Key en la configuración de secretos o en el campo del Laboratorio.',
+        errorType: 'missing_key',
+        status: 401
+      });
+    }
 
     console.log(`[handleGeminiRequest] Received request for model: ${model}, customKey: ${Boolean(customKey)}`);
 
-    // Lista estricta de modelos Lite solicitados
-    const requestedModel = model || 'gemini-flash-lite-latest';
-    const liteFallbackModels = [
+    // Modelos con cuota gratuita garantizada (Flash y Flash-Lite)
+    // Se priorizan modelos ligeros de bajo consumo sin costo
+    const freeTierModels = [
       'gemini-flash-lite-latest',
-      'gemini-2.5-flash-lite',
       'gemini-3.1-flash-lite',
-      'gemini-3.5-flash-lite',
-      'gemini-3.1-flash-lite-preview'
+      'gemini-flash-latest',
+      'gemini-3.8-flash'
     ];
+
+    const requestedModel = model && freeTierModels.includes(model) ? model : 'gemini-flash-lite-latest';
     const candidateModels = [requestedModel];
-    for (const m of liteFallbackModels) {
+    for (const m of freeTierModels) {
       if (!candidateModels.includes(m)) {
         candidateModels.push(m);
       }
@@ -129,12 +166,12 @@ async function handleGeminiRequest(req, res) {
             }],
             usedModel: currentModel
           };
-          console.log(`[Gemini API] Solicitud exitosa con modelo: ${currentModel}`);
+          console.log(`[Gemini API] Solicitud exitosa con modelo con cuota gratuita: ${currentModel}`);
           break;
         }
       } catch (genErr) {
         lastError = genErr.message || String(genErr);
-        lastStatus = genErr.status || (lastError.includes('429') ? 429 : 503);
+        lastStatus = genErr.status || (lastError.includes('429') ? 429 : (lastError.includes('400') ? 400 : 503));
         console.warn(`[Gemini API] Error con modelo ${currentModel}: ${lastError}. Probando siguiente modelo...`);
       }
     }
@@ -142,12 +179,21 @@ async function handleGeminiRequest(req, res) {
     if (!responseData) {
       const msgLower = String(lastError || '').toLowerCase();
       const isQuota = lastStatus === 429 || msgLower.includes('429') || msgLower.includes('quota') || msgLower.includes('resource_exhausted');
+      const isInvalidKey = lastStatus === 400 || msgLower.includes('api key not valid') || msgLower.includes('api_key_invalid') || msgLower.includes('invalid_argument');
       
-      const statusCode = isQuota ? 429 : 503;
-      const errorType = isQuota ? 'quota_exceeded' : 'overloaded';
-      const friendlyMessage = isQuota 
-        ? 'Se alcanzó el límite de uso del servicio gratuito. Puedes reintentar, esperar unos minutos para que se restablezca la cuota, o conectar tu propia API Key de Google AI Studio para continuar de inmediato.'
-        : 'El servicio de IA está saturado en este momento. Por favor, pulsa el botón para reintentar.';
+      let statusCode = 503;
+      let errorType = 'overloaded';
+      let friendlyMessage = 'El servicio de IA está saturado en este momento. Por favor, pulsa el botón para reintentar.';
+
+      if (isQuota) {
+        statusCode = 429;
+        errorType = 'quota_exceeded';
+        friendlyMessage = 'Se alcanzó el límite de uso de la cuota gratuita. Puedes esperar unos minutos a que se restablezca o conectar tu propia API Key de Google AI Studio.';
+      } else if (isInvalidKey) {
+        statusCode = 400;
+        errorType = 'invalid_key';
+        friendlyMessage = 'La API Key configurada no es válida o está deshabilitada en Google AI Studio. Por favor, verifica tu clave en la configuración de secretos.';
+      }
 
       return res.status(statusCode).json({
         error: friendlyMessage,
