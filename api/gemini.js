@@ -1,24 +1,38 @@
 import fs from 'fs';
+import path from 'path';
 
 function getServerSecret() {
+    const envKeys = [
+        'GEMINI_API_KEY',
+        'GOOGLE_API_KEY',
+        'GOOGLE_GENAI_API_KEY',
+        'API_KEY',
+        'GEMINI_KEY',
+        'GENAI_API_KEY'
+    ];
+
+    for (const k of envKeys) {
+        const val = process.env[k];
+        if (typeof val === 'string' && val.trim().length > 10 && val.trim() !== 'MY_GEMINI_API_KEY') {
+            return val.trim();
+        }
+    }
+
     try {
-        const paths = ['/app/.dev.env.json', './.dev.env.json', '../.dev.env.json'];
+        const paths = ['/app/.dev.env.json', './.dev.env.json', '../.dev.env.json', './.env.json'];
         for (const p of paths) {
             if (fs.existsSync(p)) {
                 const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
-                const secret = parsed.GEMINI_API_KEY || parsed.API_KEY;
-                if (typeof secret === 'string' && secret.trim().length > 10 && secret.trim() !== 'MY_GEMINI_API_KEY') {
-                    return secret.trim();
+                for (const k of envKeys) {
+                    const secret = parsed[k];
+                    if (typeof secret === 'string' && secret.trim().length > 10 && secret.trim() !== 'MY_GEMINI_API_KEY') {
+                        return secret.trim();
+                    }
                 }
             }
         }
     } catch(e) {}
-    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 10 && process.env.GEMINI_API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
-        return process.env.GEMINI_API_KEY.trim();
-    }
-    if (process.env.API_KEY && process.env.API_KEY.trim().length > 10 && process.env.API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
-        return process.env.API_KEY.trim();
-    }
+
     return undefined;
 }
 
@@ -134,14 +148,14 @@ export default async function handler(req, res) {
             const rawMsg = data?.error?.message || data?.error || '';
             const msgLower = (typeof rawMsg === 'string' ? rawMsg : JSON.stringify(rawMsg)).toLowerCase();
             const isQuota = apiResponse.status === 429 || msgLower.includes('quota') || msgLower.includes('resource_exhausted');
-            const isInvalidKey = apiResponse.status === 400 || msgLower.includes('api key not valid') || msgLower.includes('api_key_invalid');
+            const isInvalidKey = apiResponse.status === 401 || apiResponse.status === 403 || msgLower.includes('api key not valid') || msgLower.includes('api_key_invalid') || msgLower.includes('api key not found') || msgLower.includes('invalid api key');
             
             if (isQuota) {
                 data.errorType = 'quota_exceeded';
                 data.friendlyMessage = 'Se alcanzó el límite de uso de la cuota gratuita. Puedes esperar unos minutos a que se restablezca o conectar tu propia API Key de Google AI Studio.';
             } else if (isInvalidKey) {
                 data.errorType = 'invalid_key';
-                data.friendlyMessage = 'La API Key configurada no es válida o está deshabilitada. Por favor verifica tu clave en la configuración de secretos.';
+                data.friendlyMessage = 'La API Key configurada no es válida o está deshabilitada en Google AI Studio. Por favor verifica tu clave en la configuración de secretos.';
             } else {
                 data.errorType = 'overloaded';
                 data.friendlyMessage = 'El servicio de IA está saturado en este momento. Por favor, pulsa el botón para reintentar.';

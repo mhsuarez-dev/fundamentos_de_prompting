@@ -13,47 +13,56 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
-// Helper to dynamically resolve server secret from .dev.env.json or process.env
+// Helper to dynamically resolve server secret from environment variables or .dev.env.json
 function getServerSecret() {
+  const envKeys = [
+    'GEMINI_API_KEY',
+    'GOOGLE_API_KEY',
+    'GOOGLE_GENAI_API_KEY',
+    'API_KEY',
+    'GEMINI_KEY',
+    'GENAI_API_KEY'
+  ];
+
+  for (const k of envKeys) {
+    const val = process.env[k];
+    if (typeof val === 'string' && val.trim().length > 10 && val.trim() !== 'MY_GEMINI_API_KEY') {
+      return val.trim();
+    }
+  }
+
   try {
     const devEnvPaths = [
       path.join(__dirname, '../.dev.env.json'),
       path.join(__dirname, '.dev.env.json'),
-      '/app/.dev.env.json'
+      '/app/.dev.env.json',
+      path.join(__dirname, '.env.json')
     ];
     for (const p of devEnvPaths) {
       if (fs.existsSync(p)) {
         const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
-        const secret = parsed.GEMINI_API_KEY || parsed.API_KEY;
-        if (typeof secret === 'string' && secret.trim().length > 10 && secret.trim() !== 'MY_GEMINI_API_KEY') {
-          return secret.trim();
+        for (const k of envKeys) {
+          const secret = parsed[k];
+          if (typeof secret === 'string' && secret.trim().length > 10 && secret.trim() !== 'MY_GEMINI_API_KEY') {
+            return secret.trim();
+          }
         }
       }
     }
   } catch (err) {}
 
-  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 10 && process.env.GEMINI_API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
-    return process.env.GEMINI_API_KEY.trim();
-  }
-  if (process.env.API_KEY && process.env.API_KEY.trim().length > 10 && process.env.API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
-    return process.env.API_KEY.trim();
-  }
-
   return undefined;
 }
 
-// Helper to get candidate keys (server secret first, then custom key as fallback)
+// Helper to get candidate keys (prioritizes customKey if provided, then serverKey)
 function getCandidateKeys(customKey) {
   const keys = [];
-  const serverKey = getServerSecret();
-  if (serverKey) {
-    keys.push(serverKey);
-  }
   if (typeof customKey === 'string' && customKey.trim().length > 10 && customKey.trim() !== 'MY_GEMINI_API_KEY') {
-    const trimmed = customKey.trim();
-    if (!keys.includes(trimmed)) {
-      keys.push(trimmed);
-    }
+    keys.push(customKey.trim());
+  }
+  const serverKey = getServerSecret();
+  if (serverKey && !keys.includes(serverKey)) {
+    keys.push(serverKey);
   }
   return keys;
 }
@@ -191,7 +200,8 @@ async function handleGeminiRequest(req, res) {
     if (!responseData) {
       const msgLower = String(lastError || '').toLowerCase();
       const isQuota = lastStatus === 429 || msgLower.includes('429') || msgLower.includes('quota') || msgLower.includes('resource_exhausted');
-      const isInvalidKey = lastStatus === 400 || msgLower.includes('api key not valid') || msgLower.includes('api_key_invalid') || msgLower.includes('invalid_argument');
+      // Only classify as invalidKey if the error message explicitly points to an API key problem
+      const isInvalidKey = lastStatus === 401 || lastStatus === 403 || msgLower.includes('api key not valid') || msgLower.includes('api_key_invalid') || msgLower.includes('api key not found') || msgLower.includes('invalid api key');
       
       let statusCode = 503;
       let errorType = 'overloaded';
@@ -234,7 +244,24 @@ app.post('/api/gemini.js', handleGeminiRequest);
 // Serve other static files in the directory
 app.use(express.static(__dirname));
 
-const PORT = 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server listening on http://0.0.0.0:${PORT}`);
+// Primary development port is 3000 as required by AI Studio runtime
+const PRIMARY_PORT = 3000;
+app.listen(PRIMARY_PORT, '0.0.0.0', () => {
+  console.log(`Server listening on http://0.0.0.0:${PRIMARY_PORT}`);
 });
+
+// Also bind to process.env.PORT (e.g. 8080) for Cloud Run production environments
+if (process.env.PORT && String(process.env.PORT) !== String(PRIMARY_PORT)) {
+  const secondaryPort = parseInt(process.env.PORT, 10);
+  if (!isNaN(secondaryPort)) {
+    try {
+      const s2 = app.listen(secondaryPort, '0.0.0.0', () => {
+        console.log(`Server also listening on port ${secondaryPort}`);
+      });
+      s2.on('error', (err) => {
+        // Port may be already bound by NGINX reverse-proxy in dev environment
+        console.log(`Note: port ${secondaryPort} is managed by ingress (${err.code || err.message})`);
+      });
+    } catch(e) {}
+  }
+}
