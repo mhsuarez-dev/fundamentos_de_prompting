@@ -1,10 +1,34 @@
+import fs from 'fs';
+
+function getServerSecret() {
+    try {
+        const paths = ['/app/.dev.env.json', './.dev.env.json', '../.dev.env.json'];
+        for (const p of paths) {
+            if (fs.existsSync(p)) {
+                const parsed = JSON.parse(fs.readFileSync(p, 'utf8'));
+                const secret = parsed.GEMINI_API_KEY || parsed.API_KEY;
+                if (typeof secret === 'string' && secret.trim().length > 10 && secret.trim() !== 'MY_GEMINI_API_KEY') {
+                    return secret.trim();
+                }
+            }
+        }
+    } catch(e) {}
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 10 && process.env.GEMINI_API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
+        return process.env.GEMINI_API_KEY.trim();
+    }
+    if (process.env.API_KEY && process.env.API_KEY.trim().length > 10 && process.env.API_KEY.trim() !== 'MY_GEMINI_API_KEY') {
+        return process.env.API_KEY.trim();
+    }
+    return undefined;
+}
+
 export default async function handler(req, res) {
     // 1. Manejo de preflight CORS (OPTIONS)
     if (req.method === 'OPTIONS') {
         if (res && typeof res.status === 'function') {
             res.setHeader('Access-Control-Allow-Origin', '*');
             res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-            res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+            res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-goog-api-key, x-api-key');
             return res.status(200).end();
         }
         return new Response(null, {
@@ -12,21 +36,31 @@ export default async function handler(req, res) {
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type, x-goog-api-key, x-api-key',
             }
         });
     }
 
     const clientKey = (req.headers && (req.headers['x-goog-api-key'] || req.headers['x-api-key'])) || undefined;
-    const apiKey = clientKey || process.env.GEMINI_API_KEY || process.env.API_KEY;
-    if (!apiKey) {
+    const serverKey = getServerSecret();
+    const candidateKeys = [];
+    if (clientKey && typeof clientKey === 'string' && clientKey.trim().length > 10 && clientKey.trim() !== 'MY_GEMINI_API_KEY') {
+        candidateKeys.push(clientKey.trim());
+    }
+    if (serverKey && !candidateKeys.includes(serverKey)) {
+        candidateKeys.push(serverKey);
+    }
+
+    if (candidateKeys.length === 0) {
         const errorPayload = { 
-            error: 'Falta configurar la variable GEMINI_API_KEY en Vercel o falta hacer Redeploy.' 
+            error: 'No se encontró una API Key configurada. Por favor, asegúrate de ingresar una API Key en la configuración de secretos o en el campo del Laboratorio.',
+            errorType: 'missing_key',
+            status: 401
         };
         if (res && typeof res.status === 'function') {
-            return res.status(500).json(errorPayload);
+            return res.status(401).json(errorPayload);
         }
-        return Response.json(errorPayload, { status: 500 });
+        return Response.json(errorPayload, { status: 401 });
     }
 
     if (req.method !== 'POST') {
@@ -77,20 +111,22 @@ export default async function handler(req, res) {
         let apiResponse = null;
         let data = null;
 
-        for (const currentModel of candidateModels) {
-            try {
-                const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
-                apiResponse = await fetch(googleUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(geminiPayload)
-                });
-                data = await apiResponse.json();
-                if (apiResponse.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    break;
+        keyLoop: for (const keyToUse of candidateKeys) {
+            for (const currentModel of candidateModels) {
+                try {
+                    const googleUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${keyToUse}`;
+                    apiResponse = await fetch(googleUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(geminiPayload)
+                    });
+                    data = await apiResponse.json();
+                    if (apiResponse.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        break keyLoop;
+                    }
+                } catch (fetchErr) {
+                    console.warn(`Fetch error with model ${currentModel}:`, fetchErr.message);
                 }
-            } catch (fetchErr) {
-                console.warn(`Fetch error with model ${currentModel}:`, fetchErr.message);
             }
         }
 

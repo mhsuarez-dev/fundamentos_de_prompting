@@ -87,6 +87,23 @@
         }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
+        /* Calibración proporcional para pantallas medianas y laptops de escritorio (14") */
+        @media (min-width: 768px) {
+            html {
+                font-size: 15px; /* Ajustado +0.5 puntos para óptima legibilidad */
+            }
+        }
+        @media (min-width: 768px) and (max-height: 860px) {
+            html {
+                font-size: 14.5px; /* Ajustado +0.5 puntos para laptops de 14" */
+            }
+        }
+        @media (min-width: 1536px) and (min-height: 861px) {
+            html {
+                font-size: 15.5px; /* Ajustado +0.5 puntos para pantallas grandes */
+            }
+        }
+
         /* Scrollbars */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -436,92 +453,92 @@
         
         <!-- Pantalla de Bienvenida Inicial (Welcome Screen) -->
         <div id="welcome-modal" class="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-4 md:p-6 bg-slate-900/70 dark:bg-black/85 backdrop-blur-md transition-opacity duration-300 flex items-center justify-center hidden opacity-0">
-            <div id="welcome-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg sm:max-w-xl w-full p-5 sm:p-6 md:p-7 shadow-2xl relative my-auto max-h-[92dvh] flex flex-col text-left overflow-y-auto">
+            <div id="welcome-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg sm:max-w-xl w-full p-4 sm:p-5 md:p-6 shadow-2xl relative my-auto max-h-[92dvh] flex flex-col text-left overflow-y-auto">
                 
                 <!-- Badge superior -->
                 <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800/60 shadow-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider bg-blue-50 dark:bg-sky-950/80 text-blue-700 dark:text-sky-300 border border-blue-200 dark:border-sky-800/60 shadow-xs">
                         <span>⚡</span>
                         <span>Metodología C-O-N-T-E-X-T-O</span>
                     </span>
                 </div>
 
                 <!-- Título y Breve Explicación -->
-                <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mt-2.5">
+                <h1 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight mt-2">
                     Simulador Interactivo de Prompts para IA
                 </h1>
                 
-                <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">
+                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
                     Aprende a formular instrucciones de alto impacto con casos prácticos guiados y experimentación con IA en vivo.
                 </p>
 
                 <!-- Grid Armonioso 2x2 de 4 Tarjetas -->
-                <div class="grid grid-cols-2 gap-3 my-4">
-                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
-                        <span class="text-xl sm:text-2xl mb-1.5 block">🎯</span>
+                <div class="grid grid-cols-2 gap-2.5 my-3">
+                    <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-lg sm:text-xl mb-1 block">🎯</span>
                         <div>
-                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">9 Misiones</div>
-                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">Casos reales paso a paso</div>
+                            <div class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">9 Misiones</div>
+                            <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">Casos reales paso a paso</div>
                         </div>
                     </div>
-                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
-                        <span class="text-xl sm:text-2xl mb-1.5 block">🧠</span>
+                    <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-lg sm:text-xl mb-1 block">🧠</span>
                         <div>
-                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Marco CONTEXTO</div>
-                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">8 variables estratégicas</div>
+                            <div class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">Marco CONTEXTO</div>
+                            <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">8 variables estratégicas</div>
                         </div>
                     </div>
-                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
-                        <span class="text-xl sm:text-2xl mb-1.5 block">🛡</span>
+                    <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-lg sm:text-xl mb-1 block">🛡</span>
                         <div>
-                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Auditoría Técnica</div>
-                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">Análisis de fallos y aciertos</div>
+                            <div class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">Auditoría Técnica</div>
+                            <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">Análisis de fallos y aciertos</div>
                         </div>
                     </div>
-                    <div class="p-3 sm:p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
-                        <span class="text-xl sm:text-2xl mb-1.5 block">🧪</span>
+                    <div class="p-2.5 sm:p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-left flex flex-col justify-between">
+                        <span class="text-lg sm:text-xl mb-1 block">🧪</span>
                         <div>
-                            <div class="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">Laboratorio IA</div>
-                            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 leading-snug">Experimentación en vivo</div>
+                            <div class="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">Laboratorio IA</div>
+                            <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">Experimentación en vivo</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Botón de continuación de progreso previo (si existe guardado) -->
-                <div id="welcome-resume-section" class="hidden mb-3">
-                    <button onclick="continueExistingSimulation()" type="button" class="w-full flex items-center justify-between p-3.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700/80 text-emerald-900 dark:text-emerald-200 transition-all cursor-pointer group shadow-xs text-left">
+                <div id="welcome-resume-section" class="hidden mb-2.5">
+                    <button onclick="continueExistingSimulation()" type="button" class="w-full flex items-center justify-between p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/50 dark:hover:bg-emerald-900/50 border border-emerald-300 dark:border-emerald-700/80 text-emerald-900 dark:text-emerald-200 transition-all cursor-pointer group shadow-xs text-left">
                         <div class="flex items-center gap-2.5">
-                            <span class="text-xl">▶️</span>
+                            <span class="text-lg">▶️</span>
                             <div>
-                                <div class="text-sm font-bold">Continuar donde lo dejé</div>
-                                <div class="text-xs text-emerald-700 dark:text-emerald-300 font-medium" id="welcome-resume-desc">Misión activa</div>
+                                <div class="text-xs sm:text-sm font-bold">Continuar donde lo dejé</div>
+                                <div class="text-[11px] text-emerald-700 dark:text-emerald-300 font-medium" id="welcome-resume-desc">Misión activa</div>
                             </div>
                         </div>
-                        <span class="text-xs sm:text-sm font-mono font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0">Reanudar →</span>
+                        <span class="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-1 transition-transform shrink-0">Reanudar →</span>
                     </button>
                 </div>
 
                 <!-- Acciones Principales -->
-                <div class="space-y-2.5 pt-1">
+                <div class="space-y-2 pt-0.5">
                     <!-- Opción 1: Comenzar sin cuenta (solo visible si no hay avance previo) -->
-                    <button id="welcome-start-zero-btn" onclick="startFromZero()" type="button" class="w-full btn-evaluate font-bold py-3 px-4 rounded-xl text-sm sm:text-base flex items-center justify-between shadow-sm cursor-pointer transition-all active:scale-[0.99] text-left">
+                    <button id="welcome-start-zero-btn" onclick="startFromZero()" type="button" class="w-full btn-evaluate font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm flex items-center justify-between shadow-sm cursor-pointer transition-all active:scale-[0.99] text-left">
                         <div class="flex items-center gap-2.5">
-                            <span class="text-xl">🚀</span>
+                            <span class="text-lg">🚀</span>
                             <div>
                                 <div class="font-bold text-white leading-tight">Comenzar sin cuenta</div>
-                                <div class="text-[11px] text-blue-100 dark:text-sky-200 font-normal">Juega de inmediato sin registrarte</div>
+                                <div class="text-[10px] sm:text-[11px] text-blue-100 dark:text-sky-200 font-normal">Juega de inmediato sin registrarte</div>
                             </div>
                         </div>
-                        <svg class="w-5 h-5 text-white/90 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-4 h-4 text-white/90 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
 
                     <!-- Opción 2: Crear cuenta o Iniciar sesión -->
-                    <button onclick="welcomeLoadAccountProgress()" type="button" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer text-left">
+                    <button onclick="welcomeLoadAccountProgress()" type="button" class="w-full py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs flex items-center justify-between transition-colors cursor-pointer text-left">
                         <div class="flex items-center gap-2.5">
-                            <span class="text-lg">🔑</span>
+                            <span class="text-base">🔑</span>
                             <div>
                                 <div class="font-bold text-slate-900 dark:text-white leading-tight">Crear cuenta o Iniciar sesión</div>
-                                <div class="text-[11px] text-slate-500 dark:text-slate-400 font-normal">Guarda y sincroniza tu avance en la nube</div>
+                                <div class="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Guarda y sincroniza tu avance en la nube</div>
                             </div>
                         </div>
                         <span class="text-xs font-mono font-bold text-blue-600 dark:text-sky-400 shrink-0">Acceder →</span>
@@ -532,7 +549,7 @@
 
         <!-- Onboarding Wizard Modal -->
         <div id="onboarding-modal" class="fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 md:p-6 lg:p-8 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm transition-opacity duration-300 flex items-center justify-center hidden opacity-0">
-            <div id="onboarding-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl lg:max-w-5xl w-full p-4 sm:p-6 lg:p-7 shadow-2xl relative my-auto max-h-[90dvh] flex flex-col">
+            <div id="onboarding-modal-card" class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl lg:max-w-5xl w-full p-4 sm:p-5 lg:p-6 shadow-2xl relative my-auto max-h-[90dvh] flex flex-col">
                 <!-- Botón Saltar con X en la esquina superior derecha -->
                 <button onclick="finishOnboardingAndStart()" id="onboarding-close-x" type="button" aria-label="Saltar guía" class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 py-1 px-2.5 sm:px-3 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors z-10 cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm font-semibold">
                     <span class="onboarding-skip-btn-text">Saltar</span>
@@ -540,7 +557,7 @@
                 </button>
                 
                 <!-- Wizard Navigation Header -->
-                <div class="shrink-0 pb-3 border-b border-slate-100 dark:border-slate-800 pr-24">
+                <div class="shrink-0 pb-2.5 border-b border-slate-100 dark:border-slate-800 pr-24">
                     <div class="flex items-center justify-between gap-2">
                         <div>
                             <h2 class="text-xs sm:text-sm font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider">Fundamentos de Prompting</h2>
@@ -550,144 +567,144 @@
                 </div>
 
                 <!-- Wizard Scrollable Body -->
-                <div id="onboarding-modal-body" class="flex-1 min-h-0 overflow-y-auto py-3 sm:py-4 pr-0.5 sm:pr-1">
+                <div id="onboarding-modal-body" class="flex-1 min-h-0 overflow-y-auto py-3 sm:py-3.5 pr-0.5 sm:pr-1">
                     <!-- Wizard Step 1: El Escenario -->
-                    <div id="onboarding-step-1" class="space-y-3 sm:space-y-4">
+                    <div id="onboarding-step-1" class="space-y-3">
                         <div>
-                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">¿Usas la IA de forma profesional?</h2>
-                            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">Pon a prueba tu criterio al redactar instrucciones para una IA y descubre la metodología que marca la diferencia entre respuestas mediocres y resultados de alto impacto.</p>
+                            <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">¿Usas la IA de forma profesional?</h2>
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Pon a prueba tu criterio al redactar instrucciones para una IA y descubre la metodología que marca la diferencia entre respuestas mediocres y resultados de alto impacto.</p>
                         </div>
 
-                        <div class="p-4 sm:p-5 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3">
+                        <div class="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5">
                             <div class="flex items-center gap-2">
-                                <span class="text-xs sm:text-sm font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider font-mono bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">El Escenario</span>
+                                <span class="text-[11px] sm:text-xs font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider font-mono bg-blue-50 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">El Escenario</span>
                             </div>
-                            <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                            <p class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
                                 Estás a cargo de la estrategia de contenido para una campaña de concienciación sobre el impacto del uso excesivo de pantallas y redes sociales en el sueño, la salud mental y el bienestar integral.
                             </p>
-                            <p class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed">
+                            <p class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
                                 Tu meta es guiar al asistente de inteligencia artificial a lo largo de <strong class="text-slate-900 dark:text-white font-semibold">nueve tareas cotidianas (misiones)</strong> donde aprenderás a aplicar los fundamentos para obtener respuestas precisas, rigurosas y libres de alucinaciones.
                             </p>
                         </div>
                     </div>
 
                     <!-- Wizard Step 2: Instrucciones -->
-                    <div id="onboarding-step-2" class="hidden space-y-3 sm:space-y-4">
+                    <div id="onboarding-step-2" class="hidden space-y-3">
                         <div>
-                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Instrucciones de la Simulación</h2>
-                            <p class="text-sm sm:text-base text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Cuatro pasos para interactuar con el simulador:</p>
+                            <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">Instrucciones de la Simulación</h2>
+                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Cuatro pasos para interactuar con el simulador:</p>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1 sm:space-y-1.5">
                                 <div class="flex items-center gap-2 mb-0.5">
-                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">01</span>
-                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Analizar la misión</h4>
+                                    <span class="text-[11px] sm:text-xs font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">01</span>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Analizar la misión</h4>
                                 </div>
-                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Analizar y leer detenidamente la misión y la tarea asignada para resolver en la campaña.</p>
+                                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Analizar y leer detenidamente la misión y la tarea asignada para resolver en la campaña.</p>
                             </div>
 
-                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1 sm:space-y-1.5">
                                 <div class="flex items-center gap-2 mb-0.5">
-                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">02</span>
-                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Revisar y elegir</h4>
+                                    <span class="text-[11px] sm:text-xs font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">02</span>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Revisar y elegir</h4>
                                 </div>
-                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Revisar la interacción inicial en el chat y seleccionar la opción de prompt correspondiente. <strong class="text-slate-800 dark:text-slate-200 font-semibold">En móviles, presiona el botón inferior para desplegar las opciones.</strong></p>
+                                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Revisar la interacción inicial en el chat y seleccionar la opción de prompt correspondiente. <strong class="text-slate-800 dark:text-slate-200 font-semibold">En móviles, presiona el botón inferior para desplegar las opciones.</strong></p>
                             </div>
 
-                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1 sm:space-y-1.5">
                                 <div class="flex items-center gap-2 mb-0.5">
-                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">03</span>
-                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Evaluar respuesta</h4>
+                                    <span class="text-[11px] sm:text-xs font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">03</span>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Evaluar respuesta</h4>
                                 </div>
-                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Leer con atención la respuesta generada por la IA para determinar si lo hizo bien de acuerdo a tu criterio.</p>
+                                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Leer con atención la respuesta generada por la IA para determinar si lo hizo bien de acuerdo a tu criterio.</p>
                             </div>
 
-                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1.5 sm:space-y-2">
+                            <div class="bg-slate-50/80 dark:bg-slate-900/60 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800/90 flex flex-col justify-start space-y-1 sm:space-y-1.5">
                                 <div class="flex items-center gap-2 mb-0.5">
-                                    <span class="text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2.5 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">04</span>
-                                    <h4 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Mostrar veredicto</h4>
+                                    <span class="text-[11px] sm:text-xs font-mono font-bold text-blue-600 dark:text-sky-400 bg-blue-50 dark:bg-sky-950/80 px-2 py-0.5 rounded border border-blue-200 dark:border-sky-800/50">04</span>
+                                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Mostrar veredicto</h4>
                                 </div>
-                                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Pulsar en «Mostrar veredicto» para saber si la opción fue la correcta y descubrir las claves metodológicas.</p>
+                                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-relaxed">Pulsar en «Mostrar veredicto» para saber si la opción fue la correcta y descubrir las claves metodológicas.</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Wizard Step 3: Herramienta Adicional (Laboratorio de Prompts) -->
-                    <div id="onboarding-step-3" class="hidden space-y-3 sm:space-y-4">
+                    <div id="onboarding-step-3" class="hidden space-y-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">Herramienta Adicional: Laboratorio de Prompts</h2>
-                                <p class="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-medium">Experimentación y auditoría en vivo con Gemini</p>
+                                <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">Herramienta Adicional: Laboratorio de Prompts</h2>
+                                <p class="text-[11px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-medium">Experimentación y auditoría en vivo con Gemini</p>
                             </div>
                         </div>
 
-                        <div class="space-y-3 bg-slate-50 dark:bg-slate-800/40 p-3.5 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-sm leading-relaxed">
+                        <div class="space-y-2.5 bg-slate-50 dark:bg-slate-800/40 p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm leading-relaxed">
                             <div>
-                                <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
-                                    <span class="text-base">🧪</span>
+                                <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-1.5 text-xs sm:text-sm">
+                                    <span class="text-sm">🧪</span>
                                     <span>¿Qué es el Laboratorio de Prompts?</span>
                                 </h4>
-                                <p class="text-slate-600 dark:text-slate-300">
+                                <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
                                     Es un entorno libre donde puedes redactar y probar tus propias instrucciones, ver cómo responde la inteligencia artificial en tiempo real y solicitar una <strong>Auditoría Técnica</strong> para optimizar y perfeccionar tus prompts.
                                 </p>
                             </div>
 
                             <div class="pt-2 border-t border-slate-200/70 dark:border-slate-700/60">
-                                <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
-                                    <span class="text-base">🎯</span>
+                                <h4 class="font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-1.5 text-xs sm:text-sm">
+                                    <span class="text-sm">🎯</span>
                                     <span>¿Cuándo usarlo?</span>
                                 </h4>
-                                <p class="text-slate-600 dark:text-slate-300">
+                                <p class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed">
                                     Te sugerimos <strong>completar primero las 9 misiones</strong> del simulador para dominar los fundamentos y, a continuación, utilizar el Laboratorio para poner a prueba, perfeccionar y llevar a un nivel profesional tus propios prompts de trabajo o proyectos personales.
                                 </p>
                             </div>
                         </div>
 
-                        <div class="p-3 sm:p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm flex items-center gap-2.5 leading-relaxed">
-                            <span class="text-base shrink-0">⚡</span>
+                        <div class="p-2.5 sm:p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2 leading-relaxed">
+                            <span class="text-sm shrink-0">⚡</span>
                             <span>También podrás acceder al Laboratorio en todo momento pulsando el botón «Laboratorio» en la barra superior o en el menú de navegación.</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Wizard Navigation Footer -->
-                <div class="shrink-0 pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div class="shrink-0 pt-2.5 border-t border-slate-100 dark:border-slate-800">
                     <!-- Controls for Step 1 -->
                     <div id="onboarding-nav-step-1" class="flex flex-row items-center justify-end">
-                        <button onclick="nextOnboardingStep()" type="button" class="btn-evaluate font-bold py-2 sm:py-2.5 px-5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ml-auto">
+                        <button onclick="nextOnboardingStep()" type="button" class="btn-evaluate font-bold py-2 px-5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm cursor-pointer ml-auto">
                             <span>Siguiente</span>
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
 
                     <!-- Controls for Step 2 -->
                     <div id="onboarding-nav-step-2" class="hidden flex flex-row items-center justify-between gap-2">
-                        <button onclick="prevOnboardingStep()" type="button" class="py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1 transition-colors cursor-pointer shrink-0">
-                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                        <button onclick="prevOnboardingStep()" type="button" class="py-2 px-3 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors cursor-pointer shrink-0">
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                             <span>Anterior</span>
                         </button>
-                        <button onclick="nextOnboardingStep()" type="button" class="btn-evaluate font-bold py-2 sm:py-2.5 px-4 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm cursor-pointer ml-auto">
+                        <button onclick="nextOnboardingStep()" type="button" class="btn-evaluate font-bold py-2 px-4 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm cursor-pointer ml-auto">
                             <span>Siguiente</span>
-                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
 
                     <!-- Controls for Step 3 -->
                     <div id="onboarding-nav-step-3" class="hidden grid grid-cols-3 items-center gap-1.5 sm:gap-2">
                         <div class="flex justify-start">
-                            <button onclick="prevOnboardingStep()" type="button" class="py-2 sm:py-2.5 px-2.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1 transition-colors cursor-pointer shrink-0">
-                                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                            <button onclick="prevOnboardingStep()" type="button" class="py-2 px-2.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1 transition-colors cursor-pointer shrink-0">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                                 <span>Anterior</span>
                             </button>
                         </div>
                         <div class="flex justify-center">
-                            <button onclick="closeOnboarding(); openLabIntroModal();" type="button" class="py-2 sm:py-2.5 px-2.5 sm:px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center whitespace-nowrap" title="Ir al Laboratorio de IA">
+                            <button onclick="closeOnboarding(); openLabIntroModal();" type="button" class="py-2 px-2.5 sm:px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/60 border border-indigo-200/80 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center whitespace-nowrap" title="Ir al Laboratorio de IA">
                                 <svg class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                                 </svg>
@@ -695,9 +712,9 @@
                             </button>
                         </div>
                         <div class="flex justify-end">
-                            <button onclick="finishOnboardingAndStart()" id="onboarding-start-btn" type="button" class="btn-evaluate font-bold py-2 sm:py-2.5 px-3.5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 shadow-sm text-center cursor-pointer shrink-0">
+                            <button onclick="finishOnboardingAndStart()" id="onboarding-start-btn" type="button" class="btn-evaluate font-bold py-2 px-3.5 sm:px-6 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-sm text-center cursor-pointer shrink-0">
                                 <span id="onboarding-start-btn-text">Iniciar</span>
-                                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
                         </div>
                     </div>
@@ -707,52 +724,52 @@
 
         <!-- Explanatory Modal before entering Lab -->
         <div id="lab-intro-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col text-left max-h-[92vh] overflow-y-auto relative" id="lab-intro-modal-content">
-                <button onclick="closeLabIntroModal()" type="button" aria-label="Volver / Cerrar" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Volver">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-4 sm:p-5 md:p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col text-left max-h-[92vh] overflow-y-auto relative" id="lab-intro-modal-content">
+                <button onclick="closeLabIntroModal()" type="button" aria-label="Volver / Cerrar" class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Volver">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
-                <div class="flex items-center gap-3.5 mb-4 pb-3.5 border-b border-slate-100 dark:border-slate-800 pr-8">
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="flex items-center gap-3 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800 pr-8">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">Laboratorio de pruebas de IA</h3>
-                        <p class="text-xs sm:text-sm text-blue-600 dark:text-sky-400 font-medium">Entorno de prueba y auditoría en tiempo real</p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">Laboratorio de pruebas de IA</h3>
+                        <p class="text-xs text-blue-600 dark:text-sky-400 font-medium">Entorno de prueba y auditoría en tiempo real</p>
                     </div>
                 </div>
 
-                <div class="space-y-4 text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed mb-5">
+                <div class="space-y-3 text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed mb-4">
                     <p>
                         Este espacio te permite experimentar directamente con un modelo de lenguaje real:
                     </p>
                     
-                    <div class="bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3.5">
-                        <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-sky-950 text-blue-700 dark:text-sky-400 flex items-center justify-center font-mono text-xs sm:text-sm font-bold shrink-0 mt-0.5">1</span>
+                    <div class="bg-slate-50 dark:bg-slate-800/40 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2.5">
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-6 h-6 rounded-lg bg-blue-100 dark:bg-sky-950 text-blue-700 dark:text-sky-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">1</span>
                             <p class="leading-relaxed"><strong class="text-slate-900 dark:text-slate-100 font-semibold">Ejecución Libre:</strong> Redacta cualquier prompt que desees probar y observa la respuesta generada al instante.</p>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-7 h-7 rounded-lg bg-blue-100 dark:bg-indigo-950 text-blue-700 dark:text-indigo-400 flex items-center justify-center font-mono text-xs sm:text-sm font-bold shrink-0 mt-0.5">2</span>
+                        <div class="flex items-start gap-2.5">
+                            <span class="w-6 h-6 rounded-lg bg-blue-100 dark:bg-indigo-950 text-blue-700 dark:text-indigo-400 flex items-center justify-center font-mono text-xs font-bold shrink-0 mt-0.5">2</span>
                             <p class="leading-relaxed"><strong class="text-slate-900 dark:text-slate-100 font-semibold">Auditoría Técnica:</strong> Solicita una revisión detallada de tu instrucción para verificar si cumple con las mejores prácticas de ingeniería de instrucciones y contexto actuales.</p>
                         </div>
                     </div>
 
-                    <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm flex items-start gap-3 leading-relaxed">
-                        <span class="text-amber-600 dark:text-amber-400 text-xl leading-none shrink-0 mt-0.5">💡</span>
+                    <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-start gap-2.5 leading-relaxed">
+                        <span class="text-amber-600 dark:text-amber-400 text-lg leading-none shrink-0 mt-0.5">💡</span>
                         <span><strong>Recomendación:</strong> Te sugerimos completar los tres niveles (nueve misiones) del simulador antes de auditar tus propios prompts para familiarizarte con las estrategias más efectivas.</span>
                     </div>
                 </div>
 
-                <div class="flex flex-row items-center gap-2 sm:gap-3">
-                    <button onclick="closeLabIntroModal()" type="button" class="py-2.5 sm:py-3 px-3.5 sm:px-5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
-                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <div class="flex flex-row items-center gap-2 sm:gap-2.5">
+                    <button onclick="closeLabIntroModal()" type="button" class="py-2 sm:py-2.5 px-3.5 sm:px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors text-center cursor-pointer flex items-center justify-center gap-1.5 shrink-0">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver</span>
                     </button>
-                    <button onclick="continueToLabFromIntro()" type="button" class="flex-1 btn-evaluate font-bold py-2.5 sm:py-3 px-3.5 sm:px-5 rounded-xl text-xs sm:text-sm transition-all shadow-sm text-center cursor-pointer flex items-center justify-center gap-1.5 truncate">
+                    <button onclick="continueToLabFromIntro()" type="button" class="flex-1 btn-evaluate font-bold py-2 sm:py-2.5 px-3.5 sm:px-4 rounded-xl text-xs sm:text-sm transition-all shadow-sm text-center cursor-pointer flex items-center justify-center gap-1.5 truncate">
                         <span class="truncate">Continuar al Laboratorio</span>
-                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
             </div>
@@ -975,19 +992,19 @@
                         </div>
                     </div>
 
-                    <div id="evaluation-view" class="hidden flex-col items-center justify-center p-5 bg-slate-50 dark:bg-slate-900/70 rounded-xl border border-slate-200 dark:border-slate-800 text-center space-y-3 my-auto fade-in">
-                        <div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div id="evaluation-view" class="hidden flex-col items-center justify-center p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/70 rounded-xl border border-slate-200 dark:border-slate-800 text-center space-y-2.5 my-auto fade-in">
+                        <div class="w-8 h-8 rounded-full bg-blue-50 dark:bg-sky-950 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-blue-600 dark:text-sky-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white">Respuesta generada</h3>
-                            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                            <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white">Respuesta generada</h3>
+                            <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
                                 Lee en el chat la respuesta de la IA. Analiza su estructura y rigor antes de continuar.
                             </p>
                         </div>
-                        <button onclick="revealFeedback()" class="w-full btn-evaluate font-bold py-2.5 sm:py-3 px-4 rounded-xl text-xs sm:text-sm shadow-sm">
+                        <button onclick="revealFeedback()" class="w-full btn-evaluate font-bold py-2 sm:py-2.5 px-4 rounded-xl text-xs sm:text-sm shadow-sm cursor-pointer">
                             Mostrar veredicto
                         </button>
                     </div>
@@ -997,85 +1014,85 @@
         </main>
 
         <!-- Mission Intro Modal -->
-        <div id="mission-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-40 overflow-y-auto p-3 sm:p-5 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-200 text-left space-y-4 my-auto relative" id="mission-modal-content">
-                <button onclick="closeMissionModal()" type="button" aria-label="Volver / Cerrar" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Volver">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <div id="mission-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-40 overflow-y-auto p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg w-full p-4 sm:p-5 shadow-2xl transform scale-95 transition-transform duration-200 text-left space-y-3 my-auto max-h-[92dvh] md:max-h-[88vh] overflow-y-auto relative" id="mission-modal-content">
+                <button onclick="closeMissionModal()" type="button" aria-label="Volver / Cerrar" class="absolute top-3 right-3 sm:top-3.5 sm:right-3.5 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Volver">
+                    <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
-                <div class="flex items-center gap-3.5 mb-1 pr-8">
-                    <div id="modal-mission-emoji" class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-2xl shrink-0 shadow-xs">📱</div>
+                <div class="flex items-center gap-2.5 mb-0.5 pr-8">
+                    <div id="modal-mission-emoji" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-xs">📱</div>
                     <div class="min-w-0">
-                        <div class="flex items-center gap-2 mb-0.5">
-                            <span class="text-xs font-mono font-bold text-blue-600 dark:text-sky-400 uppercase px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/50" id="modal-mission-level">Nivel 1</span>
+                        <div class="flex items-center gap-1.5 mb-0.5">
+                            <span class="text-[10px] sm:text-[11px] font-mono font-bold text-blue-600 dark:text-sky-400 uppercase px-2 py-0.5 rounded-md bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/50" id="modal-mission-level">Nivel 1</span>
                             <span class="text-xs text-slate-400" aria-hidden="true">·</span>
-                            <span class="text-xs font-mono font-bold text-slate-600 dark:text-slate-300 px-2.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" id="mission-number">Misión 1</span>
+                            <span class="text-[10px] sm:text-[11px] font-mono font-bold text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" id="mission-number">Misión 1</span>
                         </div>
                         <span id="modal-mission-category" class="text-xs font-medium text-slate-500 dark:text-slate-400">Campaña de Salud Mental</span>
                     </div>
                 </div>
-                <div class="pt-1">
-                    <span class="text-xs font-mono font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider block mb-1" id="mission-modal-header-tag">Detalles de la Misión</span>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-snug" id="mission-title">Tarea: Publicaciones sobre el uso de redes sociales</h2>
+                <div class="pt-0.5">
+                    <span class="text-[10px] sm:text-[11px] font-mono font-bold text-blue-600 dark:text-sky-400 uppercase tracking-wider block mb-0.5" id="mission-modal-header-tag">Detalles de la Misión</span>
+                    <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug" id="mission-title">Tarea: Publicaciones sobre el uso de redes sociales</h2>
                 </div>
-                <div class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed space-y-2 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800" id="mission-desc">
+                <div class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed space-y-2 bg-slate-50 dark:bg-slate-800/40 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800" id="mission-desc">
                     <!-- Populated by JS -->
                 </div>
-                <div class="pt-1">
-                    <button id="mission-action-btn" onclick="handleMissionAction()" class="w-full btn-evaluate font-bold py-3.5 px-6 rounded-xl text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                <div class="pt-0.5">
+                    <button id="mission-action-btn" onclick="handleMissionAction()" class="w-full btn-evaluate font-bold py-2.5 px-4 rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
                         <span>Iniciar Conversación</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Feedback Modal -->
-        <div id="feedback-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-3 sm:p-5 lg:p-6 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg md:max-w-xl w-full p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative" id="feedback-content">
+        <div id="feedback-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg md:max-w-xl w-full p-4 sm:p-5 shadow-2xl transform scale-95 transition-transform duration-200 space-y-3 my-auto max-h-[92dvh] md:max-h-[88vh] overflow-y-auto relative" id="feedback-content">
                 
-                <div class="flex items-center justify-between gap-3.5 pb-3.5 border-b border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div id="modal-icon" class="w-12 h-12 shrink-0 rounded-xl flex items-center justify-center text-2xl font-bold shadow-sm"></div>
+                <div class="flex items-center justify-between gap-3 pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div id="modal-icon" class="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl flex items-center justify-center text-lg font-bold shadow-sm"></div>
                         <div class="min-w-0 flex-1">
-                            <h2 id="modal-title" class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-snug"></h2>
-                            <p id="modal-subtitle" class="text-sm text-slate-500 dark:text-slate-400 mt-0.5"></p>
+                            <h2 id="modal-title" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-snug"></h2>
+                            <p id="modal-subtitle" class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5"></p>
                         </div>
                     </div>
-                    <button onclick="closeFeedbackModal()" type="button" aria-label="Volver al chat" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0" title="Volver al chat">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <button onclick="closeFeedbackModal()" type="button" aria-label="Volver al chat" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0" title="Volver al chat">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
                 <div>
-                    <h4 class="text-xs sm:text-sm font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 font-bold flex items-center gap-1.5">
-                        <span class="text-sm">📊</span>
+                    <h4 class="text-[10px] sm:text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1 font-bold flex items-center gap-1.5">
+                        <span class="text-xs">📊</span>
                         <span>Análisis del Comportamiento</span>
                     </h4>
-                    <p id="modal-text" class="text-slate-700 dark:text-slate-300 text-sm sm:text-base leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-xl border border-slate-200 dark:border-slate-800"></p>
+                    <p id="modal-text" class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"></p>
                 </div>
 
-                <div class="bg-blue-50/60 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-900/50 p-4 sm:p-5 relative border-l-4 border-l-blue-600 dark:border-l-sky-500">
-                    <div class="flex items-center gap-1.5 mb-1.5 text-blue-700 dark:text-sky-400 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider" id="modal-concept-letter">
+                <div class="bg-blue-50/60 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-900/50 p-3 sm:p-3.5 relative border-l-4 border-l-blue-600 dark:border-l-sky-500">
+                    <div class="flex items-center gap-1.5 mb-0.5 text-blue-700 dark:text-sky-400 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider" id="modal-concept-letter">
                         <span>💡</span>
                         <span>APRENDIZAJES CLAVE</span>
                     </div>
-                    <p id="modal-concept-title" class="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg mb-1"></p>
-                    <p id="modal-concept-text" class="text-slate-600 dark:text-slate-300 text-sm sm:text-base leading-relaxed"></p>
+                    <p id="modal-concept-title" class="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm mb-0.5"></p>
+                    <p id="modal-concept-text" class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed"></p>
                 </div>
 
                 <div id="first-try-incorrect-review-container" class="hidden">
-                    <button onclick="openIncorrectOptionsReview()" id="first-try-review-btn" type="button" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-all cursor-pointer">
-                        <span class="text-base">🔍</span>
+                    <button onclick="openIncorrectOptionsReview()" id="first-try-review-btn" type="button" class="w-full flex items-center justify-center gap-2 py-2 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-semibold transition-all cursor-pointer">
+                        <span class="text-sm">🔍</span>
                         <span>Ver por qué las otras opciones eran incorrectas</span>
                     </button>
                 </div>
 
-                <div class="flex flex-col sm:flex-row gap-2.5 pt-1">
-                    <button onclick="closeFeedbackModal()" type="button" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <div class="flex flex-col sm:flex-row gap-2 pt-0.5">
+                    <button onclick="closeFeedbackModal()" type="button" class="py-2 sm:py-2.5 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver al Chat</span>
                     </button>
-                    <button id="modal-btn" class="flex-1 py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all active:scale-98 text-white shadow-md cursor-pointer order-1 sm:order-2">
+                    <button id="modal-btn" class="flex-1 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all active:scale-98 text-white shadow-md cursor-pointer order-1 sm:order-2">
                         Continuar
                     </button>
                 </div>
@@ -1084,62 +1101,62 @@
 
         <!-- Modal para Revisar Opciones Incorrectas (cuando se acierta a la primera) -->
         <div id="incorrect-options-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-[60] overflow-y-auto p-3 sm:p-5 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg md:max-w-xl w-full p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative" id="incorrect-options-content">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-lg md:max-w-xl w-full p-4 sm:p-5 shadow-2xl transform scale-95 transition-transform duration-200 space-y-3.5 my-auto relative" id="incorrect-options-content">
                 
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <span class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700/60 text-amber-700 dark:text-amber-400 flex items-center justify-center text-sm font-bold shrink-0">🔍</span>
+                <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-950/80 border border-amber-300 dark:border-amber-700/60 text-amber-700 dark:text-amber-400 flex items-center justify-center text-xs font-bold shrink-0">🔍</span>
                         <div class="min-w-0">
-                            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold block truncate" id="incorrect-opt-badge">Análisis de Opciones Descartadas</span>
-                            <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate" id="incorrect-opt-tag-title">Opción A</h3>
+                            <span class="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold block truncate" id="incorrect-opt-badge">Análisis de Opciones Descartadas</span>
+                            <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate" id="incorrect-opt-tag-title">Opción A</h3>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 shrink-0">
-                        <span class="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-mono font-bold whitespace-nowrap" id="incorrect-opt-counter">1/2</span>
-                        <button onclick="returnFromIncorrectReviewToFeedback()" type="button" aria-label="Volver" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Volver">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-mono font-bold whitespace-nowrap" id="incorrect-opt-counter">1/2</span>
+                        <button onclick="returnFromIncorrectReviewToFeedback()" type="button" aria-label="Volver" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" title="Volver">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                 </div>
 
                 <!-- Texto del prompt de la opción descartada -->
-                <div class="p-3.5 bg-slate-50 dark:bg-slate-900/70 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">Texto del Prompt Descartado:</span>
+                <div class="p-3 bg-slate-50 dark:bg-slate-900/70 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <span class="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">Texto del Prompt Descartado:</span>
                     <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic" id="incorrect-opt-prompt-text"></p>
                 </div>
 
                 <!-- Análisis del por qué falló -->
                 <div>
-                    <div class="flex items-center gap-2.5 mb-2">
-                        <div id="incorrect-opt-icon" class="w-8 h-8 rounded-lg flex items-center justify-center text-base font-bold shrink-0"></div>
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <div id="incorrect-opt-icon" class="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold shrink-0"></div>
                         <div>
-                            <h4 id="incorrect-opt-title" class="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight"></h4>
-                            <p id="incorrect-opt-subtitle" class="text-xs text-slate-500 dark:text-slate-400"></p>
+                            <h4 id="incorrect-opt-title" class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight"></h4>
+                            <p id="incorrect-opt-subtitle" class="text-[10px] text-slate-500 dark:text-slate-400"></p>
                         </div>
                     </div>
-                    <p id="incorrect-opt-feedback-text" class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800"></p>
+                    <p id="incorrect-opt-feedback-text" class="text-slate-700 dark:text-slate-300 text-xs sm:text-sm leading-relaxed bg-slate-50 dark:bg-slate-800/40 p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-800"></p>
                 </div>
 
                 <!-- Concepto pedagógico que faltó -->
-                <div class="bg-amber-50/60 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/50 p-3.5 sm:p-4 relative border-l-4 border-l-amber-500 dark:border-l-amber-400">
-                    <div class="flex items-center gap-1.5 mb-1 text-amber-800 dark:text-amber-400 text-xs font-mono font-bold uppercase tracking-wider">
+                <div class="bg-amber-50/60 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/50 p-3 sm:p-3.5 relative border-l-4 border-l-amber-500 dark:border-l-amber-400">
+                    <div class="flex items-center gap-1.5 mb-0.5 text-amber-800 dark:text-amber-400 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-wider">
                         ¿QUÉ FALLÓ EN ESTA ESTRUCTURA?
                     </div>
                     <p id="incorrect-opt-concept-title" class="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm mb-0.5"></p>
-                    <p id="incorrect-opt-concept-text" class="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed"></p>
+                    <p id="incorrect-opt-concept-text" class="text-slate-600 dark:text-slate-300 text-xs leading-relaxed"></p>
                 </div>
 
                 <!-- Footer Navigation Buttons -->
-                <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2.5">
-                    <button onclick="returnFromIncorrectReviewToFeedback()" type="button" class="py-2.5 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm flex items-center gap-1 transition-colors cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <div class="pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <button onclick="returnFromIncorrectReviewToFeedback()" type="button" class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center gap-1 transition-colors cursor-pointer">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver</span>
                     </button>
-                    <div class="flex items-center gap-2">
-                        <button id="incorrect-opt-prev-btn" onclick="prevIncorrectOption()" type="button" class="py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors cursor-pointer">
+                    <div class="flex items-center gap-1.5">
+                        <button id="incorrect-opt-prev-btn" onclick="prevIncorrectOption()" type="button" class="py-2 px-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors cursor-pointer">
                             ← Anterior
                         </button>
-                        <button id="incorrect-opt-next-btn" onclick="nextIncorrectOption()" type="button" class="btn-evaluate py-2.5 px-4 rounded-xl text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
+                        <button id="incorrect-opt-next-btn" onclick="nextIncorrectOption()" type="button" class="btn-evaluate py-2 px-3.5 rounded-xl text-white font-bold text-xs flex items-center gap-1 transition-all shadow-sm cursor-pointer">
                             <span>Siguiente</span>
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
@@ -1149,147 +1166,147 @@
         </div>
 
         <!-- Level Summary Modal -->
-        <div id="level-summary-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-3 sm:p-5 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative" id="level-summary-content">
+        <div id="level-summary-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-xl w-full p-4 sm:p-5 shadow-2xl transform scale-95 transition-transform duration-200 space-y-3.5 my-auto relative" id="level-summary-content">
                 
-                <div class="flex items-center justify-between gap-4 mb-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center gap-4 min-w-0">
-                        <div id="level-summary-icon" class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-2xl sm:text-3xl shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-2 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div id="level-summary-icon" class="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-2xl bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 flex items-center justify-center text-xl sm:text-2xl shadow-sm">
                             🔓
                         </div>
                         <div class="min-w-0">
-                            <h2 id="level-summary-title" class="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white leading-snug"></h2>
+                            <h2 id="level-summary-title" class="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-snug"></h2>
                         </div>
                     </div>
-                    <button onclick="closeLevelSummaryModal()" type="button" aria-label="Volver / Cerrar" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0" title="Volver">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <button onclick="closeLevelSummaryModal()" type="button" aria-label="Volver / Cerrar" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0" title="Volver">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
-                <div id="level-summary-body" class="space-y-4 text-slate-700 dark:text-slate-200">
+                <div id="level-summary-body" class="space-y-3 text-slate-700 dark:text-slate-200 text-xs sm:text-sm">
                     <!-- Populated by JS -->
                 </div>
 
-                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-2.5">
-                    <button onclick="closeLevelSummaryModal()" type="button" class="py-3.5 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm sm:text-base transition-colors flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <div class="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-2">
+                    <button onclick="closeLevelSummaryModal()" type="button" class="py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver</span>
                     </button>
-                    <button onclick="handleLevelSummaryAction()" class="flex-1 btn-evaluate font-bold py-3.5 px-6 rounded-xl text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer order-1 sm:order-2">
+                    <button onclick="handleLevelSummaryAction()" class="flex-1 btn-evaluate font-bold py-2.5 px-5 rounded-xl text-xs sm:text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer order-1 sm:order-2">
                         <span id="level-summary-btn-text">Continuar al Siguiente Nivel</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Completion Modal -->
-        <div id="completion-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-3 sm:p-5 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
-            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl transform scale-95 transition-transform duration-200 space-y-4 my-auto relative" id="completion-content">
+        <div id="completion-modal" class="fixed inset-0 bg-slate-900/60 dark:bg-black/75 backdrop-blur-sm z-50 overflow-y-auto p-3 sm:p-4 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center">
+            <div class="bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 rounded-2xl max-w-2xl w-full p-4 sm:p-5 md:p-6 shadow-2xl transform scale-95 transition-transform duration-200 space-y-3.5 my-auto relative" id="completion-content">
                 
-                <div class="flex items-center justify-between gap-4 mb-5 pb-5 border-b border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center gap-4 min-w-0">
-                        <div class="w-14 h-14 shrink-0 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center text-3xl shadow-sm">
+                <div class="flex items-center justify-between gap-3 mb-3 pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-11 h-11 sm:w-12 sm:h-12 shrink-0 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 flex items-center justify-center text-2xl shadow-sm">
                             🏆
                         </div>
                         <div class="min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 font-bold">Simulador Completado</span>
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-[10px] sm:text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 font-bold">Simulador Completado</span>
                             </div>
-                            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">¡Has dominado el método C.O.N.T.E.X.T.O.!</h2>
+                            <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">¡Has dominado el método C.O.N.T.E.X.T.O.!</h2>
                         </div>
                     </div>
-                    <button onclick="closeCompletionModal()" type="button" aria-label="Volver" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0" title="Volver al simulador">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    <button onclick="closeCompletionModal()" type="button" aria-label="Volver" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer shrink-0" title="Volver al simulador">
+                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
 
-                <div class="space-y-4 mb-6 text-base sm:text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                <div class="space-y-2.5 mb-3 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-normal">
                     <p>Has comprobado cómo estructurar instrucciones con este método transforma por completo la calidad, precisión y utilidad de las respuestas de la IA. Este es tu nuevo arsenal para el trabajo diario:</p>
                     
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-slate-50 dark:bg-slate-800/40 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">C</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Contexto:</strong> Aporta datos reales y antecedentes para evitar que la IA invente información.</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">C</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Contexto:</strong> Aporta datos reales y antecedentes para evitar que la IA invente información.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">O</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Objetivo:</strong> Define el propósito de fondo y a quién va dirigida la respuesta.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">O</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Objetivo:</strong> Define el propósito de fondo y a quién va dirigida la respuesta.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">N</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Nivel/Rol:</strong> Asigna un rol experto para que la IA analice con criterio crítico en vez de darte la razón por complacencia.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">N</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Nivel/Rol:</strong> Asigna un rol experto para que la IA analice con criterio crítico en vez de darte la razón por complacencia.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">T</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Tarea:</strong> Indica la acción concreta y el entregable exacto que necesitas.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">T</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Tarea:</strong> Indica la acción concreta y el entregable exacto que necesitas.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">E</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Especificaciones:</strong> Fija el tono, la extensión y las reglas de formato para evitar textos innecesariamente largos.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">E</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Especificaciones:</strong> Fija el tono, la extensión y las reglas de formato para evitar textos innecesariamente largos.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">X</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">eXclusiones y Ejemplos:</strong> Aclara qué errores o temas evitar y aporta ejemplos para guiar el estilo desde el primer intento.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">X</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">eXclusiones y Ejemplos:</strong> Aclara qué errores o temas evitar y aporta ejemplos para guiar el estilo desde el primer intento.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">T</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Tipo Salida:</strong> Exige un formato limpio y estructurado (tablas, listas, esquemas o viñetas) sin saludos ni rodeos.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">T</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Tipo Salida:</strong> Exige un formato limpio y estructurado (tablas, listas, esquemas o viñetas) sin saludos ni rodeos.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-sm sm:text-base shrink-0 mt-0.5">O</span>
-                            <span class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed"><strong class="text-slate-900 dark:text-white">Optimización:</strong> Pide a la IA autoverificar su respuesta antes de entregarla, evaluar con criterios objetivos y justificar sus conclusiones.</span>
+                        <div class="flex items-start gap-2">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs shrink-0 mt-0.5">O</span>
+                            <span class="text-slate-700 dark:text-slate-200 text-xs leading-snug"><strong class="text-slate-900 dark:text-white">Optimización:</strong> Pide a la IA autoverificar su respuesta antes de entregarla, evaluar con criterios objetivos y justificar sus conclusiones.</span>
                         </div>
                     </div>
 
-                    <div class="mt-3.5 p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed space-y-3">
-                        <div class="flex items-start gap-3">
-                            <span class="text-xl sm:text-2xl shrink-0 mt-0.5">🔄</span>
+                    <div class="mt-2.5 p-3 rounded-xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 text-slate-700 dark:text-slate-200 text-xs leading-normal space-y-2">
+                        <div class="flex items-start gap-2">
+                            <span class="text-base shrink-0 mt-0.5">🔄</span>
                             <div>
-                                <strong class="font-bold text-slate-900 dark:text-white block mb-1">Principio Esencial: Human-in-the-Loop y Flexibilidad</strong>
-                                <p class="text-slate-700 dark:text-slate-200 text-base sm:text-lg leading-relaxed">
+                                <strong class="font-bold text-slate-900 dark:text-white block mb-0.5">Principio Esencial: Human-in-the-Loop y Flexibilidad</strong>
+                                <p class="text-slate-700 dark:text-slate-200 text-xs leading-normal">
                                     La IA rara vez proporciona una respuesta perfecta al primer intento. El dominio del prompting no busca una perfección mágica e inmediata, sino una base sólida para <strong>iterar, contrastar y validar</strong> con tu propio criterio.
                                 </p>
                             </div>
                         </div>
-                        <div class="p-3.5 sm:p-4 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-amber-200 dark:border-amber-800/60 text-slate-700 dark:text-slate-200 flex items-start gap-3">
-                            <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0 text-lg">💡</span>
-                            <p class="text-base sm:text-lg leading-relaxed">
+                        <div class="p-2.5 rounded-lg bg-white/80 dark:bg-slate-900/80 border border-amber-200 dark:border-amber-800/60 text-slate-700 dark:text-slate-200 flex items-start gap-2">
+                            <span class="text-amber-600 dark:text-amber-400 font-bold shrink-0 text-sm">💡</span>
+                            <p class="text-[11px] sm:text-xs leading-normal">
                                 <strong class="text-slate-900 dark:text-white">Uso flexible del método:</strong> No en todas las interacciones se requiere aplicar las 8 variables de forma exhaustiva. Según la complejidad de cada tarea, puedes aplicar solo unas cuantas (ej. Rol + Tarea + Formato). C-O-N-T-E-X-T-O es una herramienta formativa para entrenar buenos hábitos y precisión, adaptable con flexibilidad a cada caso.
                             </p>
                         </div>
                     </div>
 
                     <!-- Cloud Save Card inside Completion Modal -->
-                    <div id="completion-cloud-save-card" class="mt-3.5 p-3.5 sm:p-4 rounded-xl bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-left">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-700/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 text-xl shadow-xs">
+                    <div id="completion-cloud-save-card" class="mt-3 p-3 rounded-xl bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-left">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-700/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 text-base shadow-xs">
                                 ☁️
                             </div>
                             <div>
-                                <h4 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">¿Guardar tu progreso en la nube?</h4>
-                                <p class="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300" id="completion-cloud-status">Crea una cuenta opcional o inicia sesión con Google para conservar tus 9 misiones superadas.</p>
+                                <h4 class="font-bold text-slate-900 dark:text-white text-xs">¿Guardar tu progreso en la nube?</h4>
+                                <p class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300" id="completion-cloud-status">Crea una cuenta opcional o inicia sesión con Google para conservar tus 9 misiones superadas.</p>
                             </div>
                         </div>
-                        <button onclick="openAuthModal()" id="completion-cloud-btn" type="button" class="w-full sm:w-auto shrink-0 py-2 sm:py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer">
+                        <button onclick="openAuthModal()" id="completion-cloud-btn" type="button" class="w-full sm:w-auto shrink-0 py-1.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer">
                             <span>Conectar Cuenta</span>
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </button>
                     </div>
                 </div>
 
-                <div id="share-toast" class="hidden mb-4 p-3 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-500/50 rounded-xl text-center text-sm text-emerald-800 dark:text-emerald-300 font-medium fade-in">
+                <div id="share-toast" class="hidden mb-3 p-2.5 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-500/50 rounded-xl text-center text-xs text-emerald-800 dark:text-emerald-300 font-medium fade-in">
                     ✓ Enlace de la herramienta copiado al portapapeles.
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <button onclick="handleShare()" class="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-semibold text-sm sm:text-base bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2.5 border-t border-slate-100 dark:border-slate-800">
+                    <button onclick="handleShare()" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
                         <svg class="w-4 h-4 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                         </svg>
                         Compartir Herramienta
                     </button>
-                    <button onclick="restartSimulation()" class="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-semibold text-sm sm:text-base btn-evaluate transition-all shadow-sm">
+                    <button onclick="restartSimulation()" class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-xs sm:text-sm btn-evaluate transition-all shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                         </svg>
@@ -1297,16 +1314,16 @@
                     </button>
                 </div>
 
-                <div class="mt-3 flex flex-col sm:flex-row gap-2.5">
-                    <button onclick="closeCompletionModal()" class="py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                <div class="mt-2.5 flex flex-col sm:flex-row gap-2">
+                    <button onclick="closeCompletionModal()" class="py-2.5 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                         <span>Volver al Simulador</span>
                     </button>
-                    <button onclick="closeCompletionModal(); openMissionsNavigator();" class="py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/70 dark:hover:bg-sky-900/70 border border-blue-200 dark:border-sky-800/80 text-blue-700 dark:text-sky-300 font-semibold text-sm transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                    <button onclick="closeCompletionModal(); openMissionsNavigator();" class="py-2.5 px-3.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/70 dark:hover:bg-sky-900/70 border border-blue-200 dark:border-sky-800/80 text-blue-700 dark:text-sky-300 font-semibold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
                         <span>🧭 Mapa de Misiones</span>
                     </button>
-                    <button onclick="openLabIntroModal()" class="flex-1 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-semibold text-sm sm:text-base bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
-                        <svg class="w-4 h-4 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button onclick="openLabIntroModal()" class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-semibold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition-colors">
+                        <svg class="w-3.5 h-3.5 text-blue-600 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                         </svg>
                         <span>Laboratorio de Prompts</span>
@@ -2694,6 +2711,17 @@
                     throw new Error("Respuesta vacía del modelo de IA.");
                 }
 
+                if (!backendResponse.ok && customKey && maxRetries > 0) {
+                    try {
+                        localStorage.removeItem('user_gemini_api_key');
+                        const input = document.getElementById('lab-custom-api-key');
+                        if (input) input.value = '';
+                        if (typeof updateApiKeyBadgeStatus === 'function') updateApiKeyBadgeStatus();
+                    } catch(e) {}
+                    // Reintentar de inmediato usando el secreto oficial del servidor
+                    return await callGeminiAPI(payload, 0);
+                }
+
                 const errJson = await backendResponse.json().catch(() => null);
                 const rawErrorMsg = errJson?.friendlyMessage || errJson?.error?.message || errJson?.error || `HTTP ${backendResponse.status}`;
                 const backendErrorType = errJson?.errorType;
@@ -2702,6 +2730,12 @@
 
                 if (classified.type === 'quota_exceeded') {
                     openApiKeyModal();
+                } else if (classified.type === 'invalid_key') {
+                    try {
+                        localStorage.removeItem('user_gemini_api_key');
+                        const input = document.getElementById('lab-custom-api-key');
+                        if (input) input.value = '';
+                    } catch(e) {}
                 }
 
                 const customErr = new Error(classified.description);
@@ -4336,14 +4370,14 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
             options.forEach((opt) => {
                 const btn = document.createElement('button');
-                btn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-900/90 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 transition-all duration-150 text-slate-800 dark:text-slate-200 flex items-start gap-3 group shadow-sm hover:border-slate-300 dark:hover:border-slate-700";
+                btn.className = "w-full text-left p-2.5 sm:p-3 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-900/90 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 transition-all duration-150 text-slate-800 dark:text-slate-200 flex items-start gap-2.5 sm:gap-3 group shadow-sm hover:border-slate-300 dark:hover:border-slate-700";
                 btn.onclick = () => selectOption(opt);
                 
                 btn.innerHTML = `
-                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-sky-950/60 border border-slate-200 dark:border-sky-800/60 flex items-center justify-center text-xs sm:text-sm font-mono font-bold text-blue-600 dark:text-sky-400 shrink-0 group-hover:bg-blue-50 dark:group-hover:bg-sky-900/50 group-hover:border-blue-300 dark:group-hover:border-sky-400 transition-colors mt-0.5">
+                    <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-slate-100 dark:bg-sky-950/60 border border-slate-200 dark:border-sky-800/60 flex items-center justify-center text-xs font-mono font-bold text-blue-600 dark:text-sky-400 shrink-0 group-hover:bg-blue-50 dark:group-hover:bg-sky-900/50 group-hover:border-blue-300 dark:group-hover:border-sky-400 transition-colors mt-0.5">
                         ${opt.tag}
                     </span>
-                    <span class="text-sm sm:text-base leading-relaxed text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                    <span class="text-xs sm:text-sm leading-snug text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                         ${opt.text}
                     </span>
                 `;
@@ -4370,7 +4404,7 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 mobileCta.id = 'mobile-options-cta';
                 mobileCta.className = 'md:hidden pt-2 fade-in';
                 mobileCta.innerHTML = `
-                    <button onclick="toggleMobileOptions()" type="button" class="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/90 dark:hover:bg-sky-900 border border-blue-200 dark:border-sky-500/40 text-blue-700 dark:text-sky-300 font-semibold text-sm sm:text-base transition-all shadow-sm">
+                    <button onclick="toggleMobileOptions()" type="button" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-sky-950/90 dark:hover:bg-sky-900 border border-blue-200 dark:border-sky-500/40 text-blue-700 dark:text-sky-300 font-semibold text-xs sm:text-sm transition-all shadow-sm">
                         <span>Ver opciones de respuesta</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -4400,24 +4434,24 @@ Devuelve tu análisis estrictamente en este formato Markdown:
 
         function createMessageBubble(sender, text) {
             const wrapper = document.createElement('div');
-            wrapper.className = `flex gap-3 fade-in ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            wrapper.className = `flex gap-2.5 sm:gap-3 fade-in ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
 
             if (sender === 'user') {
                 wrapper.innerHTML = `
-                    <div class="max-w-[85%] bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 text-slate-900 dark:text-slate-100 rounded-2xl rounded-tr-sm px-4 py-3 text-sm sm:text-base shadow-sm leading-relaxed">
-                        <span class="text-xs font-mono text-blue-600 dark:text-sky-400 block mb-1 font-semibold">Tú</span>
+                    <div class="max-w-[85%] bg-blue-50 dark:bg-sky-950/80 border border-blue-200 dark:border-sky-800/60 text-slate-900 dark:text-slate-100 rounded-2xl rounded-tr-sm px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm shadow-sm leading-relaxed">
+                        <span class="text-[11px] font-mono text-blue-600 dark:text-sky-400 block mb-0.5 font-semibold">Tú</span>
                         ${escapeHtml(text)}
                     </div>
                 `;
             } else {
                 wrapper.innerHTML = `
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0 mt-0.5">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-blue-600 dark:text-sky-400 shrink-0 mt-0.5">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                         </svg>
                     </div>
-                    <div class="max-w-[85%] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tl-sm px-4 py-3 text-sm sm:text-base shadow-sm leading-relaxed markdown-rendered">
-                        <span class="text-xs font-mono text-slate-500 dark:text-slate-400 block mb-1 font-semibold">IA Asistente</span>
+                    <div class="max-w-[85%] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl rounded-tl-sm px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm shadow-sm leading-relaxed markdown-rendered">
+                        <span class="text-[11px] font-mono text-slate-500 dark:text-slate-400 block mb-0.5 font-semibold">IA Asistente</span>
                         ${formatMarkdown(text)}
                     </div>
                 `;
@@ -4557,47 +4591,47 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 if (levelCompleted === 1) {
                     if (icon) icon.textContent = "🔓";
                     if (btnText) btnText.textContent = "Continuar al Nivel 2";
-                    title.innerHTML = '¡Nivel 1 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-xl sm:text-2xl font-bold">Variables Dominadas: C.O.N.</span>';
+                    title.innerHTML = '¡Nivel 1 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-lg sm:text-xl font-bold">Variables Dominadas: C.O.N.</span>';
                     body.innerHTML = `
-                        <p class="text-base sm:text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                        <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                             Has dominado las bases clave para que la IA entienda el contexto real de tu petición, capte la intención de fondo y evite inventar datos:
                         </p>
-                        <div class="space-y-4 pt-1">
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">C</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Contexto (Datos Reales y Antecedentes)</h3>
+                        <div class="space-y-3 pt-1">
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">C</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Contexto (Datos Reales y Antecedentes)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> La información, hechos reales y antecedentes que le proporcionas a la IA antes de pedirle un resultado concreto.
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> La IA genera texto a partir de probabilidades. Si no le das datos y contexto claros, tiende a rellenar los vacíos con generalidades o inventando información (alucinaciones).
                                 </div>
                             </div>
 
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">O</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Objetivo (Propósito y Destinatario)</h3>
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">O</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Objetivo (Propósito y Destinatario)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> El propósito principal de la respuesta y a quién va dirigida (por ejemplo: educar a un equipo, persuadir a un cliente, analizar opciones o tomar decisiones).
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Aclara el «para qué» y el «hacia quién». Sin un objetivo definido, la IA suele entregar respuestas superficiales o desconectadas de lo que realmente necesitas lograr.
                                 </div>
                             </div>
 
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">N</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Nivel / Rol (Postura Profesional y Criterio Crítico)</h3>
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">N</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Nivel / Rol (Postura Profesional y Criterio Crítico)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> El rol, la especialidad y el nivel de experiencia que le pides asumir a la IA (por ejemplo: auditor senior, científico de datos o especialista en evaluación).
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Evita que la IA simplemente te dé la razón por amabilidad y la orienta a analizar con criterio profesional, detectar posibles fallos y fundamentar sus argumentos.
                                 </div>
                             </div>
@@ -4606,47 +4640,47 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 } else if (levelCompleted === 2) {
                     if (icon) icon.textContent = "⚙️";
                     if (btnText) btnText.textContent = "Continuar al Nivel 3";
-                    title.innerHTML = '¡Nivel 2 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-xl sm:text-2xl font-bold">Variables Dominadas: T.E.X.</span>';
+                    title.innerHTML = '¡Nivel 2 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-lg sm:text-xl font-bold">Variables Dominadas: T.E.X.</span>';
                     body.innerHTML = `
-                        <p class="text-base sm:text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                        <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                             Has tomado el control de la estructura y el estilo, evitando respuestas innecesariamente largas y fijando límites claros:
                         </p>
-                        <div class="space-y-4 pt-1">
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">T</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Tarea (Directiva Clara y Entregable Práctico)</h3>
+                        <div class="space-y-3 pt-1">
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">T</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Tarea (Directiva Clara y Entregable Práctico)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> La acción específica y el producto final que necesitas que la IA elabore (por ejemplo: una matriz de riesgos, un protocolo de trabajo o un plan por fases).
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Define con exactitud el trabajo a realizar y evita que la IA se quede en una charla informal o en rodeos sin llegar al resultado práctico.
                                 </div>
                             </div>
 
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">E</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Especificaciones (Pautas de Tono y Extensión)</h3>
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">E</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Especificaciones (Pautas de Tono y Extensión)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> Las pautas sobre el tono, la extensión máxima o mínima, las secciones requeridas y el nivel de detalle técnico.
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Controla la tendencia de la IA a escribir de más, asegurando que el contenido sea conciso, directo y ajustado a tus necesidades.
                                 </div>
                             </div>
 
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">X</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">eXclusiones y Ejemplos (Límites y Few-Shot)</h3>
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">X</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">eXclusiones y Ejemplos (Límites y Few-Shot)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> Indicar con claridad qué errores, clichés o temas debe evitar la IA, junto con ejemplos de referencia (Few-Shot) para mostrar el estilo o formato exacto.
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Anticipa fallos comunes y alinea el resultado al estilo que buscas desde el primer intento, ahorrándote tiempo en correcciones posteriores.
                                 </div>
                             </div>
@@ -4655,48 +4689,48 @@ Devuelve tu análisis estrictamente en este formato Markdown:
                 } else if (levelCompleted === 3) {
                     if (icon) icon.textContent = "🏆";
                     if (btnText) btnText.textContent = "Ver Resumen Completo del Método";
-                    title.innerHTML = '¡Nivel 3 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-xl sm:text-2xl font-bold">Variables Dominadas: T.O.</span>';
+                    title.innerHTML = '¡Nivel 3 Completado!<br><span class="text-blue-600 dark:text-sky-400 text-lg sm:text-xl font-bold">Variables Dominadas: T.O.</span>';
                     body.innerHTML = `
-                        <p class="text-base sm:text-lg text-slate-700 dark:text-slate-200 leading-relaxed">
+                        <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                             Has alcanzado el control total del formato de entrega y de la calidad del razonamiento de la IA:
                         </p>
-                        <div class="space-y-4 pt-1">
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">T</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Tipo de Salida (Formato Limpio y Directo)</h3>
+                        <div class="space-y-3 pt-1">
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">T</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Tipo de Salida (Formato Limpio y Directo)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> El formato exacto en el que deseas la respuesta (por ejemplo: tablas estructuradas, listas ordenadas, viñetas o texto directo sin introducciones).
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Elimina saludos o textos de cortesía innecesarios y te entrega un resultado limpio, listo para copiar, usar o integrar en tus herramientas de trabajo.
                                 </div>
                             </div>
 
-                            <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
-                                <div class="flex items-center gap-3">
-                                    <span class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-base shrink-0 shadow-xs">O</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">Optimización (Autoverificación y Criterios Objetivos)</h3>
+                            <div class="p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-blue-100 dark:bg-sky-950 border border-blue-200 dark:border-sky-800 flex items-center justify-center text-blue-700 dark:text-sky-300 font-mono font-bold text-xs sm:text-sm shrink-0 shadow-xs">O</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">Optimización (Autoverificación y Criterios Objetivos)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed pl-12">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-9 sm:pl-10">
                                     <strong class="text-slate-900 dark:text-white">Definición:</strong> Instrucciones para que la IA revise su respuesta antes de entregarla, evalúe con criterios objetivos y justifique el porqué de sus conclusiones.
                                 </p>
-                                <div class="mt-1 p-3.5 rounded-xl bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-12 text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+                                <div class="mt-0.5 p-2.5 sm:p-3 rounded-lg bg-white dark:bg-slate-900/80 border-l-4 border-blue-600 dark:border-sky-500 shadow-xs ml-9 sm:ml-10 text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio clave:</strong> Fuerza a la IA a verificar su propia lógica, evitando que dé respuestas superficiales o invente datos, lo que garantiza resultados sólidos y confiables.
                                 </div>
                             </div>
 
                             <!-- Nota Humano en el Bucle -->
-                            <div class="p-4 sm:p-5 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 space-y-3">
-                                <div class="flex items-center gap-2.5">
-                                    <span class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-sm shrink-0">🔄</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white text-base sm:text-lg">El Humano en el Bucle (Human-in-the-Loop)</h3>
+                            <div class="p-3 sm:p-4 rounded-xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-600/40 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/60 border border-amber-300 dark:border-amber-700/80 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold text-xs shrink-0">🔄</span>
+                                    <h3 class="font-bold text-slate-900 dark:text-white text-xs sm:text-sm">El Humano en el Bucle (Human-in-the-Loop)</h3>
                                 </div>
-                                <p class="text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+                                <p class="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                                     La IA no ofrece respuestas perfectas al primer intento. El prompting profesional busca crear una base sólida para que la persona pueda <strong>iterar, refinar y corregir</strong>.
                                 </p>
-                                <div class="p-3.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs text-sm sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+                                <div class="p-2.5 sm:p-3 rounded-lg bg-white/80 dark:bg-slate-900/80 border-l-4 border-amber-500 shadow-xs text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                                     <strong class="text-slate-900 dark:text-white font-semibold">Principio rector:</strong> Aunque los modelos actuales cuenten con razonamiento paso a paso ('Thinking'), dar instrucciones explícitas de <strong>autoverificación y optimización</strong> reduce alucinaciones y eleva la calidad, pero la <strong>supervisión y validación humana</strong> siempre es indispensable.
                                 </div>
                             </div>

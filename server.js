@@ -13,13 +13,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.use(express.json());
 
-// Helper to dynamically resolve the best API key available
-function resolveApiKey(customKey) {
-  if (typeof customKey === 'string' && customKey.trim().length > 10 && customKey.trim() !== 'MY_GEMINI_API_KEY') {
-    return customKey.trim();
-  }
-
-  // Check dynamically in .dev.env.json (updated by AI Studio UI when secrets are modified)
+// Helper to dynamically resolve server secret from .dev.env.json or process.env
+function getServerSecret() {
   try {
     const devEnvPaths = [
       path.join(__dirname, '../.dev.env.json'),
@@ -47,24 +42,20 @@ function resolveApiKey(customKey) {
   return undefined;
 }
 
-// Helper to get GoogleGenAI client with proper API key
-function getGeminiClient(customKey) {
-  const key = resolveApiKey(customKey);
-
-  console.log('Gemini client key available:', key ? `${key.slice(0, 8)}... (len ${key.length})` : 'none');
-
-  const options = {
-    httpOptions: {
-      headers: {
-        'User-Agent': 'aistudio-build'
-      }
-    }
-  };
-  if (key) {
-    options.apiKey = key;
+// Helper to get candidate keys (server secret first, then custom key as fallback)
+function getCandidateKeys(customKey) {
+  const keys = [];
+  const serverKey = getServerSecret();
+  if (serverKey) {
+    keys.push(serverKey);
   }
-
-  return { ai: new GoogleGenAI(options), hasKey: Boolean(key) };
+  if (typeof customKey === 'string' && customKey.trim().length > 10 && customKey.trim() !== 'MY_GEMINI_API_KEY') {
+    const trimmed = customKey.trim();
+    if (!keys.includes(trimmed)) {
+      keys.push(trimmed);
+    }
+  }
+  return keys;
 }
 
 // Serve the main HTML file at root, mapping to the user's HTML entry point
@@ -93,9 +84,9 @@ async function handleGeminiRequest(req, res) {
     }
 
     const customKey = (req.headers && (req.headers['x-goog-api-key'] || req.headers['x-api-key'])) || bodyKey;
-    const { ai, hasKey } = getGeminiClient(customKey);
+    const candidateKeys = getCandidateKeys(customKey);
 
-    if (!hasKey) {
+    if (candidateKeys.length === 0) {
       return res.status(401).json({
         error: 'No se encontró una API Key configurada. Por favor, asegúrate de ingresar una API Key en la configuración de secretos o en el campo del Laboratorio.',
         errorType: 'missing_key',
@@ -103,7 +94,7 @@ async function handleGeminiRequest(req, res) {
       });
     }
 
-    console.log(`[handleGeminiRequest] Received request for model: ${model}, customKey: ${Boolean(customKey)}`);
+    console.log(`[handleGeminiRequest] Received request for model: ${model}, candidateKeys count: ${candidateKeys.length}`);
 
     // Modelos con cuota gratuita garantizada (Flash y Flash-Lite)
     // Se priorizan modelos ligeros de bajo consumo sin costo
@@ -144,35 +135,56 @@ async function handleGeminiRequest(req, res) {
     let lastError = null;
     let lastStatus = 503;
 
-    for (const currentModel of candidateModels) {
-      try {
-        const response = await ai.models.generateContent({
-          model: currentModel,
-          contents: formattedContents,
-          config: {
-            maxOutputTokens: 2048,
-            ...(sysInst ? { systemInstruction: sysInst } : {}),
-            ...(generationConfig || {})
-          }
-        });
+    // Loop through candidate keys (starting with authoritative server secret)
+    keyLoop: for (const keyToUse of candidateKeys) {
+      const ai = new GoogleGenAI({
+        apiKey: keyToUse,
+        httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
+      });
 
-        if (response && response.text) {
-          responseData = {
-            text: response.text,
-            candidates: [{
-              content: {
-                parts: [{ text: response.text }]
-              }
-            }],
-            usedModel: currentModel
-          };
-          console.log(`[Gemini API] Solicitud exitosa con modelo con cuota gratuita: ${currentModel}`);
-          break;
+      for (const currentModel of candidateModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model: currentModel,
+            contents: formattedContents,
+            config: {
+              maxOutputTokens: 2048,
+              ...(sysInst ? { systemInstruction: sysInst } : {}),
+              ...(generationConfig || {})
+            }
+          });
+
+          if (response && response.text) {
+            responseData = {
+              text: response.text,
+              candidates: [{
+                content: {
+                  parts: [{ text: response.text }]
+                }
+              }],
+              usedModel: currentModel
+            };
+            console.log(`[Gemini API] Solicitud exitosa con modelo con cuota gratuita: ${currentModel}`);
+            break keyLoop;
+          }
+        } catch (genErr) {
+          lastError = genErr.message || String(genErr);
+          lastStatus = genErr.status || (lastError.includes('429') ? 429 : (lastError.includes('400') ? 400 : 503));
+          console.warn(`[Gemini API] Error con modelo ${currentModel}: ${lastError}`);
+          const errLower = lastError.toLowerCase();
+          if (
+            lastStatus === 400 || 
+            lastStatus === 401 || 
+            lastStatus === 403 || 
+            errLower.includes('api key') || 
+            errLower.includes('api_key') || 
+            errLower.includes('permission') || 
+            errLower.includes('unauthorized') ||
+            errLower.includes('forbidden')
+          ) {
+            break; // Try next candidate key immediately
+          }
         }
-      } catch (genErr) {
-        lastError = genErr.message || String(genErr);
-        lastStatus = genErr.status || (lastError.includes('429') ? 429 : (lastError.includes('400') ? 400 : 503));
-        console.warn(`[Gemini API] Error con modelo ${currentModel}: ${lastError}. Probando siguiente modelo...`);
       }
     }
 
